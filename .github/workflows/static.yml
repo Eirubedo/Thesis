@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hikiko-mori: Digital Mental Health Solution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow-x: hidden;
+        }
+
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            margin: auto;
+            height: 100vh;
+        }
+
+        .slide {
+            display: none;
+            padding: 40px;
+            text-align: center;
+            height: 100vh;
+            position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide h1 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .slide h2 {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: #4a5568;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .slide h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #667eea;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .slide p, .slide li {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .slide ul {
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .slide li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .slide li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+            max-width: 800px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            animation: slideUp 1s ease-out 0.5s both;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+            max-width: 1000px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .navigation {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(102, 126, 234, 0.8);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 1);
+            transform: translateY(-2px);
+        }
+
+        .slide-counter {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+        }
+
+        .problem-highlight {
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 5px solid #e74c3c;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .solution-highlight {
+            background: rgba(46, 204, 113, 0.1);
+            border-left: 5px solid #2ecc71;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #666;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .team-info {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            max-width: 600px;
+        }
+
+        @media (max-width: 768px) {
+            .slide h1 { font-size: 2.5rem; }
+            .slide h2 { font-size: 2rem; }
+            .slide h3 { font-size: 1.5rem; }
+            .slide p, .slide li { font-size: 1rem; }
+            .slide { padding: 20px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="slideshow-container">
+        <div class="slide-counter">
+            <span id="slideNumber">1</span> / <span id="totalSlides">12</span>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="logo">🏠💙</div>
+            <h1>Hikiko-mori</h1>
+            <p class="subtitle">Digital Mental Health Solution for Social Isolation</p>
+            <div class="team-info">
+                <h3>Developed by UI Nursing Masters Program</h3>
+                <p><strong>Team:</strong> Laras Steffiani, Eka Putri Yulianti, Amalia Choirunnisa, Pratiwi Tangkawarow, Sophia Euodia A, Uswatun Khasanah</p>
+                <p><strong>University:</strong> Universitas Indonesia - Faculty of Nursing</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Problem Statement -->
+        <div class="slide">
+            <h2>The Growing Crisis</h2>
+            <div class="problem-highlight">
+                <h3>Social Isolation & Loneliness Epidemic</h3>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">30%</span>
+                    <div class="stat-label">Global population experiencing chronic loneliness</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">12%</span>
+                    <div class="stat-label">Indonesian adults with limited social interaction</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">21%</span>
+                    <div class="stat-label">Reduction potential through digital intervention</div>
+                </div>
+            </div>
+            <p>Social isolation affects not just mental health, but also physical wellbeing, leading to increased depression, anxiety, cardiovascular issues, and immune system disorders.</p>
+        </div>
+
+        <!-- Slide 3: Market Gap -->
+        <div class="slide">
+            <h2>Current Solution Gaps</h2>
+            <ul>
+                <li>Existing apps target general populations, not specifically isolated individuals</li>
+                <li>Lack of anonymity and personalization for vulnerable users</li>
+                <li>No integrated approach combining consultation, simulation, AI support, and routine management</li>
+                <li>Cultural stigma prevents many from seeking traditional help</li>
+                <li>Limited accessibility to professional mental health services</li>
+            </ul>
+            <div class="problem-highlight">
+                <p><strong>The Need:</strong> A comprehensive, anonymous, and culturally-sensitive digital platform specifically designed for individuals experiencing social isolation.</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Solution Overview -->
+        <div class="slide">
+            <h2>Introducing Hikiko-mori</h2>
+            <div class="solution-highlight">
+                <h3>Comprehensive Digital Mental Health Platform</h3>
+            </div>
+            <p>An integrated mobile application designed to support social reintegration and reduce isolation through:</p>
+            <ul>
+                <li>Anonymous professional consultations</li>
+                <li>Interactive social skill simulations</li>
+                <li>AI-powered chatbot companion</li>
+                <li>Personalized daily activity scheduling</li>
+                <li>Progress tracking and gamification</li>
+                <li>Community support features</li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: Key Features -->
+        <div class="slide">
+            <h2>Core Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🔍</span>
+                    <h3>Dynamic Screening</h3>
+                    <p>Adaptive questionnaires that adjust based on user profile and cultural context</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🤖</span>
+                    <h3>AI Chatbot</h3>
+                    <p>Machine learning-powered companion for daily conversation practice with emotional feedback</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎭</span>
+                    <h3>Social Simulations</h3>
+                    <p>Interactive scenarios to practice social skills in a safe, virtual environment</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">👥</span>
+                    <h3>Virtual Community</h3>
+                    <p>Moderated forums with expert guidance and peer support groups</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📅</span>
+                    <h3>Activity Scheduler</h3>
+                    <p>Personalized daily routines to build positive social habits gradually</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔒</span>
+                    <h3>Anonymous & Secure</h3>
+                    <p>Complete privacy protection with encrypted data and anonymous interactions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: User Journey -->
+        <div class="slide">
+            <h2>User Journey</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto;">
+                <div style="text-align: center; flex: 1;">
+                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">1</div>
+                    <h3>Assessment</h3>
+                    <p>Dynamic screening & personalized evaluation</p>
+                </div>
+                <div style="color: #667eea; font-size: 2rem;">→</div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">2</div>
+                    <h3>Practice</h3>
+                    <p>AI chatbot & social skill simulations</p>
+                </div>
+                <div style="color: #667eea; font-size: 2rem;">→</div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">3</div>
+                    <h3>Connect</h3>
+                    <p>Community engagement & professional consultation</p>
+                </div>
+                <div style="color: #667eea; font-size: 2rem;">→</div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">4</div>
+                    <h3>Progress</h3>
+                    <p>Track improvement & celebrate milestones</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Validation Results -->
+        <div class="slide">
+            <h2>Early Validation Results</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">82.7</span>
+                    <div class="stat-label">System Usability Scale Score</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">83%</span>
+                    <div class="stat-label">Found interface easy to navigate</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">4.1/5</span>
+                    <div class="stat-label">Overall user satisfaction rating</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">83%</span>
+                    <div class="stat-label">Would recommend to others</div>
+                </div>
+            </div>
+            <p><strong>User Feedback Highlights:</strong></p>
+            <ul>
+                <li>Significant improvement in understanding mental health conditions</li>
+                <li>AI chatbot effectively supports conversation practice</li>
+                <li>Educational content helps users understand hikikomori concepts</li>
+                <li>Strong demand for community features and group support</li>
+            </ul>
+        </div>
+
+        <!-- Slide 8: Technology & Innovation -->
+        <div class="slide">
+            <h2>Technology Innovation</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🧠</span>
+                    <h3>Machine Learning</h3>
+                    <p>Adaptive AI that learns from user interactions to provide personalized responses</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h3>Mobile-First Design</h3>
+                    <p>Responsive, intuitive interface optimized for smartphone usage</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎮</span>
+                    <h3>Gamification</h3>
+                    <p>Progress tracking, achievements, and motivation systems</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔐</span>
+                    <h3>Privacy-First</h3>
+                    <p>End-to-end encryption and anonymous interaction capabilities</p>
+                </div>
+            </div>
+            <p>Built on proven mHealth frameworks with integration of CBT principles, social learning theory, and digital therapeutics best practices.</p>
+        </div>
+
+        <!-- Slide 9: Target Market -->
+        <div class="slide">
+            <h2>Target Market</h2>
+            <div style="display: flex; justify-content: space-around; align-items: flex-start; max-width: 1000px; margin: 0 auto;">
+                <div style="text-align: center; flex: 1; margin: 0 20px;">
+                    <h3>Primary Users</h3>
+                    <ul style="text-align: left;">
+                        <li>Young adults (18-35) experiencing social isolation</li>
+                        <li>Individuals with hikikomori tendencies</li>
+                        <li>People avoiding traditional therapy due to stigma</li>
+                        <li>Remote workers lacking social interaction</li>
+                    </ul>
+                </div>
+                <div style="text-align: center; flex: 1; margin: 0 20px;">
+                    <h3>Secondary Markets</h3>
+                    <ul style="text-align: left;">
+                        <li>Mental health professionals</li>
+                        <li>Healthcare institutions</li>
+                        <li>Corporate wellness programs</li>
+                        <li>Educational institutions</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="stat-card" style="margin: 30px auto; max-width: 400px;">
+                <span class="stat-number">12M+</span>
+                <div class="stat-label">Potential users in Indonesia alone based on Riskesdas 2018 data</div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Impact & Benefits -->
+        <div class="slide">
+            <h2>Expected Impact</h2>
+            <div style="display: flex; justify-content: space-around; max-width: 1000px; margin: 0 auto;">
+                <div style="flex: 1; margin: 0 20px;">
+                    <h3>👤 For Users</h3>
+                    <ul>
+                        <li>Reduced social anxiety & loneliness</li>
+                        <li>Improved communication skills</li>
+                        <li>Better mental health literacy</li>
+                        <li>Gradual social reintegration</li>
+                        <li>24/7 accessible support</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; margin: 0 20px;">
+                    <h3>🏥 For Healthcare</h3>
+                    <ul>
+                        <li>Extended reach to isolated populations</li>
+                        <li>Data-driven insights for treatment</li>
+                        <li>Reduced burden on traditional services</li>
+                        <li>Early intervention capabilities</li>
+                        <li>Cost-effective mental health support</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="solution-highlight" style="margin-top: 30px;">
+                <p><strong>Social Impact:</strong> Contributing to Indonesia's mental health infrastructure while addressing the growing post-pandemic isolation crisis.</p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Business Model -->
+        <div class="slide">
+            <h2>Business Model</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h3>Freemium Model</h3>
+                    <p>Basic features free, premium consultations and advanced AI features subscription-based</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🏢</span>
+                    <h3>B2B Partnerships</h3>
+                    <p>Corporate wellness programs, healthcare institutions, and educational organizations</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">💊</span>
+                    <h3>Digital Therapeutics</h3>
+                    <p>Evidence-based intervention platform for healthcare providers</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>Data Analytics</h3>
+                    <p>Anonymized insights for research institutions and public health organizations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Next Steps & Call to Action -->
+        <div class="slide">
+            <h2>Next Steps</h2>
+            <div style="display: flex; justify-content: space-between; max-width: 800px; margin: 30px auto;">
+                <div style="text-align: center; flex: 1;">
+                    <h3>Phase 1</h3>
+                    <p><strong>MVP Development</strong><br>Complete core features, extensive user testing, regulatory compliance</p>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <h3>Phase 2</h3>
+                    <p><strong>Pilot Launch</strong><br>Limited release, partnerships with mental health organizations</p>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <h3>Phase 3</h3>
+                    <p><strong>Scale & Expand</strong><br>National rollout, international markets, advanced AI features</p>
+                </div>
+            </div>
+            <div class="solution-highlight" style="margin: 40px 0;">
+                <h3>🚀 Ready to Transform Mental Health Care?</h3>
+                <p>Join us in building a solution that addresses one of society's most pressing challenges. Together, we can break the cycle of social isolation and create meaningful connections.</p>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" onclick="changeSlide(-1)">← Previous</button>
+            <button class="nav-btn" onclick="changeSlide(1)">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('slideNumber').textContent = currentSlide + 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Touch navigation for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) changeSlide(1);
+            if (touchEndX > touchStartX + 50) changeSlide(-1);
+        }
+
+        // Auto-advance slides (optional)
+        // setInterval(() => changeSlide(1), 30000);
+    </script>
+</body>
+</html>
