@@ -3,618 +3,448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hikiko-mori: Digital Mental Health Solution</title>
+    <title>Thesis Proposal: Eka Putri Yulianti - AI Mental Health Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* A soft, professional blue-gray */
+            color: #1e293b; /* slate-800 */
         }
-
-        .slideshow-container {
-            position: relative;
-            max-width: 100%;
-            margin: auto;
-            height: 100vh;
+        .section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
-
-        .slide {
-            display: none;
-            padding: 40px;
-            text-align: center;
-            height: 100vh;
-            position: relative;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #333;
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        .slide.active {
+        .roadmap-card {
+            background-color: white;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .roadmap-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .roadmap-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out, margin-top 0.7s ease-in-out;
+            background-color: #f8fafc; /* slate-50 */
+            border-radius: 0.75rem;
+        }
+        .roadmap-details.open {
+            max-height: 2500px; /* Increased max-height for new content */
+            margin-top: 1rem;
+        }
+        .highlight-card, .data-card, .theory-card {
+            background: linear-gradient(145deg, #ffffff, #e6eef5);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid white;
+        }
+        .connector {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 4rem;
         }
-
-        .slide h1 {
-            font-size: 3.5rem;
-            margin-bottom: 30px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 1s ease-out;
+        .connector i {
+            color: #94a3b8; /* slate-400 */
+            animation: bounce 2s infinite;
         }
-
-        .slide h2 {
-            font-size: 2.5rem;
-            margin-bottom: 25px;
-            color: #4a5568;
-            animation: fadeInUp 1s ease-out 0.2s both;
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
         }
-
-        .slide h3 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #667eea;
-            animation: fadeInUp 1s ease-out 0.3s both;
-        }
-
-        .slide p, .slide li {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            max-width: 800px;
-            animation: fadeInUp 1s ease-out 0.4s both;
-        }
-
-        .slide ul {
-            text-align: left;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .slide li {
-            margin-bottom: 10px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .slide li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin: 30px 0;
-            max-width: 800px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transform: translateY(20px);
-            animation: slideUp 1s ease-out 0.5s both;
-        }
-
         .stat-number {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #667eea;
-            display: block;
+            font-weight: 800;
+            color: #2563eb; /* blue-600 */
         }
-
-        .stat-label {
-            font-size: 1rem;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .features-grid {
+        .method-table-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
-            max-width: 1000px;
+            gap: 1rem;
         }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .navigation {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-        }
-
-        .nav-btn {
-            background: rgba(102, 126, 234, 0.8);
-            border: none;
+        .gemini-btn {
+            background-color: #4f46e5; /* indigo-600 */
             color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s, transform 0.3s;
         }
-
-        .nav-btn:hover {
-            background: rgba(102, 126, 234, 1);
-            transform: translateY(-2px);
+        .gemini-btn:hover {
+            background-color: #4338ca; /* indigo-700 */
+            transform: scale(1.05);
         }
-
-        .slide-counter {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 1rem;
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
         }
-
-        .problem-highlight {
-            background: rgba(231, 76, 60, 0.1);
-            border-left: 5px solid #e74c3c;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .solution-highlight {
-            background: rgba(46, 204, 113, 0.1);
-            border-left: 5px solid #2ecc71;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .logo {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 1.5rem;
-            color: #666;
-            margin-bottom: 40px;
-            font-weight: 300;
-        }
-
-        .team-info {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            margin: 30px 0;
-            max-width: 600px;
-        }
-
-        @media (max-width: 768px) {
-            .slide h1 { font-size: 2.5rem; }
-            .slide h2 { font-size: 2rem; }
-            .slide h3 { font-size: 1.5rem; }
-            .slide p, .slide li { font-size: 1rem; }
-            .slide { padding: 20px; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .features-grid { grid-template-columns: 1fr; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body>
-    <div class="slideshow-container">
-        <div class="slide-counter">
-            <span id="slideNumber">1</span> / <span id="totalSlides">12</span>
-        </div>
+<body class="antialiased">
 
-        <!-- Slide 1: Title -->
-        <div class="slide active">
-            <div class="logo">🏠💙</div>
-            <h1>Hikiko-mori</h1>
-            <p class="subtitle">Digital Mental Health Solution for Social Isolation</p>
-            <div class="team-info">
-                <h3>Developed by UI Nursing Masters Program</h3>
-                <p><strong>Team:</strong> Laras Steffiani, Eka Putri Yulianti, Amalia Choirunnisa, Pratiwi Tangkawarow, Sophia Euodia A, Uswatun Khasanah</p>
-                <p><strong>University:</strong> Universitas Indonesia - Faculty of Nursing</p>
-            </div>
-        </div>
+    <div class="max-w-4xl mx-auto p-4 md:p-8">
 
-        <!-- Slide 2: Problem Statement -->
-        <div class="slide">
-            <h2>The Growing Crisis</h2>
-            <div class="problem-highlight">
-                <h3>Social Isolation & Loneliness Epidemic</h3>
+        <!-- Header: Central Thesis -->
+        <header class="text-center my-12 section">
+            <div class="inline-block bg-white p-4 rounded-full shadow-lg mb-6">
+                <i data-lucide="brain-circuit" class="w-16 h-16 text-blue-600"></i>
             </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-number">30%</span>
-                    <div class="stat-label">Global population experiencing chronic loneliness</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">12%</span>
-                    <div class="stat-label">Indonesian adults with limited social interaction</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">21%</span>
-                    <div class="stat-label">Reduction potential through digital intervention</div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4 uppercase leading-tight">The Utilization of Artificial Intelligence-Based Mental Health Chatbot for Detecting Anxiety, Body Image Disorders, and Suicide Risk in Hypertension and Diabetes Mellitus Patients: A Mixed-Method Study</h1>
+            <p class="text-xl md:text-2xl text-blue-700 font-medium">Eka Putri Yulianti</p>
+            <p class="text-lg text-slate-500">NPM: 2306192680</p>
+            <div class="mt-4 text-sm text-slate-600">
+                <p><span class="font-semibold">Advisors:</span> Prof. Dr. Budi Anna Keliat, S.Kp., M.App., Sc & Prof. Dr. Achmad Nizar Hidayanto, S.Kom., M.Kom</p>
+            </div>
+        </header>
+        
+        <!-- Background Section -->
+        <div class="my-24 section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Background of the Problem</h2>
+                <p class="text-lg text-slate-600">Building context from a macro to micro scale.</p>
+            </div>
+            
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold text-center mb-6">Global & National Context</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="activity" class="mr-2 text-red-500"></i>Chronic Illness Prevalence</h4><div class="space-y-4"><div><p class="font-semibold">Hypertension</p><div class="flex justify-between items-center text-sm text-slate-500"><span>Global: 33.1%</span><span>Indonesia: 34.1%</span></div><div class="w-full bg-slate-200 rounded-full h-2.5 mt-1"><div class="bg-red-400 h-2.5 rounded-full" style="width: 34.1%"></div></div></div><div><p class="font-semibold">Diabetes</p><div class="flex justify-between items-center text-sm text-slate-500"><span>Global: 10.6%</span><span>Indonesia: 10.9%</span></div><div class="w-full bg-slate-200 rounded-full h-2.5 mt-1"><div class="bg-red-400 h-2.5 rounded-full" style="width: 10.9%"></div></div></div></div></div>
+                    <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="smile" class="mr-2 text-blue-500"></i>Mental Health Prevalence</h4><div class="space-y-4"><div><p class="font-semibold">Anxiety Disorders</p><div class="flex justify-between items-center text-sm text-slate-500"><span>Global: 4.05%</span><span>Indonesia: 3.7%</span></div><div class="w-full bg-slate-200 rounded-full h-2.5 mt-1"><div class="bg-blue-400 h-2.5 rounded-full" style="width: 3.7%"></div></div></div><div><p class="font-semibold">Depressive Disorders</p><div class="flex justify-between items-center text-sm text-slate-500"><span>Global: ~5%</span><span>Indonesia: 1.4%</span></div><div class="w-full bg-slate-200 rounded-full h-2.5 mt-1"><div class="bg-blue-400 h-2.5 rounded-full" style="width: 1.4%"></div></div></div></div></div>
                 </div>
             </div>
-            <p>Social isolation affects not just mental health, but also physical wellbeing, leading to increased depression, anxiety, cardiovascular issues, and immune system disorders.</p>
-        </div>
 
-        <!-- Slide 3: Market Gap -->
-        <div class="slide">
-            <h2>Current Solution Gaps</h2>
-            <ul>
-                <li>Existing apps target general populations, not specifically isolated individuals</li>
-                <li>Lack of anonymity and personalization for vulnerable users</li>
-                <li>No integrated approach combining consultation, simulation, AI support, and routine management</li>
-                <li>Cultural stigma prevents many from seeking traditional help</li>
-                <li>Limited accessibility to professional mental health services</li>
-            </ul>
-            <div class="problem-highlight">
-                <p><strong>The Need:</strong> A comprehensive, anonymous, and culturally-sensitive digital platform specifically designed for individuals experiencing social isolation.</p>
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold text-center mb-6">The Challenge of Diagnostic Accuracy</h3>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="data-card text-center"><p class="stat-number text-5xl">~5%</p><p class="font-semibold mt-1">Error Rate in Primary Care</p><p class="text-sm text-slate-500">with over half having potential for severe harm.</p></div>
+                    <div class="data-card text-center"><p class="stat-number text-5xl">23%</p><p class="font-semibold mt-1">Error Rate in Severe Cases</p><p class="text-sm text-slate-500">(ICU transfers / in-hospital deaths).</p></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Slide 4: Solution Overview -->
-        <div class="slide">
-            <h2>Introducing Hikiko-mori</h2>
-            <div class="solution-highlight">
-                <h3>Comprehensive Digital Mental Health Platform</h3>
-            </div>
-            <p>An integrated mobile application designed to support social reintegration and reduce isolation through:</p>
-            <ul>
-                <li>Anonymous professional consultations</li>
-                <li>Interactive social skill simulations</li>
-                <li>AI-powered chatbot companion</li>
-                <li>Personalized daily activity scheduling</li>
-                <li>Progress tracking and gamification</li>
-                <li>Community support features</li>
-            </ul>
-        </div>
-
-        <!-- Slide 5: Key Features -->
-        <div class="slide">
-            <h2>Core Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-icon">🔍</span>
-                    <h3>Dynamic Screening</h3>
-                    <p>Adaptive questionnaires that adjust based on user profile and cultural context</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🤖</span>
-                    <h3>AI Chatbot</h3>
-                    <p>Machine learning-powered companion for daily conversation practice with emotional feedback</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🎭</span>
-                    <h3>Social Simulations</h3>
-                    <p>Interactive scenarios to practice social skills in a safe, virtual environment</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">👥</span>
-                    <h3>Virtual Community</h3>
-                    <p>Moderated forums with expert guidance and peer support groups</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">📅</span>
-                    <h3>Activity Scheduler</h3>
-                    <p>Personalized daily routines to build positive social habits gradually</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🔒</span>
-                    <h3>Anonymous & Secure</h3>
-                    <p>Complete privacy protection with encrypted data and anonymous interactions</p>
+            <div>
+                <h3 class="text-2xl font-bold text-center mb-6">Case Study: Batutulis, Bogor</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="bar-chart-4" class="mr-2 text-blue-500"></i>Dominant Conditions</h4><p class="text-slate-600 text-sm">Registered cases are dominated by depression-anxiety (62%) and psychotic disorders (23%). The true figure is likely much higher.</p></div>
+                    <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="heart-pulse" class="mr-2 text-red-500"></i>The Mind-Body Link</h4><p class="text-slate-600 text-sm">Anxiety was found in 91.36% of hypertension patients and 100% of diabetes patients, creating a negative cycle in health management.</p></div>
+                    <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="users" class="mr-2 text-amber-500"></i>Socio-Cultural Barriers</h4><p class="text-slate-600 text-sm">Stigma, poverty (22.3% of families are pre-prosperous), and low mental health literacy (55% don't know early signs) hinder help-seeking.</p></div>
+                    <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="hospital" class="mr-2 text-green-500"></i>Service Landscape Challenges</h4><p class="text-slate-600 text-sm">Limited resources, infrastructure, and risk of misdiagnosis highlight the need for standardized and accurate assessment tools.</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 6: User Journey -->
-        <div class="slide">
-            <h2>User Journey</h2>
-            <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto;">
-                <div style="text-align: center; flex: 1;">
-                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">1</div>
-                    <h3>Assessment</h3>
-                    <p>Dynamic screening & personalized evaluation</p>
+        <!-- Research Questions Section -->
+        <div class="my-24 section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Research Questions</h2>
+                <p class="text-lg text-slate-600">What we aim to answer through research gaps.</p>
+            </div
+            <div class="data-card p-6 md:p-8">
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <i data-lucide="flask-conical" class="w-8 h-8 text-blue-500 mr-4 mt-1 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="font-bold">Validity & Accuracy</h4>
+                            <p class="text-slate-600">What is the diagnostic accuracy (F1-score, AUC) of the Venti chatbot in detecting depression, anxiety, and suicide risk compared to a gold standard set by clinical expert review?</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <i data-lucide="user-check" class="w-8 h-8 text-green-500 mr-4 mt-1 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="font-bold">Usability & User Experience</h4>
+                            <p class="text-slate-600">How do users perceive the usability of the Venti chatbot, as measured by the Chatbot Usability Questionnaire (CUQ)?</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <i data-lucide="message-circle-heart" class="w-8 h-8 text-purple-500 mr-4 mt-1 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="font-bold">Qualitative Analysis of Therapeutic Experience</h4>
+                            <p class="text-slate-600">What are the key thematic elements of empathy and conversational structure that emerge from user interactions with Venti, and how do these relate to the therapeutic experience?</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Systematic Review Section -->
+        <div id="sysrev-section" class="my-24 section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Systematic Review: AI for Mental Health Diagnosis (Sysrev)</h2>
+                <p class="text-lg text-slate-600">Assessing the Potential and Pitfalls of NLP-Based Diagnostic Tools.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="trending-up" class="mr-2 text-green-500"></i>Strong Diagnostic Performance</h4><p class="text-slate-600 text-sm"><strong>70.6%</strong> of studies showed good performance (AUC: 0.77–0.92). LLMs (GPT-4, BERT) significantly <strong>outperformed traditional methods</strong>, with AUC > 0.90 in depression detection.</p></div>
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="globe-2" class="mr-2 text-orange-500"></i>Cultural Adaptation Challenges</h4><p class="text-slate-600 text-sm"><strong>Mixed to poor performance (29.4%)</strong> was found in non-English contexts (e.g., Bahasa Malaysia F1=0.66) and with multimodal models, highlighting generalization challenges.</p></div>
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="shield-alert" class="mr-2 text-red-500"></i>Ethical & Methodological Gaps</h4><p class="text-slate-600 text-sm">Data privacy was <strong>underreported (70.6%)</strong>, algorithmic bias persists, and <strong>82.4% of studies are from high-income countries</strong>, limiting generalizability to low-resource settings.</p></div>
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="lightbulb" class="mr-2 text-blue-500"></i>Implications & Recommendations</h4><p class="text-slate-600 text-sm">NLP has great potential, but successful integration requires <strong>robust external validation, diverse datasets, and rigorous Randomized Controlled Trials (RCTs)</strong> to ensure relevance and equity.</p></div>
+            </div>
+            <div class="text-center mt-8">
+                <button id="summarize-sysrev-btn" class="gemini-btn font-bold py-2 px-4 rounded-full inline-flex items-center">
+                    <span class="mr-2">✨</span> Ringkasan
+                </button>
+                <div id="sysrev-summary-loader" class="hidden mx-auto mt-4 loader"></div>
+                <div id="sysrev-summary" class="hidden mt-4 data-card text-left p-4"></div>
+            </div>
+        </div>
+
+        <!-- Visual Roadmap -->
+        <div id="roadmap" class="space-y-4 section">
+            <div class="section">
+                <div class="roadmap-card" data-target="details-methodology">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg mr-4"><i data-lucide="file-check-2"></i></div>
+                        <div><p class="font-semibold text-slate-500">Manuscripts & Methods</p><h3 class="text-xl font-bold text-slate-800">Detailed Methodology & Validation Workflow</h3></div>
+                        <i data-lucide="chevron-down" class="ml-auto text-slate-400 transition-transform"></i>
+                    </div>
                 </div>
-                <div style="color: #667eea; font-size: 2rem;">→</div>
-                <div style="text-align: center; flex: 1;">
-                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">2</div>
-                    <h3>Practice</h3>
-                    <p>AI chatbot & social skill simulations</p>
-                </div>
-                <div style="color: #667eea; font-size: 2rem;">→</div>
-                <div style="text-align: center; flex: 1;">
-                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">3</div>
-                    <h3>Connect</h3>
-                    <p>Community engagement & professional consultation</p>
-                </div>
-                <div style="color: #667eea; font-size: 2rem;">→</div>
-                <div style="text-align: center; flex: 1;">
-                    <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">4</div>
-                    <h3>Progress</h3>
-                    <p>Track improvement & celebrate milestones</p>
+                <div id="details-methodology" class="roadmap-details">
+                    <div class="p-4 md:p-6 space-y-8">
+                        <div>
+                            <h4 class="text-xl font-bold text-slate-800 mb-4 text-center">Thesis Methodology Overview</h4>
+                            <div class="space-y-6">
+                                <div class="bg-white p-4 rounded-lg border border-slate-200"><p class="font-bold text-blue-600 mb-2">Aim 1: Build & Validate the LLM + RAG Pipeline</p><div class="method-table-grid text-sm"><div><p class="font-semibold">Data & Frameworks</p><p class="text-slate-600">NANDA, NIC, NOC, DSM-V; Public depression & suicide dialogue dataset.</p></div><div><p class="font-semibold">Methods & Tools</p><p class="text-slate-600">RAG (Elasticsearch + dense embeddings); LLM API (e.g., GPT-4) with SCANNING-driven prompts; Optional Speech I/O.</p></div><div><p class="font-semibold">Evaluation & Metrics</p><p class="text-slate-600">Retrieval Accuracy (Precision@k, Recall@k); Diagnostic F1-score & AUC.</p></div></div></div>
+                                <div class="bg-white p-4 rounded-lg border border-slate-200"><p class="font-bold text-green-600 mb-2">Aim 2: Establish Gold Standard via Expert Review</p><div class="method-table-grid text-sm"><div><p class="font-semibold">Data & Frameworks</p><p class="text-slate-600">Pre-chat self-reports (GAD-7, PHQ-9, etc.); Venti interaction transcripts.</p></div><div><p class="font-semibold">Methods & Tools</p><p class="text-slate-600">Two psych-nursing experts independently code transcripts; Adjudication meeting.</p></div><div><p class="font-semibold">Evaluation & Metrics</p><p class="text-slate-600">Inter-rater reliability (Cohen’s κ); Sensitivity, specificity, κ vs. self-reports.</p></div></div></div>
+                                <div class="bg-white p-4 rounded-lg border border-slate-200"><p class="font-bold text-purple-600 mb-2">Aim 3: Assess Usability & Therapeutic Experience</p><div class="method-table-grid text-sm"><div><p class="font-semibold">Data & Frameworks</p><p class="text-slate-600">CUQ (Chatbot Usability Questionnaire); Interaction transcripts for qualitative analysis.</p></div><div><p class="font-semibold">Methods & Tools</p><p class="text-slate-600">Quantitative: CUQ score analysis (descriptive + regression in R); Qualitative: Interaction Process Analysis (IPA).</p></div><div><p class="font-semibold">Evaluation & Metrics</p><p class="text-slate-600">CUQ: mean ± SD; regression; Frequency of top 3–5 empathy-structure themes from IPA.</p></div></div></div>
+                            </div>
+                        </div>
+                        <hr class="border-slate-200">
+                        <div>
+                            <h4 class="text-xl font-bold text-slate-800 mb-4 text-center">Population & Sampling Method</h4>
+                             <div class="bg-white p-4 rounded-lg border border-slate-200 space-y-4">
+                                <div><p class="font-semibold text-slate-700">Location & Technique</p><p class="text-slate-600 text-sm">The study will be conducted in the community fostered by FIK UI & the Public Health Center in Batutulis, Bogor, using <strong>Convenience Sampling</strong>.</p></div>
+                                <div><p class="font-semibold text-slate-700">Target Population & Limitations</p><p class="text-slate-600 text-sm">Adults (21-59 years) with Diabetes Mellitus (DM), Hypertension (HT), or both. The study <strong>does not include other chronic diseases</strong> like cancer.</p></div>
+                                <div><p class="font-semibold text-slate-700">Sample Size Determination (G*Power)</p><div class="text-sm text-slate-600 grid grid-cols-2 md:grid-cols-3 gap-2 mt-2"><span><strong>Test:</strong> Z-Test (Logistic Regression)</span><span><strong>Effect Size (OR):</strong> 3.5</span><span><strong>Power (1-β):</strong> 0.95</span><span><strong>Significance (α):</strong> 0.05</span><span><strong>Tails:</strong> One-tailed</span><span><strong>Pr(Y=1|X=1) H0:</strong> 0.20</span></div><p class="text-slate-600 text-sm mt-3">This calculation indicates a minimum sample size of <strong>53 participants</strong>. To account for dropout, the recruitment target is set to <strong>60 participants</strong>.</p></div>
+                            </div>
+                        </div>
+                        <hr class="border-slate-200">
+                        <div>
+                            <h4 class="text-xl font-bold text-slate-800 mb-6 text-center">Validation Workflow</h4>
+                            <div class="relative space-y-6 pl-12">
+                                <div class="absolute left-6 top-5 bottom-5 w-0.5 bg-slate-200 border-l-2 border-dashed"></div>
+                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">1</span></div><div><p class="font-semibold">Pre-Interaction</p><p class="text-slate-600 text-sm">Participants complete GAD-7, PHQ-9, SRQ-20, C-SSRS.</p></div></div>
+                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">2</span></div><div><p class="font-semibold">Chat Session</p><p class="text-slate-600 text-sm">Interaction with Venti. Full transcript is captured and anonymized.</p></div></div>
+                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">3</span></div><div><p class="font-semibold">Expert Review</p><p class="text-slate-600 text-sm">Two experts code for risks. Cohen’s κ is calculated for consistency, then adjudicated for a "gold standard."</p></div></div>
+                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">4</span></div><div><p class="font-semibold">Performance Analysis</p><p class="text-slate-600 text-sm">Compute F1 & AUC of Venti’s flags against the gold-standard diagnosis. Cross-validate against self-report scores (Spearman’s ρ).</p></div></div>
+                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">5</span></div><div><p class="font-semibold">Usability & Experience</p><p class="text-slate-600 text-sm">Aggregate CUQ scores; run IPA on transcripts to surface care-structure themes.</p></div></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 7: Validation Results -->
-        <div class="slide">
-            <h2>Early Validation Results</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-number">82.7</span>
-                    <div class="stat-label">System Usability Scale Score</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">83%</span>
-                    <div class="stat-label">Found interface easy to navigate</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">4.1/5</span>
-                    <div class="stat-label">Overall user satisfaction rating</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">83%</span>
-                    <div class="stat-label">Would recommend to others</div>
-                </div>
+        <!-- THEORETICAL FRAMEWORK SECTION -->
+        <div id="theory-section" class="my-24 section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Theoretical Frameworks</h2>
+                <p class="text-lg text-slate-600">Underpinning the Concept of <span class="font-semibold text-purple-700">Compassionate Skepticism</span> in AI</p>
             </div>
-            <p><strong>User Feedback Highlights:</strong></p>
-            <ul>
-                <li>Significant improvement in understanding mental health conditions</li>
-                <li>AI chatbot effectively supports conversation practice</li>
-                <li>Educational content helps users understand hikikomori concepts</li>
-                <li>Strong demand for community features and group support</li>
-            </ul>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="shield-check" class="w-5 h-5 mr-2 text-purple-600"></i>Hunt–Vitell Ethical Model on AI (Ferrell & Ferrell, 2021) </h4><p class="text-slate-600 text-sm">Emphasizes moral awareness, judgment, and intent phases, adapted for AI to merge design empathy with rational control over machine decisions.</p></div>
+                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="handshake" class="w-5 h-5 mr-2 text-purple-600"></i>Trust as Reliance + "Extra Factor" (Durán & Formanek, 2021)</h4><p class="text-slate-600 text-sm">Defines trust in AI as a combination of system reliability (reliance) and moral commitment (extra factor), supporting "benefit of the doubt" and "cross-checking".</p></div>
+                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="layout-grid" class="w-5 h-5 mr-2 text-purple-600"></i>Ethical Framework (Ashok et al, 2022.)</h4><p class="text-slate-600 text-sm">Presents a four-domain ontology (physical, cognitive, information, governance) to map and balance ethical implications like fairness, autonomy, and privacy.</p></div>
+                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="file-check-2" class="w-5 h-5 mr-2 text-purple-600"></i>AI Trust Framework </h4><p class="text-slate-600 text-sm">Uses information theory to evaluate AI transparency and emphasizes audit, validation, and human-in-the-loop as forms of systematic cross-checking.</p></div>
+            </div>
+             <div class="text-center mt-8">
+                <button id="summarize-theory-btn" class="gemini-btn font-bold py-2 px-4 rounded-full inline-flex items-center">
+                    <span class="mr-2">✨</span> Ringkas untuk Awam
+                </button>
+                <div id="theory-summary-loader" class="hidden mx-auto mt-4 loader"></div>
+                <div id="theory-summary" class="hidden mt-4 data-card text-left p-4"></div>
+            </div>
         </div>
-
-        <!-- Slide 8: Technology & Innovation -->
-        <div class="slide">
-            <h2>Technology Innovation</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-icon">🧠</span>
-                    <h3>Machine Learning</h3>
-                    <p>Adaptive AI that learns from user interactions to provide personalized responses</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">📱</span>
-                    <h3>Mobile-First Design</h3>
-                    <p>Responsive, intuitive interface optimized for smartphone usage</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🎮</span>
-                    <h3>Gamification</h3>
-                    <p>Progress tracking, achievements, and motivation systems</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🔐</span>
-                    <h3>Privacy-First</h3>
-                    <p>End-to-end encryption and anonymous interaction capabilities</p>
-                </div>
-            </div>
-            <p>Built on proven mHealth frameworks with integration of CBT principles, social learning theory, and digital therapeutics best practices.</p>
-        </div>
-
-        <!-- Slide 9: Target Market -->
-        <div class="slide">
-            <h2>Target Market</h2>
-            <div style="display: flex; justify-content: space-around; align-items: flex-start; max-width: 1000px; margin: 0 auto;">
-                <div style="text-align: center; flex: 1; margin: 0 20px;">
-                    <h3>Primary Users</h3>
-                    <ul style="text-align: left;">
-                        <li>Young adults (18-35) experiencing social isolation</li>
-                        <li>Individuals with hikikomori tendencies</li>
-                        <li>People avoiding traditional therapy due to stigma</li>
-                        <li>Remote workers lacking social interaction</li>
-                    </ul>
-                </div>
-                <div style="text-align: center; flex: 1; margin: 0 20px;">
-                    <h3>Secondary Markets</h3>
-                    <ul style="text-align: left;">
-                        <li>Mental health professionals</li>
-                        <li>Healthcare institutions</li>
-                        <li>Corporate wellness programs</li>
-                        <li>Educational institutions</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="stat-card" style="margin: 30px auto; max-width: 400px;">
-                <span class="stat-number">12M+</span>
-                <div class="stat-label">Potential users in Indonesia alone based on Riskesdas 2018 data</div>
+        
+        <!-- Abstract Highlights Section -->
+        <div id="abstract-section" class="my-24 section">
+            <h2 class="text-3xl font-extrabold text-slate-900 text-center mb-8">Abstract Highlights</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="highlight-card"><h4 class="font-bold text-lg mb-2">Background</h4><p class="text-slate-600">Patients with chronic illness face elevated mental health risks; scalable, holistic tools are needed.</p></div>
+                <div class="highlight-card"><h4 class="font-bold text-lg mb-2">Objective</h4><p class="text-slate-600">To develop and evaluate Venti, an AI chatbot grounded in nursing epistemology.</p></div>
+                <div class="highlight-card"><h4 class="font-bold text-lg mb-2">Outcomes</h4><p class="text-slate-600">High diagnostic accuracy (AUC > 0.85), strong usability (CUQ), and rich thematic analysis of empathy.</p></div>
+                <div class="highlight-card"><h4 class="font-bold text-lg mb-2">Conclusion</h4><p class="text-slate-600">Successfully validates a new nursing-centric AI model for scalable, ethical mental health screening.</p></div>
             </div>
         </div>
 
-        <!-- Slide 10: Impact & Benefits -->
-        <div class="slide">
-            <h2>Expected Impact</h2>
-            <div style="display: flex; justify-content: space-around; max-width: 1000px; margin: 0 auto;">
-                <div style="flex: 1; margin: 0 20px;">
-                    <h3>👤 For Users</h3>
-                    <ul>
-                        <li>Reduced social anxiety & loneliness</li>
-                        <li>Improved communication skills</li>
-                        <li>Better mental health literacy</li>
-                        <li>Gradual social reintegration</li>
-                        <li>24/7 accessible support</li>
-                    </ul>
-                </div>
-                <div style="flex: 1; margin: 0 20px;">
-                    <h3>🏥 For Healthcare</h3>
-                    <ul>
-                        <li>Extended reach to isolated populations</li>
-                        <li>Data-driven insights for treatment</li>
-                        <li>Reduced burden on traditional services</li>
-                        <li>Early intervention capabilities</li>
-                        <li>Cost-effective mental health support</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="solution-highlight" style="margin-top: 30px;">
-                <p><strong>Social Impact:</strong> Contributing to Indonesia's mental health infrastructure while addressing the growing post-pandemic isolation crisis.</p>
-            </div>
+        <!-- Contribution -->
+        <div class="text-center section my-24">
+            <div class="inline-block bg-purple-100 p-4 rounded-full shadow-lg mb-4"><i data-lucide="award" class="w-12 h-12 text-purple-600"></i></div>
+            <h2 class="text-2xl font-extrabold text-slate-900">Contribution</h2>
+            <p class="text-lg text-purple-700">A validated, nursing-centric AI model for scalable, ethical mental health screening.</p>
         </div>
-
-        <!-- Slide 11: Business Model -->
-        <div class="slide">
-            <h2>Business Model</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-icon">📱</span>
-                    <h3>Freemium Model</h3>
-                    <p>Basic features free, premium consultations and advanced AI features subscription-based</p>
+        
+        <!-- Anticipated Impact Section -->
+        <div class="my-24 section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Anticipated Impact of the Study</h2>
+                <p class="text-lg text-slate-600">Projecting the benefits of our study for practice, science, and society.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="data-card p-6">
+                    <h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="stethoscope" class="mr-2 text-blue-500"></i>Clinical Impact</h4>
+                    <p class="text-slate-600 text-sm">Empowers nurses with an accurate screening tool, potentially reducing diagnostic errors and improving early detection. Increases patient access to preliminary mental health assessment, especially in resource-limited settings.</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🏢</span>
-                    <h3>B2B Partnerships</h3>
-                    <p>Corporate wellness programs, healthcare institutions, and educational organizations</p>
+                <div class="data-card p-6">
+                    <h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="cpu" class="mr-2 text-green-500"></i>Scientific & Technological Impact</h4>
+                    <p class="text-slate-600 text-sm">Provides a validated, nursing-informed AI model for a low-resource, non-English context. Contributes a unique dataset of Indonesian patient-chatbot interactions for future research on cultural and linguistic nuances in AI.</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">💊</span>
-                    <h3>Digital Therapeutics</h3>
-                    <p>Evidence-based intervention platform for healthcare providers</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">📊</span>
-                    <h3>Data Analytics</h3>
-                    <p>Anonymized insights for research institutions and public health organizations</p>
+                <div class="data-card p-6">
+                    <h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="building" class="mr-2 text-purple-500"></i>Community & Policy Impact</h4>
+                    <p class="text-slate-600 text-sm">Offers a scalable solution to address gaps in community mental health services. The findings can inform public health policies on integrating AI tools to improve healthcare equity and reduce the burden on primary care facilities.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 12: Next Steps & Call to Action -->
-        <div class="slide">
-            <h2>Next Steps</h2>
-            <div style="display: flex; justify-content: space-between; max-width: 800px; margin: 30px auto;">
-                <div style="text-align: center; flex: 1;">
-                    <h3>Phase 1</h3>
-                    <p><strong>MVP Development</strong><br>Complete core features, extensive user testing, regulatory compliance</p>
-                </div>
-                <div style="text-align: center; flex: 1;">
-                    <h3>Phase 2</h3>
-                    <p><strong>Pilot Launch</strong><br>Limited release, partnerships with mental health organizations</p>
-                </div>
-                <div style="text-align: center; flex: 1;">
-                    <h3>Phase 3</h3>
-                    <p><strong>Scale & Expand</strong><br>National rollout, international markets, advanced AI features</p>
-                </div>
-            </div>
-            <div class="solution-highlight" style="margin: 40px 0;">
-                <h3>🚀 Ready to Transform Mental Health Care?</h3>
-                <p>Join us in building a solution that addresses one of society's most pressing challenges. Together, we can break the cycle of social isolation and create meaningful connections.</p>
-            </div>
+        <!-- Gemini Future Research Section -->
+        <div class="my-24 section text-center">
+             <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Explore Future Directions</h2>
+             <p class="text-lg text-slate-600 mb-8">Let AI suggest the next steps for this research.</p>
+             <button id="suggest-research-btn" class="gemini-btn font-bold py-3 px-6 rounded-full inline-flex items-center text-lg">
+                <span class="mr-2">✨</span> Sarankan Pertanyaan Penelitian Baru
+            </button>
+            <div id="research-loader" class="hidden mx-auto mt-4 loader"></div>
+            <div id="research-suggestions" class="hidden mt-6 data-card text-left p-6"></div>
         </div>
 
-        <div class="navigation">
-            <button class="nav-btn" onclick="changeSlide(-1)">← Previous</button>
-            <button class="nav-btn" onclick="changeSlide(1)">Next →</button>
-        </div>
+
+        <footer class="text-center my-8 text-slate-400 section">
+            <p>Interactive Thesis Preview</p>
+        </footer>
+
     </div>
 
     <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-        const totalSlides = slides.length;
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
 
-        document.getElementById('totalSlides').textContent = totalSlides;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
 
-        function showSlide(n) {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (n + totalSlides) % totalSlides;
-            slides[currentSlide].classList.add('active');
-            document.getElementById('slideNumber').textContent = currentSlide + 1;
-        }
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
 
-        function changeSlide(direction) {
-            showSlide(currentSlide + direction);
-        }
+            const roadmapCards = document.querySelectorAll('.roadmap-card');
+            roadmapCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const targetId = card.dataset.target;
+                    const details = document.getElementById(targetId);
+                    const icon = card.querySelector('[data-lucide="chevron-down"]');
 
-        // Keyboard navigation
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'ArrowLeft') changeSlide(-1);
-            if (e.key === 'ArrowRight') changeSlide(1);
+                    document.querySelectorAll('.roadmap-details.open').forEach(openDetail => {
+                        if (openDetail.id !== targetId) {
+                            openDetail.classList.remove('open');
+                            const otherCard = document.querySelector(`[data-target="${openDetail.id}"]`);
+                            otherCard.querySelector('[data-lucide="chevron-down"]').style.transform = 'rotate(0deg)';
+                        }
+                    });
+
+                    details.classList.toggle('open');
+                    icon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+                });
+            });
+
+            // --- Gemini API Integration ---
+            const apiKey = ""; // API key will be injected by the environment.
+
+            async function callGemini(prompt, loaderElement, resultElement) {
+                loaderElement.style.display = 'block';
+                resultElement.style.display = 'none';
+                
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        // Simple markdown to HTML conversion
+                        let htmlText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold
+                        htmlText = htmlText.replace(/\n/g, '<br>'); // Newlines
+                        resultElement.innerHTML = htmlText;
+                    } else {
+                       resultElement.textContent = 'Maaf, respons tidak dapat dihasilkan saat ini.';
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    resultElement.textContent = 'Terjadi kesalahan saat menghubungi AI. Silakan coba lagi nanti.';
+                } finally {
+                    loaderElement.style.display = 'none';
+                    resultElement.style.display = 'block';
+                }
+            }
+
+            // Summarize Systematic Review
+            const summarizeSysrevBtn = document.getElementById('summarize-sysrev-btn');
+            summarizeSysrevBtn.addEventListener('click', () => {
+                const sysrevSection = document.getElementById('sysrev-section');
+                const textToSummarize = sysrevSection.querySelector('.text-lg').textContent + " " + Array.from(sysrevSection.querySelectorAll('.data-card p')).map(p => p.textContent).join(' ');
+                const prompt = `Summarize the following findings from a systematic review for a non-expert audience, like a patient or their family. Explain it in one simple paragraph in Indonesian:\n\n"${textToSummarize}"`;
+                callGemini(prompt, document.getElementById('sysrev-summary-loader'), document.getElementById('sysrev-summary'));
+            });
+
+            // Summarize Theoretical Frameworks
+            const summarizeTheoryBtn = document.getElementById('summarize-theory-btn');
+            summarizeTheoryBtn.addEventListener('click', () => {
+                const theorySection = document.getElementById('theory-section');
+                const textToSummarize = theorySection.querySelector('.text-lg').textContent + " " + Array.from(theorySection.querySelectorAll('.theory-card p')).map(p => p.textContent).join(' ');
+                const prompt = `Summarize these four complex theoretical frameworks for a nursing student. Explain the core idea of each in one sentence and how they connect, in one simple paragraph in Indonesian:\n\n"${textToSummarize}"`;
+                callGemini(prompt, document.getElementById('theory-summary-loader'), document.getElementById('theory-summary'));
+            });
+
+            // Suggest Future Research
+            const suggestResearchBtn = document.getElementById('suggest-research-btn');
+            suggestResearchBtn.addEventListener('click', () => {
+                const abstractText = document.getElementById('abstract-section').querySelector('.grid').textContent;
+                const researchQuestions = Array.from(document.querySelectorAll('.section .data-card ul li')).map(li => li.textContent).join('\n');
+                const prompt = `Based on the following thesis abstract and existing research questions, suggest three specific and innovative future research questions. Present them as a numbered list with a brief justification for each, in Indonesian:\n\n**Abstract:**\n${abstractText}\n\n**Existing Questions:**\n${researchQuestions}`;
+                callGemini(prompt, document.getElementById('research-loader'), document.getElementById('research-suggestions'));
+            });
+
         });
-
-        // Touch navigation for mobile
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        document.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        document.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            if (touchEndX < touchStartX - 50) changeSlide(1);
-            if (touchEndX > touchStartX + 50) changeSlide(-1);
-        }
-
-        // Auto-advance slides (optional)
-        // setInterval(() => changeSlide(1), 30000);
     </script>
 </body>
 </html>
