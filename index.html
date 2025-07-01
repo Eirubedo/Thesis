@@ -111,7 +111,7 @@
 
     <div class="max-w-4xl mx-auto p-4 md:p-8">
 
-        <!-- Header: Central Thesis -->
+       <!-- Header: Central Thesis -->
         <header class="text-center my-12 section">
             <div class="inline-block bg-white p-4 rounded-full shadow-lg mb-6">
                 <i data-lucide="brain-circuit" class="w-16 h-16 text-blue-600"></i>
@@ -121,8 +121,8 @@
             <p class="text-lg text-slate-500">NPM: 2306192680</p>
             <div class="mt-4 text-sm text-slate-600">
                 <p><span class="font-semibold">Advisors:</p>
-             <p><span class="font-semibold">Prof. Dr. Budi Anna Keliat, S.Kp., M.App., Sc </span> Faculty of Nursing, Universitas Indonesia</p>
-             <p><span class="font-semibold">Prof. Dr. Achmad Nizar Hidayanto, S.Kom., M.Kom</span>Faculty of Computer Science, Universitas Indonesia</p>
+             <p><span class="font-semibold">Prof. Dr. Budi Anna Keliat, S.Kp., M.App., Sc, </span> The Faculty of Nursing, Universitas Indonesia</p>
+             <p><span class="font-semibold">Prof. Dr. Achmad Nizar Hidayanto, S.Kom., M.Kom,</span> The Faculty of Computer Science, Universitas Indonesia</p>
             </div>
         </header>
         
@@ -160,33 +160,33 @@
             </div>
         </div>
 
-        <!-- Research Questions Section -->
+        <!-- REVISED: Research Questions Section -->
         <div class="my-24 section">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Research Questions</h2>
-                <p class="text-lg text-slate-600">What we aim to answer through research gaps.</p>
-            </div
+                <p class="text-lg text-slate-600">Guiding the investigation to bridge the identified gaps.</p>
+            </div>
             <div class="data-card p-6 md:p-8">
                 <ul class="space-y-4">
                     <li class="flex items-start">
                         <i data-lucide="flask-conical" class="w-8 h-8 text-blue-500 mr-4 mt-1 flex-shrink-0"></i>
                         <div>
-                            <h4 class="font-bold">Validity & Accuracy</h4>
-                            <p class="text-slate-600">What is the diagnostic accuracy (F1-score, AUC) of the Venti chatbot in detecting depression, anxiety, and suicide risk compared to a gold standard set by clinical expert review?</p>
+                            <h4 class="font-bold">Diagnostic Accuracy</h4>
+                            <p class="text-slate-600">How does the diagnostic accuracy (Sensitivity, Specificity, F1-Score, AUC) of the Venti chatbot compare to a clinical gold standard in identifying indicators of anxiety, depression, and suicide risk?</p>
                         </div>
                     </li>
                     <li class="flex items-start">
                         <i data-lucide="user-check" class="w-8 h-8 text-green-500 mr-4 mt-1 flex-shrink-0"></i>
                         <div>
-                            <h4 class="font-bold">Usability & User Experience</h4>
-                            <p class="text-slate-600">How do users perceive the usability of the Venti chatbot, as measured by the Chatbot Usability Questionnaire (CUQ)?</p>
+                            <h4 class="font-bold">User Perception</h4>
+                            <p class="text-slate-600">What are the user-perceived levels of usability (measured by CUQ) and trust (measured by S-TIAS) towards the Venti chatbot among patients with hypertension and diabetes?</p>
                         </div>
                     </li>
                     <li class="flex items-start">
                         <i data-lucide="message-circle-heart" class="w-8 h-8 text-purple-500 mr-4 mt-1 flex-shrink-0"></i>
                         <div>
-                            <h4 class="font-bold">Qualitative Analysis of Therapeutic Experience</h4>
-                            <p class="text-slate-600">What are the key thematic elements of empathy and conversational structure that emerge from user interactions with Venti, and how do these relate to the therapeutic experience?</p>
+                            <h4 class="font-bold">Therapeutic Communication</h4>
+                            <p class="text-slate-600">To what extent does the Venti chatbot employ therapeutic communication techniques, as defined by Stuart's Nurse-Patient Communication Model, in its interactions with users?</p>
                         </div>
                     </li>
                 </ul>
@@ -197,7 +197,6 @@
         <div id="sysrev-section" class="my-24 section">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Systematic Review: AI for Mental Health Diagnosis (Yulianti et al., 2025)</h2>
-                <p class="text-lg text-slate-600">Assessing the Potential and Pitfalls of NLP-Based Diagnostic Tools.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="trending-up" class="mr-2 text-green-500"></i>Strong Diagnostic Performance</h4><p class="text-slate-600 text-sm"><strong>70.6%</strong> of studies showed good performance (AUC: 0.77–0.92). LLMs (GPT-4, BERT) significantly <strong>outperformed traditional methods</strong>, with AUC > 0.90 in depression detection.</p></div>
@@ -205,7 +204,13 @@
                 <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="shield-alert" class="mr-2 text-red-500"></i>Ethical & Methodological Gaps</h4><p class="text-slate-600 text-sm">Data privacy was <strong>underreported (70.6%)</strong>, algorithmic bias persists, and <strong>82.4% of studies are from high-income countries</strong>, limiting generalizability to low-resource settings.</p></div>
                 <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="lightbulb" class="mr-2 text-blue-500"></i>Implications & Recommendations</h4><p class="text-slate-600 text-sm">NLP has great potential, but successful integration requires <strong>robust external validation, diverse datasets, and rigorous Randomized Controlled Trials (RCTs)</strong> to ensure relevance and equity.</p></div>
             </div>
-
+            <div class="text-center mt-8">
+                <button id="summarize-sysrev-btn" class="gemini-btn font-bold py-2 px-4 rounded-full inline-flex items-center">
+                    <span class="mr-2">✨</span> Explain
+                </button>
+                <div id="sysrev-summary-loader" class="hidden mx-auto mt-4 loader"></div>
+                <div id="sysrev-summary" class="hidden mt-4 data-card text-left p-4"></div>
+            </div>
         </div>
 
         <!-- Visual Roadmap -->
@@ -214,18 +219,45 @@
                 <div class="roadmap-card" data-target="details-methodology">
                     <div class="flex items-center">
                         <div class="bg-blue-100 text-blue-600 p-3 rounded-lg mr-4"><i data-lucide="file-check-2"></i></div>
-                        <div><p class="font-semibold text-slate-500">Manuscripts & Methods</p><h3 class="text-xl font-bold text-slate-800">Detailed Methodology & Validation Workflow</h3></div>
+                        <div><p class="font-semibold text-slate-500">Methodology</p><h3 class="text-xl font-bold text-slate-800">Data Analysis & Population</h3></div>
                         <i data-lucide="chevron-down" class="ml-auto text-slate-400 transition-transform"></i>
                     </div>
                 </div>
                 <div id="details-methodology" class="roadmap-details">
                     <div class="p-4 md:p-6 space-y-8">
+                        <!-- REVISED: Data Analysis Section -->
                         <div>
-                            <h4 class="text-xl font-bold text-slate-800 mb-4 text-center">Thesis Methodology Overview</h4>
+                            <h4 class="text-xl font-bold text-slate-800 mb-4 text-center">Data Analysis</h4>
+                            <p class="text-center text-slate-600 mb-6 text-sm">Data analysis will be conducted through three complementary approaches. All data will be anonymized, using R Studio for quantitative analysis and NVivo for qualitative analysis.</p>
                             <div class="space-y-6">
-                                <div class="bg-white p-4 rounded-lg border border-slate-200"><p class="font-bold text-blue-600 mb-2">Aim 1: Build & Validate the LLM + RAG Pipeline</p><div class="method-table-grid text-sm"><div><p class="font-semibold">Data & Frameworks</p><p class="text-slate-600">NANDA, NIC, NOC, DSM-V; Public depression & suicide dialogue dataset.</p></div><div><p class="font-semibold">Methods & Tools</p><p class="text-slate-600">RAG (Elasticsearch + dense embeddings); LLM API (e.g., GPT-4) with SCANNING-driven prompts; Optional Speech I/O.</p></div><div><p class="font-semibold">Evaluation & Metrics</p><p class="text-slate-600">Retrieval Accuracy (Precision@k, Recall@k); Diagnostic F1-score & AUC.</p></div></div></div>
-                                <div class="bg-white p-4 rounded-lg border border-slate-200"><p class="font-bold text-green-600 mb-2">Aim 2: Establish Gold Standard via Expert Review</p><div class="method-table-grid text-sm"><div><p class="font-semibold">Data & Frameworks</p><p class="text-slate-600">Pre-chat self-reports (GAD-7, PHQ-9, etc.); Venti interaction transcripts.</p></div><div><p class="font-semibold">Methods & Tools</p><p class="text-slate-600">Two psych-nursing experts independently code transcripts; Adjudication meeting.</p></div><div><p class="font-semibold">Evaluation & Metrics</p><p class="text-slate-600">Inter-rater reliability (Cohen’s κ); Sensitivity, specificity, κ vs. self-reports.</p></div></div></div>
-                                <div class="bg-white p-4 rounded-lg border border-slate-200"><p class="font-bold text-purple-600 mb-2">Aim 3: Assess Usability & Therapeutic Experience</p><div class="method-table-grid text-sm"><div><p class="font-semibold">Data & Frameworks</p><p class="text-slate-600">CUQ (Chatbot Usability Questionnaire); Interaction transcripts for qualitative analysis.</p></div><div><p class="font-semibold">Methods & Tools</p><p class="text-slate-600">Quantitative: CUQ score analysis (descriptive + regression in R); Qualitative: Interaction Process Analysis (IPA).</p></div><div><p class="font-semibold">Evaluation & Metrics</p><p class="text-slate-600">CUQ: mean ± SD; regression; Frequency of top 3–5 empathy-structure themes from IPA.</p></div></div></div>
+                                <div class="bg-white p-4 rounded-lg border border-slate-200">
+                                    <p class="font-bold text-blue-600 mb-2">Pillar 1: Diagnostic Accuracy Analysis (AI vs. Clinical Experts)</p>
+                                    <ul class="list-disc list-inside text-slate-600 text-sm space-y-2">
+                                        <li>Focuses on objectively evaluating the AI chatbot's clinical performance.</li>
+                                        <li>A gold standard will be established by two clinical experts independently analyzing transcripts using a <strong>"Clinical Indicator Checklist."</strong></li>
+                                        <li>Inter-rater reliability will be measured using <strong>Fleiss' Kappa</strong> to ensure consistency.</li>
+                                        <li>The AI's binary detection for each variable will be compared against the consensus gold standard.</li>
+                                        <li>Performance metrics will be calculated, including <strong>Sensitivity, Specificity, Precision, F1-Score, and AUC</strong></li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg border border-slate-200">
+                                    <p class="font-bold text-green-600 mb-2">Pillar 2: User Perception Analysis (Quantitative)</p>
+                                    <ul class="list-disc list-inside text-slate-600 text-sm space-y-2">
+                                        <li>Aims to measure the subjective perception and experience of participants.</li>
+                                        <li>After interaction, participants will complete the <strong>Chatbot Usability Questionnaire (CUQ)</strong> and the <strong>Short Trust in Automation Scale (S-TIAS)</strong>.</li>
+                                        <li>Collected data will be analyzed using <strong>descriptive statistics</strong> (mean, standard deviation, frequency).</li>
+                                        <li>This provides a quantitative overview of <strong> usability and trust </strong/>.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg border border-slate-200">
+                                    <p class="font-bold text-purple-600 mb-2">Pillar 3: Chatbot Therapeutic Communication Analysis (Qualitative)</p>
+                                    <ul class="list-disc list-inside text-slate-600 text-sm space-y-2">
+                                        <li>Analyzes the chatbot's own behavior from a nursing theory perspective.</li>
+                                        <li>A qualitative analysis of transcripts will be conducted using <strong>Stuart's Nurse-Patient Therapeutic Communication Model</strong> as a framework.</li>
+                                        <li>The researcher will systematically <strong>identify, code, and count the frequency of therapeutic techniques </strong> (e.g., validation, clarification, reflection).</li>
+                                        <li>The analysis will also assess the <strong>relevance and appropriateness </strong> of the techniques used in response to participant statements.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <hr class="border-slate-200">
@@ -235,18 +267,6 @@
                                 <div><p class="font-semibold text-slate-700">Location & Technique</p><p class="text-slate-600 text-sm">The study will be conducted in the community fostered by FIK UI & the Public Health Center in Batutulis, Bogor, using <strong>Convenience Sampling</strong>.</p></div>
                                 <div><p class="font-semibold text-slate-700">Target Population & Limitations</p><p class="text-slate-600 text-sm">Adults (21-59 years) with Diabetes Mellitus (DM), Hypertension (HT), or both. The study <strong>does not include other chronic diseases</strong> like cancer.</p></div>
                                 <div><p class="font-semibold text-slate-700">Sample Size Determination (G*Power)</p><div class="text-sm text-slate-600 grid grid-cols-2 md:grid-cols-3 gap-2 mt-2"><span><strong>Test:</strong> Z-Test (Logistic Regression)</span><span><strong>Effect Size (OR):</strong> 3.5</span><span><strong>Power (1-β):</strong> 0.95</span><span><strong>Significance (α):</strong> 0.05</span><span><strong>Tails:</strong> One-tailed</span><span><strong>Pr(Y=1|X=1) H0:</strong> 0.20</span></div><p class="text-slate-600 text-sm mt-3">This calculation indicates a minimum sample size of <strong>53 participants</strong>. To account for dropout, the recruitment target is set to <strong>60 participants</strong>.</p></div>
-                            </div>
-                        </div>
-                        <hr class="border-slate-200">
-                        <div>
-                            <h4 class="text-xl font-bold text-slate-800 mb-6 text-center">Validation Workflow</h4>
-                            <div class="relative space-y-6 pl-12">
-                                <div class="absolute left-6 top-5 bottom-5 w-0.5 bg-slate-200 border-l-2 border-dashed"></div>
-                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">1</span></div><div><p class="font-semibold">Pre-Interaction</p><p class="text-slate-600 text-sm">Participants complete GAD-7, PHQ-9, SRQ-20, C-SSRS.</p></div></div>
-                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">2</span></div><div><p class="font-semibold">Chat Session</p><p class="text-slate-600 text-sm">Interaction with Venti. Full transcript is captured and anonymized.</p></div></div>
-                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">3</span></div><div><p class="font-semibold">Expert Review</p><p class="text-slate-600 text-sm">Two experts code for risks. Cohen’s κ is calculated for consistency, then adjudicated for a "gold standard."</p></div></div>
-                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">4</span></div><div><p class="font-semibold">Performance Analysis</p><p class="text-slate-600 text-sm">Compute F1 & AUC of Venti’s flags against the gold-standard diagnosis. Cross-validate against self-report scores (Spearman’s ρ).</p></div></div>
-                                <div class="relative flex items-start"><div class="absolute left-[-3rem] top-0.5 flex items-center justify-center w-12 h-12 bg-white rounded-full border-2 border-slate-300"><span class="font-bold text-blue-600">5</span></div><div><p class="font-semibold">Usability & Experience</p><p class="text-slate-600 text-sm">Aggregate CUQ scores; run IPA on transcripts to surface care-structure themes.</p></div></div>
                             </div>
                         </div>
                     </div>
@@ -260,13 +280,19 @@
                 <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Theoretical Frameworks</h2>
                 <p class="text-lg text-slate-600">Underpinning the Concept of <span class="font-semibold text-purple-700">Compassionate Skepticism</span> in AI</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="shield-check" class="w-5 h-5 mr-2 text-purple-600"></i>Hunt–Vitell Ethical Model on AI (Ferrell & Ferrell, 2021) </h4><p class="text-slate-600 text-sm">Emphasizes moral awareness, judgment, and intent phases, adapted for AI to merge design empathy with rational control over machine decisions.</p></div>
-                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="handshake" class="w-5 h-5 mr-2 text-purple-600"></i>Trust as Reliance + "Extra Factor" (Durán & Formanek, 2021)</h4><p class="text-slate-600 text-sm">Defines trust in AI as a combination of system reliability (reliance) and moral commitment (extra factor), supporting "benefit of the doubt" and "cross-checking".</p></div>
-                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="layout-grid" class="w-5 h-5 mr-2 text-purple-600"></i>Ethical Framework (Ashok et al, 2022.)</h4><p class="text-slate-600 text-sm">Presents a four-domain ontology (physical, cognitive, information, governance) to map and balance ethical implications like fairness, autonomy, and privacy.</p></div>
-                <div class="theory-card"><h4 class="font-bold text-lg mb-2 flex items-center"><i data-lucide="file-check-2" class="w-5 h-5 mr-2 text-purple-600"></i>AI Trust Framework </h4><p class="text-slate-600 text-sm">Uses information theory to evaluate AI transparency and emphasizes audit, validation, and human-in-the-loop as forms of systematic cross-checking.</p></div>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="trending-up" class="mr-2 text-green-500"></i>Strong Diagnostic Performance</h4><p class="text-slate-600 text-sm"><strong>70.6%</strong> of studies showed good performance (AUC: 0.77–0.92). LLMs (GPT-4, BERT) significantly <strong>outperformed traditional methods</strong>, with AUC > 0.90 in depression detection.</p></div>
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="globe-2" class="mr-2 text-orange-500"></i>Cultural Adaptation Challenges</h4><p class="text-slate-600 text-sm"><strong>Mixed to poor performance (29.4%)</strong> was found in non-English contexts (e.g., Bahasa Malaysia F1=0.66) and with multimodal models, highlighting generalization challenges.</p></div>
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="shield-alert" class="mr-2 text-red-500"></i>Ethical & Methodological Gaps</h4><p class="text-slate-600 text-sm">Data privacy was <strong>underreported (70.6%)</strong>, algorithmic bias persists, and <strong>82.4% of studies are from high-income countries</strong>, limiting generalizability to low-resource settings.</p></div>
+                <div class="data-card p-6"><h4 class="font-bold text-xl mb-4 flex items-center"><i data-lucide="lightbulb" class="mr-2 text-blue-500"></i>Implications & Recommendations</h4><p class="text-slate-600 text-sm">NLP has great potential, but successful integration requires <strong>robust external validation, diverse datasets, and rigorous Randomized Controlled Trials (RCTs)</strong> to ensure relevance and equity.</p></div>
             </div>
-           
+             <div class="text-center mt-8">
+                <button id="summarize-theory-btn" class="gemini-btn font-bold py-2 px-4 rounded-full inline-flex items-center">
+                    <span class="mr-2">✨</span> Explain
+                </button>
+                <div id="theory-summary-loader" class="hidden mx-auto mt-4 loader"></div>
+                <div id="theory-summary" class="hidden mt-4 data-card text-left p-4"></div>
+            </div>
         </div>
         
         <!-- Abstract Highlights Section -->
@@ -291,7 +317,7 @@
         <div class="my-24 section">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Anticipated Impact of the Study</h2>
-                <p class="text-lg text-slate-600">Projecting the benefits of our study for practice, science, and society.</p>
+                <p class="text-lg text-slate-600">Projecting the benefits for practice, science, and society.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="data-card p-6">
@@ -314,7 +340,7 @@
              <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Explore Future Directions</h2>
              <p class="text-lg text-slate-600 mb-8">Let AI suggest the next steps for this research.</p>
              <button id="suggest-research-btn" class="gemini-btn font-bold py-3 px-6 rounded-full inline-flex items-center text-lg">
-                <span class="mr-2">✨</span> Sarankan Pertanyaan Penelitian Baru
+                <span class="mr-2">✨</span> Suggest New Research Questions
             </button>
             <div id="research-loader" class="hidden mx-auto mt-4 loader"></div>
             <div id="research-suggestions" class="hidden mt-6 data-card text-left p-6"></div>
@@ -396,11 +422,11 @@
                         htmlText = htmlText.replace(/\n/g, '<br>'); // Newlines
                         resultElement.innerHTML = htmlText;
                     } else {
-                       resultElement.textContent = 'Maaf, respons tidak dapat dihasilkan saat ini.';
+                       resultElement.textContent = 'Sorry, a response could not be generated at this time.';
                     }
                 } catch (error) {
                     console.error("Error calling Gemini API:", error);
-                    resultElement.textContent = 'Terjadi kesalahan saat menghubungi AI. Silakan coba lagi nanti.';
+                    resultElement.textContent = 'An error occurred while contacting the AI. Please try again later.';
                 } finally {
                     loaderElement.style.display = 'none';
                     resultElement.style.display = 'block';
@@ -412,7 +438,7 @@
             summarizeSysrevBtn.addEventListener('click', () => {
                 const sysrevSection = document.getElementById('sysrev-section');
                 const textToSummarize = sysrevSection.querySelector('.text-lg').textContent + " " + Array.from(sysrevSection.querySelectorAll('.data-card p')).map(p => p.textContent).join(' ');
-                const prompt = `Summarize the following findings from a systematic review for a non-expert audience, like a patient or their family. Explain it in one simple paragraph in Indonesian:\n\n"${textToSummarize}"`;
+                const prompt = `Explain the following findings from a systematic review for a non-expert audience, like a patient or their family. Explain it in one simple paragraph in Bahasa Indonesia non formal:\n\n"${textToSummarize}"`;
                 callGemini(prompt, document.getElementById('sysrev-summary-loader'), document.getElementById('sysrev-summary'));
             });
 
@@ -421,7 +447,7 @@
             summarizeTheoryBtn.addEventListener('click', () => {
                 const theorySection = document.getElementById('theory-section');
                 const textToSummarize = theorySection.querySelector('.text-lg').textContent + " " + Array.from(theorySection.querySelectorAll('.theory-card p')).map(p => p.textContent).join(' ');
-                const prompt = `Summarize these four complex theoretical frameworks for a nursing student. Explain the core idea of each in one sentence and how they connect, in one simple paragraph in Indonesian:\n\n"${textToSummarize}"`;
+                const prompt = `Explain these four complex theoretical frameworks for non-expert audience. Explain the core idea of each in one sentence and how they connect, in one simple paragraph in Bahasa Indonesia non formal:\n\n"${textToSummarize}"`;
                 callGemini(prompt, document.getElementById('theory-summary-loader'), document.getElementById('theory-summary'));
             });
 
@@ -429,8 +455,8 @@
             const suggestResearchBtn = document.getElementById('suggest-research-btn');
             suggestResearchBtn.addEventListener('click', () => {
                 const abstractText = document.getElementById('abstract-section').querySelector('.grid').textContent;
-                const researchQuestions = Array.from(document.querySelectorAll('.section .data-card ul li')).map(li => li.textContent).join('\n');
-                const prompt = `Based on the following thesis abstract and existing research questions, suggest three specific and innovative future research questions. Present them as a numbered list with a brief justification for each, in Indonesian:\n\n**Abstract:**\n${abstractText}\n\n**Existing Questions:**\n${researchQuestions}`;
+                const researchQuestions = Array.from(document.querySelectorAll('.my-24.section .data-card ul li')).map(li => li.textContent).join('\n');
+                const prompt = `Based on the following thesis abstract and existing research questions, suggest three specific and innovative future research questions. Present them as a numbered list with a brief justification for each, in English:\n\n**Abstract:**\n${abstractText}\n\n**Existing Questions:**\n${researchQuestions}`;
                 callGemini(prompt, document.getElementById('research-loader'), document.getElementById('research-suggestions'));
             });
 
