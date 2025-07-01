@@ -441,7 +441,7 @@
                 const title = sysrevSection.querySelector('h2')?.textContent || '';
                 const cardsText = Array.from(sysrevSection.querySelectorAll('.data-card p')).map(p => p.textContent).join(' ');
                 const textToSummarize = `${title} ${cardsText}`;
-                const prompt = `Explain the following findings from a systematic review for a non-expert audience, like a patient or their family. Explain it in one simple paragraph in English:\n\n"${textToSummarize}"`;
+                const prompt = `Explain the following findings from a systematic review for a non-expert audience, like a patient or their family. Explain it in one simple paragraph:\n\n"${textToSummarize}"`;
                 callGemini(prompt, document.getElementById('sysrev-summary-loader'), document.getElementById('sysrev-summary'));
             });
 
@@ -454,7 +454,7 @@
                 const subtitle = theorySection.querySelector('p.text-lg')?.textContent || '';
                 const cardsText = Array.from(theorySection.querySelectorAll('.theory-card p')).map(p => p.textContent).join(' ');
                 const textToSummarize = `${title} ${subtitle} ${cardsText}`;
-                const prompt = `Explain these four complex theoretical frameworks for a non-expert audience. Explain the core idea of each in one sentence and how they connect, in one simple paragraph in Bahasa Indonesia:\n\n"${textToSummarize}"`;
+                const prompt = `Explain these four complex theoretical frameworks for a non-expert audience. Explain the core idea of each in one sentence and how they connect, in one simple paragraph in Grounded tone and language:\n\n"${textToSummarize}"`;
                 callGemini(prompt, document.getElementById('theory-summary-loader'), document.getElementById('theory-summary'));
             });
 
@@ -467,7 +467,7 @@
 
                 const abstractText = abstractSection.querySelector('.grid')?.textContent || '';
                 const researchQuestions = Array.from(researchQuestionsSection.querySelectorAll('ul li')).map(li => li.textContent).join('\n');
-                const prompt = `Based on the following thesis imapct and existing research questions, Explain how this study might be impactful for our world. Present them as a numbered list with a brief justification for each, in Indonesian, grounded form:\n\n**Abstract:**\n${abstractText}\n\n**Existing Questions:**\n${researchQuestions}`;
+                const prompt = `Based on the following thesis impact and existing research questions, Explain how this study might be impactful for our world. Present them as a numbered list with a brief justification for each, in grounded tone and language:\n\n**Abstract:**\n${abstractText}\n\n**Existing Questions:**\n${researchQuestions}`;
                 callGemini(prompt, document.getElementById('research-loader'), document.getElementById('research-suggestions'));
             });
 
