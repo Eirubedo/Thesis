@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Training Prep App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .tab-button.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .tab-button:disabled { color: #9ca3af; cursor: not-allowed; }
+        .speaker-card.selected {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px #2563eb;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen py-8">
+    <div class="w-full max-w-4xl mx-auto p-4 sm:p-8 bg-white rounded-2xl shadow-lg">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Erudate Training Platform</h1>
+            <p class="text-gray-500 mt-2">AI-Powered Training Management & Speaker Discovery</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav id="tabs" class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button data-tab="input" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Input</button>
+                <button data-tab="topics" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" disabled>Topics</button>
+                <button data-tab="speakers" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" disabled>Speakers</button>
+                <button data-tab="proposals" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" disabled>Proposals</button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="tab-content">
+            <!-- Step 1: Main Details Form -->
+            <div id="input-panel" class="tab-panel">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Training Requirements</h2>
+                <div class="mb-4">
+                    <label for="api-key-input" class="block text-sm font-medium text-gray-700 mb-1">Google Custom Search API Key</label>
+                    <input type="password" id="api-key-input" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm" placeholder="Enter your Google Search API Key here" />
+                </div>
+                <div class="mb-4">
+                     <label for="theme-keywords-input" class="block text-sm font-medium text-gray-700 mb-2">Training Topics (Keywords)</label>
+                    <input type="text" id="theme-keywords-input" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm" placeholder="e.g., digital transformation, leadership, innovation..." />
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div>
+                        <label for="training-date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                        <input type="date" id="training-date" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm">
+                    </div>
+                    <div>
+                        <label for="training-location" class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input type="text" id="training-location" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm" placeholder="e.g., New York, Virtual">
+                    </div>
+                    <div class="flex gap-4">
+                        <div>
+                            <label for="start-time" class="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                            <input type="time" id="start-time" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm" value="09:00">
+                        </div>
+                        <div>
+                            <label for="end-time" class="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                            <input type="time" id="end-time" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm" value="15:00">
+                        </div>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Method</label>
+                        <select id="training-method" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm">
+                            <option>Online</option>
+                            <option>Offline</option>
+                            <option>Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="generate-titles-btn" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition">AI Analysis & Generate Topics</button>
+            </div>
+
+            <!-- Step 2: Title Selector -->
+            <div id="topics-panel" class="tab-panel hidden">
+                 <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Select Session Titles</h2>
+                    <button id="back-to-step1-btn" class="text-sm font-medium text-blue-600 hover:underline">Edit Details</button>
+                </div>
+                <p id="title-selection-guidance" class="text-gray-600 mb-4"></p>
+                <div id="title-options" class="space-y-2"></div>
+                <button id="find-speakers-btn" class="hidden mt-6 w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition">Find Speakers for Selected Titles</button>
+            </div>
+
+            <!-- Step 3: Speaker-Title Matching -->
+            <div id="speakers-panel" class="tab-panel hidden">
+                 <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Match Speakers to Titles</h2>
+                    <button id="back-to-step2-btn" class="text-sm font-medium text-blue-600 hover:underline">Back to Titles</button>
+                </div>
+                <div id="matcher-options" class="space-y-6"></div>
+                <button id="generate-full-proposal-btn" class="hidden mt-6 w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition">Generate Full Proposal</button>
+            </div>
+            
+            <!-- Step 4: Final Proposal -->
+            <div id="proposals-panel" class="tab-panel hidden">
+                <div id="proposal-content" class="p-6 border rounded-lg bg-white prose max-w-none"></div>
+                <button id="download-proposal-btn" class="mt-4 w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition">Print Proposal</button>
+            </div>
+        </div>
+
+        <!-- Universal Status/Error Display -->
+        <div id="status-container" class="mt-8 text-center">
+            <div id="loader" class="hidden mx-auto loader"></div>
+            <div id="status-text" class="text-gray-500"></div>
+            <div id="error-card" class="hidden p-4 border border-red-300 rounded-lg bg-red-50 text-red-700 mt-4">
+                <h3 class="font-semibold mb-1">Error</h3>
+                <p id="error-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- STATE MANAGEMENT ---
+        let trainingPlan = {
+            details: {},
+            titleOptions: [],
+            selectedTitles: [],
+            speakerPool: [],
+            finalAgenda: []
+        };
+        
+        // --- SVG ICONS ---
+        const ICONS = {
+            mail: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
+            building: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`,
+            link: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>`
+        };
+
+        // --- API HELPERS (unchanged) ---
+        async function retrieveSpeakerDataFromGoogle(query, apiKey) { const searchEngineId = "7720edf1897b0467a"; const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}`; const response = await fetch(apiUrl); if (!response.ok) { const errorData = await response.json(); throw new Error(`Google Search API Error: ${errorData.error?.message || 'Failed to fetch results'}`); } const data = await response.json(); return data.items || []; }
+        async function retrieveReferenceData(query, apiKey) { const searchEngineId = "73f1541aaeb04423e"; const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}`; const response = await fetch(apiUrl); if (!response.ok) { const errorData = await response.json(); throw new Error(`Google Search API Error (Reference Search): ${errorData.error?.message || 'Failed to fetch results'}`); } const data = await response.json(); return data.items || []; }
+        async function callGemini(prompt) { const geminiApiKey = ""; const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`; const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] }; const response = await fetch(geminiApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) { const errorData = await response.json(); throw new Error(`Gemini API Error: ${errorData.error?.message || 'Unknown error'}`); } const result = await response.json(); return result.candidates[0]?.content?.parts[0]?.text || ''; }
+        function parseJsonFromGemini(text) { const cleanedText = text.replace(/```json|```/g, "").trim(); const firstBracket = cleanedText.indexOf('['); const firstBrace = cleanedText.indexOf('{'); if (firstBracket === -1 && firstBrace === -1) throw new Error("No JSON found in the response from the AI."); let startIndex = (firstBracket !== -1 && (firstBracket < firstBrace || firstBrace === -1)) ? firstBracket : firstBrace; const lastBracket = cleanedText.lastIndexOf(']'); const lastBrace = cleanedText.lastIndexOf('}'); let endIndex = Math.max(lastBracket, lastBrace); if (startIndex === -1 || endIndex === -1) throw new Error("Could not find a complete JSON object or array in the AI response."); let jsonString = cleanedText.substring(startIndex, endIndex + 1); jsonString = jsonString.replace(/}(?!\s*[,\]])\s*"/g, '},"'); try { return JSON.parse(jsonString); } catch (e) { console.error("Original text from AI:", text); console.error("Attempted to parse:", jsonString); throw new Error(`Failed to parse JSON from AI response: ${e.message}`); } }
+
+        // --- DOM ELEMENTS & HELPERS ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        
+        function setStatus(message) { document.getElementById('status-text').textContent = message; }
+        function showError(message) { document.getElementById('error-text').textContent = message; document.getElementById('error-card').classList.remove('hidden'); }
+        function hideStatus() { document.getElementById('loader').classList.add('hidden'); document.getElementById('status-text').textContent = ''; document.getElementById('error-card').classList.add('hidden'); }
+
+        function switchToTab(tabName, enableNext = false) {
+            tabButtons.forEach(button => {
+                button.classList.toggle('active', button.dataset.tab === tabName);
+                if (enableNext) {
+                    if (button.dataset.tab === tabName) {
+                        let next = button.nextElementSibling;
+                        if(next) next.disabled = false;
+                    }
+                }
+            });
+            tabPanels.forEach(panel => {
+                panel.classList.toggle('hidden', panel.id !== `${tabName}-panel`);
+            });
+        }
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (!button.disabled) {
+                    switchToTab(button.dataset.tab);
+                }
+            });
+        });
+
+        // --- WORKFLOW STEP 1: Generate Titles ---
+        document.getElementById('generate-titles-btn').addEventListener('click', async () => {
+            const date = document.getElementById('training-date').value;
+            const location = document.getElementById('training-location').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const theme = document.getElementById('theme-keywords-input').value;
+            const googleApiKey = document.getElementById('api-key-input').value.trim();
+
+            if (!date || !location || !startTime || !endTime || !theme || !googleApiKey) {
+                alert("Please fill in all details."); return;
+            }
+            const start = new Date(`${date}T${startTime}`);
+            const end = new Date(`${date}T${endTime}`);
+            const durationHours = Math.round((end - start) / (1000 * 60 * 60));
+            if (durationHours <= 0) { alert("End time must be after start time."); return; }
+
+            trainingPlan.details = { date, location, startTime, endTime, theme, durationHours, method: document.getElementById('training-method').value };
+            
+            document.getElementById('loader').classList.remove('hidden');
+            setStatus("Generating title options...");
+            
+            try {
+                const titlePrompt = `Based on the theme "${theme}", generate a JSON array of ${durationHours + 5} professional training session titles. Respond only with the JSON array of strings.`;
+                trainingPlan.titleOptions = parseJsonFromGemini(await callGemini(titlePrompt));
+                trainingPlan.selectedTitles = [];
+                switchToTab('topics', true);
+                renderTitleOptions();
+            } catch(e) { showError(e.message); } finally { hideStatus(); }
+        });
+
+        function renderTitleOptions() {
+            const container = document.getElementById('title-options');
+            container.innerHTML = '';
+            const needed = trainingPlan.details.durationHours;
+            const selectedCount = trainingPlan.selectedTitles.length;
+            document.getElementById('title-selection-guidance').textContent = `Select ${needed} title(s). You have selected ${selectedCount}.`;
+
+            trainingPlan.titleOptions.forEach(title => {
+                const isSelected = trainingPlan.selectedTitles.includes(title);
+                const wrapper = document.createElement('div');
+                const label = document.createElement('label');
+                label.className = `flex items-center p-3 bg-white border rounded-lg cursor-pointer ${isSelected ? 'border-blue-500 ring-2 ring-blue-200' : ''}`;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'h-4 w-4 text-blue-600';
+                checkbox.checked = isSelected;
+                checkbox.onchange = () => toggleTitleSelection(title);
+
+                const span = document.createElement('span');
+                span.className = 'ml-3 text-sm text-gray-700';
+                span.textContent = title;
+
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                wrapper.appendChild(label);
+                container.appendChild(wrapper);
+            });
+            document.getElementById('find-speakers-btn').classList.toggle('hidden', selectedCount !== needed);
+        }
+
+        function toggleTitleSelection(title) {
+            const index = trainingPlan.selectedTitles.indexOf(title);
+            if (index > -1) {
+                trainingPlan.selectedTitles.splice(index, 1);
+            } else {
+                if (trainingPlan.selectedTitles.length < trainingPlan.details.durationHours) {
+                    trainingPlan.selectedTitles.push(title);
+                } else {
+                    alert(`You can only select ${trainingPlan.details.durationHours} titles.`);
+                }
+            }
+            renderTitleOptions();
+        }
+
+        // --- WORKFLOW STEP 2: Find Speakers ---
+        document.getElementById('find-speakers-btn').addEventListener('click', async () => {
+            document.getElementById('loader').classList.remove('hidden');
+            setStatus("Pooling keywords and finding speakers...");
+            
+            try {
+                const googleApiKey = document.getElementById('api-key-input').value.trim();
+                const keywordPoolPrompt = `From the following list of titles, extract a JSON array of the most important and relevant keywords for finding expert speakers. Combine them into a single list of unique terms. Titles: ${JSON.stringify(trainingPlan.selectedTitles)}`;
+                const keywords = parseJsonFromGemini(await callGemini(keywordPoolPrompt));
+                const searchQuery = `${keywords.join(' OR ')} ${trainingPlan.details.theme}`;
+                
+                const searchResults = await retrieveSpeakerDataFromGoogle(searchQuery, googleApiKey);
+                if (searchResults.length === 0) throw new Error("Could not find any speakers for the selected titles.");
+
+                const synthesisPrompt = `
+                  You are an expert talent scout. From the provided search results, generate a detailed JSON array of ${trainingPlan.details.durationHours + 5} potential speaker profiles.
+                  **CRITICAL RULE: Only include results that are clearly a person's name.** Do NOT list institutions or paper titles as people.
+                  Each object must match this structure:
+                  {
+                    "name": "Full Name",
+                    "title": "Professional Title (e.g., Professor of Nursing, Clinical Psychologist)",
+                    "institution": "Affiliated Institution",
+                    "expertise": ["keyword1", "keyword2", "keyword3"],
+                    "bio": "A concise 1-2 sentence summary of their work and focus.",
+                    "contact": { "email": "speaker@example.com", "institutionalPage": "http://..." }
+                  }
+                  Respond only with the JSON array. Data: ${JSON.stringify(searchResults)}
+                `;
+                trainingPlan.speakerPool = parseJsonFromGemini(await callGemini(synthesisPrompt));
+                
+                trainingPlan.finalAgenda = trainingPlan.selectedTitles.map(title => ({ title, speaker: null }));
+                switchToTab('speakers', true);
+                renderSpeakerMatcher();
+            } catch(e) { showError(e.message); } finally { hideStatus(); }
+        });
+
+        function renderSpeakerMatcher() {
+            const container = document.getElementById('matcher-options');
+            container.innerHTML = '';
+            trainingPlan.finalAgenda.forEach((session, index) => {
+                const section = document.createElement('div');
+                section.className = 'p-4 border rounded-lg bg-gray-50';
+                
+                const titleEl = document.createElement('h3');
+                titleEl.className = 'font-semibold text-gray-800 mb-3';
+                titleEl.textContent = session.title;
+                section.appendChild(titleEl);
+
+                const selectEl = document.createElement('select');
+                selectEl.className = 'w-full p-2 border border-gray-300 rounded-md';
+                selectEl.onchange = (e) => selectSpeaker(index, e.target.value);
+                
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = '-- Select a Speaker --';
+                defaultOption.value = -1;
+                selectEl.appendChild(defaultOption);
+
+                trainingPlan.speakerPool.forEach((speaker, speakerIndex) => {
+                    const option = document.createElement('option');
+                    option.value = speakerIndex;
+                    option.textContent = `${speaker.name} - ${speaker.title}`;
+                    if (session.speaker && session.speaker.name === speaker.name) {
+                        option.selected = true;
+                    }
+                    selectEl.appendChild(option);
+                });
+                section.appendChild(selectEl);
+                
+                const detailsContainer = document.createElement('div');
+                detailsContainer.id = `details-${index}`;
+                detailsContainer.className = 'mt-4';
+                section.appendChild(detailsContainer);
+
+                container.appendChild(section);
+            });
+        }
+
+        function selectSpeaker(agendaIndex, speakerPoolIndex) {
+            const detailsContainer = document.getElementById(`details-${agendaIndex}`);
+            detailsContainer.innerHTML = '';
+
+            if (speakerPoolIndex < 0) {
+                trainingPlan.finalAgenda[agendaIndex].speaker = null;
+            } else {
+                const speaker = trainingPlan.speakerPool[speakerPoolIndex];
+                trainingPlan.finalAgenda[agendaIndex].speaker = speaker;
+
+                const card = document.createElement('div');
+                card.className = 'p-4 border rounded-lg bg-white';
+                
+                let expertiseHTML = speaker.expertise.map(e => `<span class="inline-block bg-gray-200 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${e}</span>`).join('');
+                
+                let contactHTML = '';
+                if (speaker.contact?.email) {
+                    contactHTML += `<a href="mailto:${speaker.contact.email}" class="flex items-center text-blue-600 hover:underline text-sm mr-4"><span class="mr-1">${ICONS.mail}</span> Email</a>`;
+                }
+                if (speaker.contact?.institutionalPage) {
+                    contactHTML += `<a href="${speaker.contact.institutionalPage}" target="_blank" class="flex items-center text-blue-600 hover:underline text-sm"><span class="mr-1">${ICONS.link}</span> Profile</a>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+                            ${speaker.name.split(" ").map(n=>n[0]).join("")}
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-lg">${speaker.name}</h4>
+                            <p class="text-sm text-gray-600">${speaker.title}</p>
+                            <p class="text-xs text-gray-500 flex items-center mt-1"><span class="mr-1">${ICONS.building}</span> ${speaker.institution}</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-700 my-3">${speaker.bio}</p>
+                    <div class="flex flex-wrap gap-2 my-3">${expertiseHTML}</div>
+                    <div class="flex items-center border-t pt-3 mt-3">${contactHTML}</div>
+                `;
+                detailsContainer.appendChild(card);
+            }
+            const allSpeakersAssigned = trainingPlan.finalAgenda.every(s => s.speaker);
+            document.getElementById('generate-full-proposal-btn').classList.toggle('hidden', !allSpeakersAssigned);
+        }
+
+        // --- WORKFLOW STEP 3: Generate Proposal ---
+        document.getElementById('generate-full-proposal-btn').addEventListener('click', async () => {
+            document.getElementById('loader').classList.remove('hidden');
+            setStatus(`Generating full proposal...`);
+            
+            try {
+                let currentTime = new Date(`${trainingPlan.details.date}T${trainingPlan.details.startTime}`);
+                trainingPlan.finalAgenda.forEach(session => {
+                    session.time = `${currentTime.toTimeString().substring(0, 5)} - ${new Date(currentTime.getTime() + 60 * 60 * 1000).toTimeString().substring(0, 5)}`;
+                    currentTime.setHours(currentTime.getHours() + 1);
+                });
+
+                const referenceResults = await retrieveReferenceData(trainingPlan.details.theme, document.getElementById('api-key-input').value.trim());
+                
+                const proposalTemplate = `
+                    <div style="font-family: Inter, sans-serif; color: #333;">
+                        <div style="text-align: center; border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 2rem;">
+                            <h1 style="font-size: 2.25rem; font-weight: bold; color: #111;">{OVERALL_TITLE}</h1>
+                            <p style="font-size: 1.125rem; color: #555;">Kerangka Acuan Kegiatan (KAK) Webinar</p>
+                        </div>
+                        <h2 style="font-size: 1.5rem; font-weight: 600; color: #111; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-top: 2rem;">1. Latar Belakang</h2>
+                        <p style="line-height: 1.6;">{BACKGROUND}</p>
+                        
+                        <h2 style="font-size: 1.5rem; font-weight: 600; color: #111; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-top: 2rem;">2. Detail Acara</h2>
+                        <p><strong>Tanggal:</strong> {DATE}</p>
+                        <p><strong>Lokasi:</strong> {LOCATION}</p>
+                        <p><strong>Metode:</strong> {METHOD}</p>
+
+                        <h2 style="font-size: 1.5rem; font-weight: 600; color: #111; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-top: 2rem;">3. Jadwal Kegiatan</h2>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                            <thead>
+                                <tr style="background-color: #f7f7f7;">
+                                    <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Waktu</th>
+                                    <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Materi</th>
+                                    <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Narasumber</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {AGENDA_TABLE_ROWS}
+                            </tbody>
+                        </table>
+
+                        <h2 style="font-size: 1.5rem; font-weight: 600; color: #111; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; margin-top: 2rem;">4. Profil Narasumber</h2>
+                        {SPEAKER_CV_LIST}
+                    </div>
+                `;
+                
+                const proposalPrompt = `
+                  You are an expert event proposal writer, fluent in formal Indonesian. Based on the template and training plan, generate a complete event proposal.
+                  - Create a compelling overall title in Indonesian for {OVERALL_TITLE}.
+                  - Write a professional "Latar Belakang" in Indonesian for {BACKGROUND}, using the provided references.
+                  - Fill in {DATE}, {LOCATION}, and {METHOD}.
+                  - For {AGENDA_TABLE_ROWS}, create HTML table rows (<tr>...</tr>) for each session.
+                  - For {SPEAKER_CV_LIST}, create a styled HTML div for each unique speaker. **The speaker's name must be a clickable hyperlink (<a> tag) pointing to their 'institutionalPage' link.** If they have an email, add a separate clickable mailto link.
+                  Respond ONLY with the complete, valid HTML code for the proposal content.
+                  Template: """${proposalTemplate}"""
+                  Training Plan: ${JSON.stringify(trainingPlan)}
+                  References: ${JSON.stringify(referenceResults.map(r => r.snippet))}
+                `;
+                const htmlProposal = await callGemini(proposalPrompt);
+
+                document.getElementById('proposal-content').innerHTML = htmlProposal;
+                switchToTab('proposals', true);
+                
+                document.getElementById('download-proposal-btn').onclick = () => {
+                    const blob = new Blob([`<html><head><title>Proposal</title><style>body{font-family:Inter,sans-serif;padding:2rem}</style></head><body>${htmlProposal}</body></html>`], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Proposal - ${trainingPlan.details.date}.html`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+            } catch (e) { showError(e.message); } finally { hideStatus(); }
+        });
+        
+        // --- Back Button Listeners (FIXED) ---
+        document.getElementById('back-to-step1-btn').addEventListener('click', () => switchToTab('input'));
+        document.getElementById('back-to-step2-btn').addEventListener('click', () => switchToTab('topics'));
+
+
+        // Initial setup
+        switchToTab('input');
+    });
+    </script>
+</body>
+</html>
