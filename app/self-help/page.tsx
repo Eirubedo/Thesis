@@ -72,30 +72,6 @@ export default function SelfHelpPage() {
         duration: "10:15",
       },
       content: `
-# Deep Breathing for Blood Pressure Control
-
-## How It Helps:
-Deep breathing activates the parasympathetic nervous system, which helps:
-- Lower heart rate
-- Reduce blood pressure
-- Decrease stress hormones
-- Improve circulation
-
-## Instructions:
-1. Sit comfortably with your back straight
-2. Place one hand on your chest, one on your belly
-3. Breathe in slowly through your nose for 4 counts
-4. Hold your breath for 4 counts
-5. Exhale slowly through your mouth for 6 counts
-6. Repeat for 10 minutes
-
-## Best Practices:
-- Practice twice daily (morning and evening)
-- Use before stressful situations
-- Combine with blood pressure monitoring
-- Track your progress over time
-      `,
-      contentId: `
 # Pernapasan Dalam untuk Kontrol Tekanan Darah
 
 ## Bagaimana Membantu:
@@ -118,6 +94,48 @@ Pernapasan dalam mengaktifkan sistem saraf parasimpatis, yang membantu:
 - Gunakan sebelum situasi stres
 - Kombinasikan dengan pemantauan tekanan darah
 - Lacak kemajuan Anda dari waktu ke waktu
+
+## Manfaat Berdasarkan Penelitian:
+Berdasarkan Pedoman Hipertensi 2024, teknik pernapasan dalam dapat menurunkan tekanan darah sistolik hingga 5-10 mmHg dan diastolik 3-6 mmHg ketika dipraktikkan secara konsisten.
+
+## Mekanisme Fisiologis:
+- Aktivasi sistem saraf parasimpatis mengurangi aktivitas simpatis
+- Penurunan pelepasan katekolamin (adrenalin dan noradrenalin)
+- Relaksasi otot polos pembuluh darah
+- Perbaikan variabilitas detak jantung
+      `,
+      contentId: `
+# Deep Breathing for Blood Pressure Control
+
+## How It Helps:
+Deep breathing activates the parasympathetic nervous system, which helps:
+- Lower heart rate
+- Reduce blood pressure
+- Decrease stress hormones
+- Improve circulation
+
+## Instructions:
+1. Sit comfortably with your back straight
+2. Place one hand on your chest, one on your belly
+3. Breathe in slowly through your nose for 4 counts
+4. Hold your breath for 4 counts
+5. Exhale slowly through your mouth for 6 counts
+6. Repeat for 10 minutes
+
+## Best Practices:
+- Practice twice daily (morning and evening)
+- Use before stressful situations
+- Combine with blood pressure monitoring
+- Track your progress over time
+
+## Research-Based Benefits:
+According to the 2024 Hypertension Guidelines, deep breathing techniques can reduce systolic blood pressure by 5-10 mmHg and diastolic by 3-6 mmHg when practiced consistently.
+
+## Physiological Mechanisms:
+- Parasympathetic nervous system activation reduces sympathetic activity
+- Decreased catecholamine release (adrenaline and noradrenaline)
+- Smooth muscle relaxation in blood vessels
+- Improved heart rate variability
       `,
     },
     {
@@ -142,66 +160,122 @@ Pernapasan dalam mengaktifkan sistem saraf parasimpatis, yang membantu:
         duration: "12:30",
       },
       content: `
-# DASH Diet for Hypertension
-
-## What is DASH?
-DASH (Dietary Approaches to Stop Hypertension) is an eating plan designed to help treat or prevent high blood pressure.
-
-## Key Principles:
-- Emphasize fruits and vegetables
-- Include whole grains
-- Choose lean proteins
-- Limit sodium intake
-- Reduce saturated fats
-- Include low-fat dairy
-
-## Daily Servings:
-- Vegetables: 4-5 servings
-- Fruits: 4-5 servings
-- Grains: 6-8 servings
-- Lean meats: 6 oz or less
-- Nuts/seeds: 4-5 servings per week
-- Sodium: Less than 2,300mg (ideally 1,500mg)
-
-## Benefits:
-- Can lower blood pressure by 8-14 mmHg
-- Reduces risk of heart disease
-- Helps with weight management
-- Improves overall health
-      `,
-      contentId: `
 # Diet DASH untuk Hipertensi
 
 ## Apa itu DASH?
 DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang dirancang untuk membantu mengobati atau mencegah tekanan darah tinggi.
 
-## Prinsip Utama:
-- Menekankan buah dan sayuran
-- Sertakan biji-bijian utuh
-- Pilih protein tanpa lemak
-- Batasi asupan natrium
+## Prinsip Utama berdasarkan Pedoman Hipertensi 2024:
+- Menekankan buah dan sayuran (4-5 porsi sehari)
+- Sertakan biji-bijian utuh (6-8 porsi sehari)
+- Pilih protein tanpa lemak (≤6 oz sehari)
+- Batasi asupan natrium (<2.300mg, idealnya 1.500mg)
 - Kurangi lemak jenuh
-- Sertakan produk susu rendah lemak
+- Sertakan produk susu rendah lemak (2-3 porsi sehari)
 
-## Porsi Harian:
+## Porsi Harian Berdasarkan Kebutuhan 2000 Kalori:
 - Sayuran: 4-5 porsi
 - Buah: 4-5 porsi
 - Biji-bijian: 6-8 porsi
 - Daging tanpa lemak: 6 oz atau kurang
 - Kacang/biji: 4-5 porsi per minggu
-- Natrium: Kurang dari 2.300mg (idealnya 1.500mg)
+- Lemak dan minyak: 2-3 porsi
+- Makanan manis: ≤5 porsi per minggu
 
-## Manfaat:
-- Dapat menurunkan tekanan darah 8-14 mmHg
-- Mengurangi risiko penyakit jantung
+## Manfaat Terbukti:
+- Dapat menurunkan tekanan darah sistolik 8-14 mmHg
+- Mengurangi risiko penyakit jantung hingga 20%
 - Membantu pengelolaan berat badan
 - Meningkatkan kesehatan secara keseluruhan
+- Mengurangi risiko stroke hingga 14%
+
+## Tips Implementasi:
+- Mulai dengan mengurangi natrium secara bertahap
+- Tingkatkan konsumsi buah dan sayuran perlahan
+- Ganti nasi putih dengan nasi merah
+- Pilih ikan 2-3 kali seminggu
+- Batasi makanan olahan dan fast food
+
+## Makanan yang Direkomendasikan:
+### Sayuran (4-5 porsi/hari):
+- Bayam, kangkung, sawi
+- Brokoli, kembang kol
+- Wortel, tomat
+- Labu, terong
+
+### Buah (4-5 porsi/hari):
+- Pisang (tinggi kalium)
+- Jeruk, pepaya
+- Apel, pir
+- Melon, semangka
+
+### Protein Rendah Lemak:
+- Ikan (salmon, tuna, makarel)
+- Ayam tanpa kulit
+- Tahu, tempe
+- Kacang-kacangan
+      `,
+      contentId: `
+# DASH Diet for Hypertension
+
+## What is DASH?
+DASH (Dietary Approaches to Stop Hypertension) is an eating plan designed to help treat or prevent high blood pressure.
+
+## Key Principles based on 2024 Hypertension Guidelines:
+- Emphasize fruits and vegetables (4-5 servings daily)
+- Include whole grains (6-8 servings daily)
+- Choose lean proteins (≤6 oz daily)
+- Limit sodium intake (<2,300mg, ideally 1,500mg)
+- Reduce saturated fats
+- Include low-fat dairy (2-3 servings daily)
+
+## Daily Servings for 2000 Calorie Diet:
+- Vegetables: 4-5 servings
+- Fruits: 4-5 servings
+- Grains: 6-8 servings
+- Lean meats: 6 oz or less
+- Nuts/seeds: 4-5 servings per week
+- Fats and oils: 2-3 servings
+- Sweets: ≤5 servings per week
+
+## Proven Benefits:
+- Can lower systolic blood pressure by 8-14 mmHg
+- Reduces heart disease risk by up to 20%
+- Helps with weight management
+- Improves overall health
+- Reduces stroke risk by up to 14%
+
+## Implementation Tips:
+- Start by gradually reducing sodium
+- Slowly increase fruit and vegetable intake
+- Replace white rice with brown rice
+- Choose fish 2-3 times per week
+- Limit processed foods and fast food
+
+## Recommended Foods:
+### Vegetables (4-5 servings/day):
+- Spinach, kale, bok choy
+- Broccoli, cauliflower
+- Carrots, tomatoes
+- Squash, eggplant
+
+### Fruits (4-5 servings/day):
+- Bananas (high potassium)
+- Oranges, papaya
+- Apples, pears
+- Cantaloupe, watermelon
+
+### Lean Proteins:
+- Fish (salmon, tuna, mackerel)
+- Skinless chicken
+- Tofu, tempeh
+- Legumes and nuts
       `,
     },
     {
       id: 3,
-      title: "Gentle Exercise for Hypertension",
-      titleId: "Olahraga Ringan untuk Hipertensi",
+      title: "Safe Exercise for Hypertension",
+      titleId: "Olahraga Aman untuk Hipertensi",
       description: "Safe and effective exercises for people with high blood pressure",
       descriptionId: "Olahraga yang aman dan efektif untuk penderita tekanan darah tinggi",
       category: "exercise",
@@ -220,68 +294,126 @@ DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang diranca
         duration: "18:45",
       },
       content: `
-# Safe Exercise for Hypertension
-
-## Benefits of Exercise:
-- Lowers blood pressure by 4-9 mmHg
-- Strengthens the heart
-- Improves circulation
-- Reduces stress
-- Helps with weight management
-
-## Recommended Activities:
-- Walking (30 minutes daily)
-- Swimming
-- Cycling
-- Light strength training
-- Yoga
-- Tai Chi
-
-## Exercise Guidelines:
-- Start slowly and gradually increase intensity
-- Aim for 150 minutes of moderate activity per week
-- Include strength training 2 days per week
-- Monitor blood pressure before and after exercise
-- Stay hydrated
-
-## Safety Tips:
-- Consult your doctor before starting
-- Avoid holding your breath during exercise
-- Stop if you feel dizzy or chest pain
-- Take medications as prescribed
-- Monitor your heart rate
-      `,
-      contentId: `
 # Olahraga Aman untuk Hipertensi
 
-## Manfaat Olahraga:
-- Menurunkan tekanan darah 4-9 mmHg
-- Memperkuat jantung
-- Meningkatkan sirkulasi
-- Mengurangi stres
+## Manfaat Olahraga berdasarkan Pedoman 2024:
+- Menurunkan tekanan darah sistolik 4-9 mmHg
+- Menurunkan tekanan darah diastolik 3-5 mmHg
+- Memperkuat jantung dan meningkatkan efisiensi pompa
+- Meningkatkan sirkulasi dan elastisitas pembuluh darah
+- Mengurangi stres dan hormon kortisol
 - Membantu pengelolaan berat badan
 
 ## Aktivitas yang Direkomendasikan:
-- Jalan kaki (30 menit sehari)
-- Berenang
-- Bersepeda
-- Latihan kekuatan ringan
-- Yoga
-- Tai Chi
+### Olahraga Aerobik (Prioritas Utama):
+- Jalan cepat: 30-45 menit, 5-7 hari/minggu
+- Berenang: 30-45 menit, 3-5 hari/minggu
+- Bersepeda: 30-60 menit, 3-5 hari/minggu
+- Jogging ringan: 20-30 menit, 3-4 hari/minggu
 
-## Panduan Olahraga:
-- Mulai perlahan dan tingkatkan intensitas secara bertahap
-- Targetkan 150 menit aktivitas sedang per minggu
-- Sertakan latihan kekuatan 2 hari per minggu
-- Pantau tekanan darah sebelum dan sesudah olahraga
-- Tetap terhidrasi
+### Latihan Kekuatan (2-3 hari/minggu):
+- Angkat beban ringan (50-60% 1RM)
+- Latihan resistensi dengan band
+- Latihan berat badan (push-up, squat)
+
+### Olahraga Fleksibilitas:
+- Yoga: 2-3 kali seminggu
+- Tai Chi: sangat baik untuk lansia
+- Stretching: setiap hari
+
+## Panduan Olahraga Berdasarkan Tingkat Hipertensi:
+
+### Hipertensi Tahap 1 (140-159/90-99 mmHg):
+- Semua jenis olahraga aerobik diperbolehkan
+- Latihan kekuatan dengan pengawasan
+- Target: 150 menit aktivitas sedang/minggu
+
+### Hipertensi Tahap 2 (≥160/100 mmHg):
+- Konsultasi dokter sebelum memulai
+- Mulai dengan intensitas rendah
+- Hindari angkat beban berat
+- Fokus pada olahraga aerobik
 
 ## Tips Keamanan:
-- Konsultasikan dengan dokter sebelum memulai
-- Hindari menahan napas saat berolahraga
-- Berhenti jika merasa pusing atau nyeri dada
-- Minum obat sesuai resep
-- Pantau detak jantung Anda
+- Pemanasan 5-10 menit sebelum olahraga
+- Pendinginan 5-10 menit setelah olahraga
+- Hindari menahan napas saat latihan kekuatan
+- Hentikan jika merasa pusing, nyeri dada, atau sesak napas
+- Monitor tekanan darah sebelum dan sesudah olahraga
+- Minum obat sesuai jadwal
+- Tetap terhidrasi
+
+## Target Detak Jantung:
+- Intensitas sedang: 50-70% dari detak jantung maksimal
+- Rumus: (220 - usia) x 0.5-0.7
+- Gunakan skala RPE (Rate of Perceived Exertion) 5-6 dari 10
+
+## Olahraga yang Harus Dihindari:
+- Angkat beban sangat berat (>85% 1RM)
+- Olahraga isometrik berlebihan
+- Aktivitas dengan perubahan posisi mendadak
+- Olahraga kompetitif dengan intensitas tinggi
+      `,
+      contentId: `
+# Safe Exercise for Hypertension
+
+## Exercise Benefits based on 2024 Guidelines:
+- Lowers systolic blood pressure by 4-9 mmHg
+- Lowers diastolic blood pressure by 3-5 mmHg
+- Strengthens heart and improves pump efficiency
+- Improves circulation and blood vessel elasticity
+- Reduces stress and cortisol hormones
+- Helps with weight management
+
+## Recommended Activities:
+### Aerobic Exercise (Top Priority):
+- Brisk walking: 30-45 minutes, 5-7 days/week
+- Swimming: 30-45 minutes, 3-5 days/week
+- Cycling: 30-60 minutes, 3-5 days/week
+- Light jogging: 20-30 minutes, 3-4 days/week
+
+### Strength Training (2-3 days/week):
+- Light weight lifting (50-60% 1RM)
+- Resistance band exercises
+- Bodyweight exercises (push-ups, squats)
+
+### Flexibility Exercises:
+- Yoga: 2-3 times per week
+- Tai Chi: excellent for elderly
+- Stretching: daily
+
+## Exercise Guidelines by Hypertension Stage:
+
+### Stage 1 Hypertension (140-159/90-99 mmHg):
+- All aerobic exercises allowed
+- Strength training with supervision
+- Target: 150 minutes moderate activity/week
+
+### Stage 2 Hypertension (≥160/100 mmHg):
+- Consult doctor before starting
+- Begin with low intensity
+- Avoid heavy weight lifting
+- Focus on aerobic exercise
+
+## Safety Tips:
+- Warm up 5-10 minutes before exercise
+- Cool down 5-10 minutes after exercise
+- Avoid holding breath during strength training
+- Stop if feeling dizzy, chest pain, or shortness of breath
+- Monitor blood pressure before and after exercise
+- Take medications as scheduled
+- Stay hydrated
+
+## Target Heart Rate:
+- Moderate intensity: 50-70% of maximum heart rate
+- Formula: (220 - age) x 0.5-0.7
+- Use RPE (Rate of Perceived Exertion) scale 5-6 out of 10
+
+## Exercises to Avoid:
+- Very heavy weight lifting (>85% 1RM)
+- Excessive isometric exercises
+- Activities with sudden position changes
+- High-intensity competitive sports
       `,
     },
     {
@@ -298,68 +430,460 @@ DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang diranca
       type: "guide",
       timerDuration: 900,
       content: `
-# Stress Management for Hypertension
-
-## How Stress Affects Blood Pressure:
-- Triggers fight-or-flight response
-- Increases heart rate
-- Constricts blood vessels
-- Releases stress hormones
-- Can lead to unhealthy coping behaviors
-
-## Stress Management Techniques:
-1. **Deep Breathing**: 4-7-8 breathing technique
-2. **Progressive Muscle Relaxation**: Tense and release muscle groups
-3. **Mindfulness Meditation**: Focus on present moment
-4. **Regular Exercise**: Natural stress reliever
-5. **Adequate Sleep**: 7-9 hours per night
-6. **Social Support**: Connect with friends and family
-
-## Quick Stress Relief:
-- Take 10 deep breaths
-- Go for a short walk
-- Listen to calming music
-- Practice gratitude
-- Use positive self-talk
-
-## Long-term Strategies:
-- Identify stress triggers
-- Develop healthy coping mechanisms
-- Maintain work-life balance
-- Consider counseling if needed
-- Practice regular relaxation
-      `,
-      contentId: `
 # Manajemen Stres untuk Hipertensi
 
 ## Bagaimana Stres Mempengaruhi Tekanan Darah:
-- Memicu respons fight-or-flight
-- Meningkatkan detak jantung
-- Menyempitkan pembuluh darah
-- Melepaskan hormon stres
-- Dapat menyebabkan perilaku koping yang tidak sehat
+Berdasarkan Pedoman Hipertensi 2024, stres kronis dapat:
+- Meningkatkan tekanan darah 10-20 mmHg sementara
+- Memicu respons fight-or-flight yang meningkatkan detak jantung
+- Menyempitkan pembuluh darah melalui pelepasan adrenalin
+- Melepaskan hormon kortisol yang meningkatkan retensi natrium
+- Menyebabkan perilaku tidak sehat (merokok, makan berlebihan, kurang tidur)
 
-## Teknik Manajemen Stres:
-1. **Pernapasan Dalam**: Teknik pernapasan 4-7-8
-2. **Relaksasi Otot Progresif**: Tegang dan lepaskan kelompok otot
-3. **Meditasi Mindfulness**: Fokus pada momen saat ini
-4. **Olahraga Teratur**: Penghilang stres alami
-5. **Tidur Cukup**: 7-9 jam per malam
-6. **Dukungan Sosial**: Terhubung dengan teman dan keluarga
+## Teknik Manajemen Stres Terbukti Efektif:
 
-## Penghilang Stres Cepat:
-- Ambil 10 napas dalam
-- Jalan-jalan sebentar
-- Dengarkan musik yang menenangkan
-- Praktikkan rasa syukur
-- Gunakan self-talk positif
+### 1. Teknik Pernapasan (Efektivitas Tinggi):
+- **Pernapasan 4-7-8**: Tarik napas 4 detik, tahan 7 detik, buang 8 detik
+- **Pernapasan Diafragma**: Fokus pada pernapasan perut, bukan dada
+- **Pernapasan Kotak**: 4 detik masuk, 4 detik tahan, 4 detik keluar, 4 detik tahan
+- Praktik: 10-15 menit, 2-3 kali sehari
 
-## Strategi Jangka Panjang:
-- Identifikasi pemicu stres
-- Kembangkan mekanisme koping yang sehat
-- Pertahankan keseimbangan kerja-hidup
-- Pertimbangkan konseling jika diperlukan
-- Praktikkan relaksasi teratur
+### 2. Relaksasi Otot Progresif:
+- Tegang dan lepaskan setiap kelompok otot secara berurutan
+- Mulai dari kaki hingga kepala
+- Tahan ketegangan 5 detik, lepaskan 15 detik
+- Durasi: 15-20 menit sebelum tidur
+
+### 3. Meditasi Mindfulness:
+- Fokus pada momen saat ini tanpa menilai
+- Mulai dengan 5-10 menit sehari
+- Gunakan aplikasi panduan atau musik relaksasi
+- Terbukti menurunkan tekanan darah 5-10 mmHg
+
+### 4. Olahraga Teratur:
+- Aktivitas fisik melepaskan endorfin alami
+- Mengurangi hormon stres kortisol
+- Target: 150 menit aktivitas sedang per minggu
+- Yoga dan Tai Chi sangat efektif untuk stres
+
+### 5. Tidur Berkualitas:
+- 7-9 jam tidur per malam untuk dewasa
+- Tidur kurang dari 6 jam meningkatkan risiko hipertensi 20%
+- Buat rutinitas tidur yang konsisten
+- Hindari kafein 6 jam sebelum tidur
+
+## Strategi Pengelolaan Stres Harian:
+
+### Pagi Hari:
+- Bangun 15 menit lebih awal untuk rutinitas tenang
+- Praktik pernapasan dalam 5 menit
+- Hindari langsung mengecek ponsel
+- Sarapan sehat dan terhidrasi
+
+### Siang Hari:
+- Istirahat 5-10 menit setiap 2 jam kerja
+- Jalan kaki singkat saat istirahat
+- Praktik pernapasan saat merasa tertekan
+- Batasi konsumsi kafein (maksimal 400mg/hari)
+
+### Malam Hari:
+- Matikan perangkat elektronik 1 jam sebelum tidur
+- Praktik relaksasi otot progresif
+- Tulis jurnal rasa syukur
+- Mandi air hangat untuk relaksasi
+
+## Dukungan Sosial dan Profesional:
+- Berbagi dengan keluarga dan teman dekat
+- Bergabung dengan kelompok dukungan hipertensi
+- Konsultasi dengan psikolog jika stres kronis
+- Pertimbangkan terapi kognitif-perilaku (CBT)
+      `,
+      contentId: `
+# Stress Management for Hypertension
+
+## How Stress Affects Blood Pressure:
+Based on 2024 Hypertension Guidelines, chronic stress can:
+- Temporarily increase blood pressure by 10-20 mmHg
+- Trigger fight-or-flight response increasing heart rate
+- Constrict blood vessels through adrenaline release
+- Release cortisol hormone increasing sodium retention
+- Lead to unhealthy behaviors (smoking, overeating, poor sleep)
+
+## Proven Effective Stress Management Techniques:
+
+### 1. Breathing Techniques (High Effectiveness):
+- **4-7-8 Breathing**: Inhale 4 seconds, hold 7 seconds, exhale 8 seconds
+- **Diaphragmatic Breathing**: Focus on belly breathing, not chest
+- **Box Breathing**: 4 seconds in, 4 seconds hold, 4 seconds out, 4 seconds hold
+- Practice: 10-15 minutes, 2-3 times daily
+
+### 2. Progressive Muscle Relaxation:
+- Tense and release each muscle group sequentially
+- Start from feet to head
+- Hold tension 5 seconds, release 15 seconds
+- Duration: 15-20 minutes before bedtime
+
+### 3. Mindfulness Meditation:
+- Focus on present moment without judgment
+- Start with 5-10 minutes daily
+- Use guided apps or relaxation music
+- Proven to lower blood pressure by 5-10 mmHg
+
+### 4. Regular Exercise:
+- Physical activity releases natural endorphins
+- Reduces stress hormone cortisol
+- Target: 150 minutes moderate activity per week
+- Yoga and Tai Chi particularly effective for stress
+
+### 5. Quality Sleep:
+- 7-9 hours sleep per night for adults
+- Less than 6 hours increases hypertension risk by 20%
+- Create consistent sleep routine
+- Avoid caffeine 6 hours before bedtime
+
+## Daily Stress Management Strategies:
+
+### Morning:
+- Wake up 15 minutes earlier for calm routine
+- Practice deep breathing for 5 minutes
+- Avoid immediately checking phone
+- Eat healthy breakfast and hydrate
+
+### Daytime:
+- Take 5-10 minute breaks every 2 hours
+- Short walks during breaks
+- Practice breathing when feeling pressured
+- Limit caffeine intake (maximum 400mg/day)
+
+### Evening:
+- Turn off electronic devices 1 hour before bed
+- Practice progressive muscle relaxation
+- Write gratitude journal
+- Take warm bath for relaxation
+
+## Social and Professional Support:
+- Share with close family and friends
+- Join hypertension support groups
+- Consult psychologist for chronic stress
+- Consider cognitive-behavioral therapy (CBT)
+      `,
+    },
+    {
+      id: 5,
+      title: "Medication Adherence for Hypertension",
+      titleId: "Kepatuhan Obat untuk Hipertensi",
+      description: "Understanding and maintaining proper medication adherence",
+      descriptionId: "Memahami dan menjaga kepatuhan minum obat yang tepat",
+      category: "medications",
+      duration: "12 min",
+      durationId: "12 mnt",
+      difficulty: t("selfHelp.beginner"),
+      rating: 4.9,
+      type: "guide",
+      timerDuration: 720,
+      content: `
+# Kepatuhan Obat untuk Hipertensi
+
+## Pentingnya Kepatuhan Obat berdasarkan Pedoman 2024:
+- Kepatuhan <80% meningkatkan risiko stroke 2-3 kali lipat
+- Kepatuhan optimal (>90%) dapat mencegah 70% komplikasi kardiovaskular
+- Penghentian obat mendadak dapat menyebabkan rebound hypertension
+- Kontrol tekanan darah yang baik mengurangi risiko kematian hingga 25%
+
+## Jenis Obat Hipertensi dan Cara Kerjanya:
+
+### 1. ACE Inhibitors (Captopril, Lisinopril):
+- **Cara Kerja**: Menghambat enzim pengubah angiotensin
+- **Manfaat**: Melindungi jantung dan ginjal
+- **Waktu Minum**: Pagi hari, perut kosong
+- **Efek Samping**: Batuk kering (10-15% pasien)
+- **Monitoring**: Fungsi ginjal dan kalium darah
+
+### 2. ARB (Valsartan, Telmisartan):
+- **Cara Kerja**: Memblokir reseptor angiotensin II
+- **Manfaat**: Sama dengan ACE inhibitor, tanpa batuk
+- **Waktu Minum**: Pagi atau malam, dengan/tanpa makanan
+- **Efek Samping**: Minimal, kadang pusing ringan
+- **Monitoring**: Fungsi ginjal dan elektrolit
+
+### 3. Calcium Channel Blockers (Amlodipine, Nifedipine):
+- **Cara Kerja**: Menghambat masuknya kalsium ke otot jantung
+- **Manfaat**: Efektif untuk hipertensi sistolik terisolasi
+- **Waktu Minum**: Pagi hari, bersamaan dengan makanan
+- **Efek Samping**: Pembengkakan kaki, pusing
+- **Monitoring**: Detak jantung dan tekanan darah
+
+### 4. Diuretik (Hydrochlorothiazide, Furosemide):
+- **Cara Kerja**: Mengeluarkan kelebihan cairan dan natrium
+- **Manfaat**: Mengurangi volume darah dan beban jantung
+- **Waktu Minum**: Pagi hari untuk menghindari sering buang air kecil malam
+- **Efek Samping**: Sering buang air kecil, kram otot
+- **Monitoring**: Elektrolit (kalium, natrium, magnesium)
+
+### 5. Beta Blockers (Propranolol, Metoprolol):
+- **Cara Kerja**: Menghambat reseptor beta di jantung
+- **Manfaat**: Mengurangi detak jantung dan kontraktilitas
+- **Waktu Minum**: Pagi dan malam (jika 2x sehari)
+- **Efek Samping**: Kelelahan, disfungsi seksual
+- **Monitoring**: Detak jantung dan tekanan darah
+
+## Tips Meningkatkan Kepatuhan:
+
+### 1. Sistem Pengingat:
+- Alarm ponsel untuk waktu minum obat
+- Kotak obat mingguan dengan pembagian hari
+- Aplikasi pengingat obat
+- Hubungkan dengan aktivitas rutin (sikat gigi, sarapan)
+
+### 2. Edukasi dan Pemahaman:
+- Pahami nama obat, dosis, dan waktu minum
+- Ketahui manfaat dan efek samping yang mungkin terjadi
+- Diskusikan kekhawatiran dengan dokter atau apoteker
+- Baca informasi obat yang disediakan
+
+### 3. Komunikasi dengan Tenaga Kesehatan:
+- Laporkan efek samping yang mengganggu
+- Diskusikan kesulitan minum obat (ukuran, rasa, frekuensi)
+- Tanyakan alternatif jika ada masalah finansial
+- Jadwalkan kontrol rutin sesuai anjuran
+      `,
+      contentId: `
+# Medication Adherence for Hypertension
+
+## Importance of Medication Adherence based on 2024 Guidelines:
+- Adherence <80% increases stroke risk 2-3 times
+- Optimal adherence (>90%) can prevent 70% of cardiovascular complications
+- Sudden medication discontinuation can cause rebound hypertension
+- Good blood pressure control reduces mortality risk by up to 25%
+
+## Types of Hypertension Medications and How They Work:
+
+### 1. ACE Inhibitors (Captopril, Lisinopril):
+- **Mechanism**: Inhibit angiotensin-converting enzyme
+- **Benefits**: Protect heart and kidneys
+- **Timing**: Morning, on empty stomach
+- **Side Effects**: Dry cough (10-15% of patients)
+- **Monitoring**: Kidney function and blood potassium
+
+### 2. ARBs (Valsartan, Telmisartan):
+- **Mechanism**: Block angiotensin II receptors
+- **Benefits**: Same as ACE inhibitors, without cough
+- **Timing**: Morning or evening, with/without food
+- **Side Effects**: Minimal, occasional mild dizziness
+- **Monitoring**: Kidney function and electrolytes
+
+### 3. Calcium Channel Blockers (Amlodipine, Nifedipine):
+- **Mechanism**: Block calcium entry into heart muscle
+- **Benefits**: Effective for isolated systolic hypertension
+- **Timing**: Morning, with food
+- **Side Effects**: Ankle swelling, dizziness
+- **Monitoring**: Heart rate and blood pressure
+
+### 4. Diuretics (Hydrochlorothiazide, Furosemide):
+- **Mechanism**: Remove excess fluid and sodium
+- **Benefits**: Reduce blood volume and heart workload
+- **Timing**: Morning to avoid nighttime urination
+- **Side Effects**: Frequent urination, muscle cramps
+- **Monitoring**: Electrolytes (potassium, sodium, magnesium)
+
+### 5. Beta Blockers (Propranolol, Metoprolol):
+- **Mechanism**: Block beta receptors in heart
+- **Benefits**: Reduce heart rate and contractility
+- **Timing**: Morning and evening (if twice daily)
+- **Side Effects**: Fatigue, sexual dysfunction
+- **Monitoring**: Heart rate and blood pressure
+
+## Tips to Improve Adherence:
+
+### 1. Reminder Systems:
+- Phone alarms for medication times
+- Weekly pill organizers with daily compartments
+- Medication reminder apps
+- Link with routine activities (brushing teeth, breakfast)
+
+### 2. Education and Understanding:
+- Know medication names, doses, and timing
+- Understand benefits and possible side effects
+- Discuss concerns with doctor or pharmacist
+- Read provided medication information
+
+### 3. Communication with Healthcare Providers:
+- Report bothersome side effects
+- Discuss difficulties taking medications (size, taste, frequency)
+- Ask about alternatives if financial issues exist
+- Schedule regular follow-ups as recommended
+      `,
+    },
+    {
+      id: 6,
+      title: "Mental Health and Hypertension",
+      titleId: "Kesehatan Mental dan Hipertensi",
+      description: "Understanding the connection between mental health and blood pressure",
+      descriptionId: "Memahami hubungan antara kesehatan mental dan tekanan darah",
+      category: "mentalHealth",
+      duration: "18 min",
+      durationId: "18 mnt",
+      difficulty: t("selfHelp.intermediate"),
+      rating: 4.6,
+      type: "guide",
+      timerDuration: 1080,
+      content: `
+# Kesehatan Mental dan Hipertensi
+
+## Hubungan Kesehatan Mental dengan Tekanan Darah:
+Berdasarkan Pedoman Hipertensi 2024, terdapat hubungan dua arah antara kesehatan mental dan hipertensi:
+
+### Dampak Gangguan Mental terhadap Hipertensi:
+- **Depresi**: Meningkatkan risiko hipertensi 42%
+- **Kecemasan**: Meningkatkan tekanan darah 10-15 mmHg saat episode akut
+- **Stres Kronis**: Menyebabkan peningkatan kortisol dan aktivasi sistem saraf simpatis
+- **Gangguan Tidur**: Kurang tidur (<6 jam) meningkatkan risiko hipertensi 20%
+
+### Dampak Hipertensi terhadap Kesehatan Mental:
+- Risiko depresi meningkat 25% pada penderita hipertensi
+- Kecemasan tentang komplikasi dapat memperburuk kontrol tekanan darah
+- Efek samping obat dapat mempengaruhi mood dan fungsi kognitif
+- Pembatasan aktivitas dapat menyebabkan isolasi sosial
+
+## Mekanisme Biologis:
+
+### 1. Sistem Saraf Otonom:
+- Stres mengaktifkan sistem saraf simpatis
+- Pelepasan adrenalin dan noradrenalin
+- Peningkatan detak jantung dan kontraksi pembuluh darah
+- Aktivasi sistem renin-angiotensin-aldosteron
+
+### 2. Sistem Endokrin:
+- Peningkatan kortisol kronis
+- Gangguan regulasi insulin
+- Perubahan hormon tiroid
+- Ketidakseimbangan neurotransmitter (serotonin, dopamin)
+
+### 3. Peradangan:
+- Stres kronis meningkatkan marker inflamasi (CRP, IL-6)
+- Peradangan merusak endotel pembuluh darah
+- Aterosklerosis dan kekakuan arteri
+- Gangguan fungsi ginjal
+
+## Strategi Pengelolaan Terintegrasi:
+
+### 1. Terapi Psikologis:
+- **Cognitive Behavioral Therapy (CBT)**: Terbukti menurunkan TD 5-10 mmHg
+- **Mindfulness-Based Stress Reduction**: Efektif untuk kecemasan dan TD
+- **Terapi Relaksasi**: Progressive muscle relaxation, guided imagery
+- **Konseling**: Untuk mengatasi masalah adaptasi dan kepatuhan
+
+### 2. Intervensi Gaya Hidup:
+- **Olahraga Teratur**: Meningkatkan endorfin dan menurunkan kortisol
+- **Yoga dan Tai Chi**: Kombinasi aktivitas fisik dan meditasi
+- **Hobi dan Aktivitas Menyenangkan**: Mengurangi stres dan meningkatkan mood
+- **Dukungan Sosial**: Bergabung dengan kelompok dukungan atau komunitas
+
+### 3. Manajemen Tidur:
+- Tidur 7-9 jam per malam
+- Rutinitas tidur yang konsisten
+- Lingkungan tidur yang nyaman (gelap, sejuk, tenang)
+- Hindari kafein dan alkohol sebelum tidur
+- Teknik relaksasi sebelum tidur
+
+## Tanda-tanda yang Memerlukan Bantuan Profesional:
+
+### Gejala Depresi:
+- Perasaan sedih atau putus asa >2 minggu
+- Kehilangan minat pada aktivitas yang biasa disukai
+- Perubahan nafsu makan atau berat badan signifikan
+- Gangguan tidur (insomnia atau hipersomnia)
+- Kelelahan atau kehilangan energi
+- Perasaan tidak berharga atau bersalah berlebihan
+- Kesulitan konsentrasi atau membuat keputusan
+- Pikiran tentang kematian atau bunuh diri
+
+### Gejala Kecemasan:
+- Kekhawatiran berlebihan yang sulit dikontrol
+- Ketegangan otot dan gelisah
+- Mudah lelah atau irritable
+- Kesulitan konsentrasi
+- Gangguan tidur
+- Gejala fisik (jantung berdebar, berkeringat, tremor)
+      `,
+      contentId: `
+# Mental Health and Hypertension
+
+## Connection Between Mental Health and Blood Pressure:
+Based on 2024 Hypertension Guidelines, there's a bidirectional relationship between mental health and hypertension:
+
+### Impact of Mental Disorders on Hypertension:
+- **Depression**: Increases hypertension risk by 42%
+- **Anxiety**: Increases blood pressure by 10-15 mmHg during acute episodes
+- **Chronic Stress**: Causes increased cortisol and sympathetic nervous system activation
+- **Sleep Disorders**: Less than 6 hours sleep increases hypertension risk by 20%
+
+### Impact of Hypertension on Mental Health:
+- Depression risk increases by 25% in hypertensive patients
+- Anxiety about complications can worsen blood pressure control
+- Medication side effects can affect mood and cognitive function
+- Activity restrictions can lead to social isolation
+
+## Biological Mechanisms:
+
+### 1. Autonomic Nervous System:
+- Stress activates sympathetic nervous system
+- Release of adrenaline and noradrenaline
+- Increased heart rate and blood vessel contraction
+- Activation of renin-angiotensin-aldosterone system
+
+### 2. Endocrine System:
+- Chronic cortisol elevation
+- Insulin regulation disruption
+- Thyroid hormone changes
+- Neurotransmitter imbalance (serotonin, dopamine)
+
+### 3. Inflammation:
+- Chronic stress increases inflammatory markers (CRP, IL-6)
+- Inflammation damages blood vessel endothelium
+- Atherosclerosis and arterial stiffness
+- Kidney function impairment
+
+## Integrated Management Strategies:
+
+### 1. Psychological Therapies:
+- **Cognitive Behavioral Therapy (CBT)**: Proven to lower BP by 5-10 mmHg
+- **Mindfulness-Based Stress Reduction**: Effective for anxiety and BP
+- **Relaxation Therapy**: Progressive muscle relaxation, guided imagery
+- **Counseling**: To address adaptation and adherence issues
+
+### 2. Lifestyle Interventions:
+- **Regular Exercise**: Increases endorphins and reduces cortisol
+- **Yoga and Tai Chi**: Combination of physical activity and meditation
+- **Hobbies and Enjoyable Activities**: Reduce stress and improve mood
+- **Social Support**: Join support groups or communities
+
+### 3. Sleep Management:
+- 7-9 hours sleep per night
+- Consistent sleep routine
+- Comfortable sleep environment (dark, cool, quiet)
+- Avoid caffeine and alcohol before bedtime
+- Relaxation techniques before sleep
+
+## Signs Requiring Professional Help:
+
+### Depression Symptoms:
+- Sad or hopeless feelings >2 weeks
+- Loss of interest in usually enjoyed activities
+- Significant appetite or weight changes
+- Sleep disturbances (insomnia or hypersomnia)
+- Fatigue or energy loss
+- Excessive worthlessness or guilt feelings
+- Concentration or decision-making difficulties
+- Thoughts about death or suicide
+
+### Anxiety Symptoms:
+- Excessive worry that's hard to control
+- Muscle tension and restlessness
+- Easy fatigue or irritability
+- Concentration difficulties
+- Sleep disturbances
+- Physical symptoms (palpitations, sweating, tremor)
       `,
     },
   ]
@@ -463,18 +987,32 @@ DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang diranca
                             </h2>
                           )
                         }
+                        if (line.startsWith("### ")) {
+                          return (
+                            <h3 key={index} className="text-lg font-semibold mb-2 mt-4">
+                              {line.substring(4)}
+                            </h3>
+                          )
+                        }
                         if (line.startsWith("- ")) {
                           return (
-                            <li key={index} className="mb-1">
+                            <li key={index} className="mb-1 ml-4">
                               {line.substring(2)}
                             </li>
                           )
                         }
                         if (line.match(/^\d+\./)) {
                           return (
-                            <li key={index} className="mb-1">
+                            <li key={index} className="mb-1 ml-4">
                               {line}
                             </li>
+                          )
+                        }
+                        if (line.startsWith("**") && line.endsWith("**")) {
+                          return (
+                            <p key={index} className="mb-3 font-semibold">
+                              {line.substring(2, line.length - 2)}
+                            </p>
                           )
                         }
                         if (line.trim() === "") {

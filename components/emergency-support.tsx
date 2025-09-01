@@ -54,7 +54,7 @@ export function EmergencySupport() {
     setLocationError(null)
 
     if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by this browser")
+      setLocationError(t("emergency.locationError"))
       setIsLoadingLocation(false)
       return
     }
@@ -69,7 +69,7 @@ export function EmergencySupport() {
         searchNearbyFacilities(location)
       },
       (error) => {
-        setLocationError("Unable to retrieve your location")
+        setLocationError(t("emergency.locationError"))
         setIsLoadingLocation(false)
         console.error("Geolocation error:", error)
       },
@@ -117,7 +117,7 @@ export function EmergencySupport() {
             <ScrollArea className="h-full">
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Emergency Support</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{t("emergency.title")}</h2>
                 </div>
 
                 {/* Crisis Support */}
@@ -125,11 +125,10 @@ export function EmergencySupport() {
                   <CardHeader className="pb-2 sm:pb-3">
                     <CardTitle className="text-red-800 flex items-center text-sm sm:text-base">
                       <AlertTriangle className="w-4 h-4 mr-2" />
-                      Crisis Support
+                      {t("emergency.crisisSupport")}
                     </CardTitle>
                     <CardDescription className="text-red-700 text-xs sm:text-sm">
-                      If you're in immediate danger or having thoughts of self-harm, please reach out for help
-                      immediately.
+                      {t("emergency.crisisDescription")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -138,7 +137,7 @@ export function EmergencySupport() {
                       className="w-full bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm h-8 sm:h-10"
                     >
                       <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                      Call Crisis Hotline (119)
+                      {t("emergency.callCrisisHotline")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -146,9 +145,11 @@ export function EmergencySupport() {
                 {/* Mental Health Support */}
                 <Card className="border-sky-200 bg-sky-50">
                   <CardHeader className="pb-2 sm:pb-3">
-                    <CardTitle className="text-sky-800 text-sm sm:text-base">Mental Health Support</CardTitle>
+                    <CardTitle className="text-sky-800 text-sm sm:text-base">
+                      {t("emergency.mentalHealthSupport")}
+                    </CardTitle>
                     <CardDescription className="text-sky-700 text-xs sm:text-sm">
-                      Connect with mental health professionals and support services.
+                      {t("emergency.mentalHealthDescription")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -158,7 +159,7 @@ export function EmergencySupport() {
                       className="w-full border-green-500 text-green-600 hover:bg-green-50 bg-transparent text-xs sm:text-sm h-8 sm:h-10"
                     >
                       <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                      WhatsApp Mental Health Facility
+                      {t("emergency.whatsappFacility")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -169,7 +170,7 @@ export function EmergencySupport() {
                     <CardTitle className="text-blue-800 flex items-center justify-between text-sm sm:text-base">
                       <div className="flex items-center">
                         <MapPin className="w-4 h-4 mr-2" />
-                        Nearby Healthcare Facilities
+                        {t("emergency.nearbyFacilities")}
                       </div>
                       <Button
                         onClick={getCurrentLocation}
@@ -190,7 +191,7 @@ export function EmergencySupport() {
                     {isLoadingLocation ? (
                       <div className="flex items-center justify-center py-3 sm:py-4">
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        <span className="text-xs sm:text-sm">Searching for nearby facilities...</span>
+                        <span className="text-xs sm:text-sm">{t("emergency.searchingFacilities")}</span>
                       </div>
                     ) : locationError ? (
                       <div className="text-center py-3 sm:py-4">
@@ -202,12 +203,12 @@ export function EmergencySupport() {
                           className="text-xs sm:text-sm bg-transparent h-8"
                         >
                           <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                          Enable Location
+                          {t("emergency.enableLocation")}
                         </Button>
                       </div>
                     ) : facilities.length === 0 ? (
                       <div className="text-center py-3 sm:py-4">
-                        <p className="text-xs sm:text-sm text-gray-600 mb-3">No facilities found nearby</p>
+                        <p className="text-xs sm:text-sm text-gray-600 mb-3">{t("emergency.noFacilitiesFound")}</p>
                         <Button
                           onClick={getCurrentLocation}
                           variant="outline"
@@ -215,7 +216,7 @@ export function EmergencySupport() {
                           className="text-xs sm:text-sm bg-transparent h-8"
                         >
                           <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                          Try Again
+                          {t("emergency.tryAgain")}
                         </Button>
                       </div>
                     ) : (
@@ -238,10 +239,12 @@ export function EmergencySupport() {
                                 </div>
                               </div>
                               <div className="text-right ml-2">
-                                <div className="text-xs text-gray-600">{facility.distance} km</div>
+                                <div className="text-xs text-gray-600">
+                                  {facility.distance} {t("emergency.distance")}
+                                </div>
                                 {facility.isOpen !== undefined && (
                                   <Badge variant={facility.isOpen ? "default" : "secondary"} className="text-xs mt-1">
-                                    {facility.isOpen ? "Open Now" : "Closed"}
+                                    {facility.isOpen ? t("emergency.openNow") : t("emergency.closed")}
                                   </Badge>
                                 )}
                               </div>
@@ -255,7 +258,7 @@ export function EmergencySupport() {
                                 className="flex-1 text-xs h-7 sm:h-8"
                               >
                                 <Navigation className="w-3 h-3 mr-1" />
-                                Get Directions
+                                {t("emergency.getDirections")}
                               </Button>
                               {facility.phone && (
                                 <Button
@@ -265,7 +268,7 @@ export function EmergencySupport() {
                                   className="flex-1 text-xs h-7 sm:h-8"
                                 >
                                   <Phone className="w-3 h-3 mr-1" />
-                                  Call
+                                  {t("emergency.callFacility")}
                                 </Button>
                               )}
                             </div>
@@ -279,24 +282,22 @@ export function EmergencySupport() {
                 {/* Resources */}
                 <Card className="border-yellow-200 bg-yellow-50">
                   <CardHeader className="pb-2 sm:pb-3">
-                    <CardTitle className="text-yellow-800 text-sm sm:text-base">Resources</CardTitle>
+                    <CardTitle className="text-yellow-800 text-sm sm:text-base">{t("emergency.resources")}</CardTitle>
                     <CardDescription className="text-yellow-700 text-xs sm:text-sm">
-                      Additional mental health resources and information.
+                      {t("emergency.resourcesDescription")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-1">
-                      <p className="text-xs sm:text-sm text-yellow-800">• National Suicide Prevention Lifeline</p>
-                      <p className="text-xs sm:text-sm text-yellow-800">• Crisis Text Line: Text HOME to 741741</p>
-                      <p className="text-xs sm:text-sm text-yellow-800">• Emergency Services: 911</p>
+                      <p className="text-xs sm:text-sm text-yellow-800">{t("emergency.nationalSuicide")}</p>
+                      <p className="text-xs sm:text-sm text-yellow-800">{t("emergency.crisisText")}</p>
+                      <p className="text-xs sm:text-sm text-yellow-800">{t("emergency.emergencyServices")}</p>
                     </div>
                   </CardContent>
                 </Card>
 
                 <div className="pt-2 border-t">
-                  <p className="text-xs text-gray-500 text-center">
-                    Remember: You are not alone. Help is available 24/7.
-                  </p>
+                  <p className="text-xs text-gray-500 text-center">{t("emergency.notAlone")}</p>
                 </div>
               </div>
             </ScrollArea>
