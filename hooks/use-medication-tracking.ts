@@ -12,8 +12,6 @@ interface MedicationWithSchedule extends Medication {
     taken: boolean
     takenAt?: string
   }>
-  isExpired?: boolean
-  daysRemaining?: number
 }
 
 export function useMedicationTracking() {
@@ -25,56 +23,6 @@ export function useMedicationTracking() {
     if (typeof window === "undefined") return null
     const storedUser = localStorage.getItem("auth_user")
     return storedUser ? JSON.parse(storedUser).id : null
-  }
-
-  const calculateEndDate = (startDate: string, durationType?: string, durationValue?: number) => {
-    if (!durationType || durationType === "lifelong" || durationType === "as_needed") {
-      return null
-    }
-
-    const start = new Date(startDate)
-    const end = new Date(start)
-
-    switch (durationType) {
-      case "days":
-        end.setDate(start.getDate() + (durationValue || 0))
-        break
-      case "weeks":
-        end.setDate(start.getDate() + (durationValue || 0) * 7)
-        break
-      case "months":
-        end.setMonth(start.getMonth() + (durationValue || 0))
-        break
-    }
-
-    return end.toISOString()
-  }
-
-  const checkMedicationStatus = (medication: Medication) => {
-    const now = new Date()
-    let endDate: Date | null = null
-
-    if (medication.end_date) {
-      endDate = new Date(medication.end_date)
-    } else if (medication.start_date && medication.duration_type && medication.duration_value) {
-      const calculatedEndDate = calculateEndDate(
-        medication.start_date,
-        medication.duration_type,
-        medication.duration_value,
-      )
-      if (calculatedEndDate) {
-        endDate = new Date(calculatedEndDate)
-      }
-    }
-
-    if (!endDate) {
-      return { isExpired: false, daysRemaining: null }
-    }
-
-    const isExpired = now > endDate
-    const daysRemaining = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-
-    return { isExpired, daysRemaining: isExpired ? 0 : daysRemaining }
   }
 
   useEffect(() => {
@@ -96,39 +44,27 @@ export function useMedicationTracking() {
 
       if (error) throw error
 
-      // Parse the frequency and notes to extract schedule times
+      // Parse the notes to extract schedule times
       const medicationsWithSchedule = (data || []).map((med) => {
         let times: string[] = []
+        let notes = ""
 
-        // Try to parse times from notes or create default times based on frequency
-        if (med.notes && med.notes.includes("times:")) {
-          const timesMatch = med.notes.match(/times:\s*\[(.*?)\]/)
-          if (timesMatch) {
-            times = timesMatch[1].split(",").map((t) => t.trim().replace(/"/g, ""))
-          }
-        } else {
-          // Generate default times based on frequency
-          switch (med.frequency) {
-            case "once-daily":
-              times = ["08:00"]
-              break
-            case "twice-daily":
-              times = ["08:00", "20:00"]
-              break
-            case "three-times-daily":
-              times = ["08:00", "14:00", "20:00"]
-              break
-            default:
-              times = ["08:00"]
+        if (med.notes) {
+          try {
+            const parsed = JSON.parse(med.notes)
+            times = parsed.times || []
+            notes = parsed.notes || ""
+          } catch {
+            // If parsing fails, treat as plain text notes
+            notes = med.notes
+            times = []
           }
         }
-
-        const status = checkMedicationStatus(med)
 
         return {
           ...med,
           times,
-          ...status,
+          notes,
         }
       })
 
@@ -161,31 +97,17 @@ export function useMedicationTracking() {
   const addMedication = async (medicationData: {
     name: string
     dosage?: string
-    frequency?: string
     times?: string[]
-    start_date?: string
-    end_date?: string
-    duration_type?: "lifelong" | "days" | "weeks" | "months" | "as_needed"
-    duration_value?: number
     notes?: string
   }) => {
     const userId = getUserId()
     if (!userId) return { success: false, error: "Not authenticated" }
 
     try {
-      // Store times in notes field as JSON
-      const notesWithTimes = medicationData.notes
-        ? `${medicationData.notes} times: [${medicationData.times?.map((t) => `"${t}"`).join(", ")}]`
-        : `times: [${medicationData.times?.map((t) => `"${t}"`).join(", ")}]`
-
-      // Calculate end date if duration is specified
-      let endDate = medicationData.end_date
-      if (!endDate && medicationData.start_date && medicationData.duration_type && medicationData.duration_value) {
-        endDate = calculateEndDate(
-          medicationData.start_date,
-          medicationData.duration_type,
-          medicationData.duration_value,
-        )
+      // Store times and notes in JSON format
+      const notesData = {
+        times: medicationData.times || [],
+        notes: medicationData.notes || "",
       }
 
       const { data, error } = await supabase
@@ -194,12 +116,7 @@ export function useMedicationTracking() {
           user_id: userId,
           name: medicationData.name,
           dosage: medicationData.dosage,
-          frequency: medicationData.frequency,
-          start_date: medicationData.start_date,
-          end_date: endDate,
-          duration_type: medicationData.duration_type,
-          duration_value: medicationData.duration_value,
-          notes: notesWithTimes,
+          notes: JSON.stringify(notesData),
           is_active: true,
         })
         .select()
@@ -207,11 +124,10 @@ export function useMedicationTracking() {
 
       if (error) throw error
 
-      const status = checkMedicationStatus(data)
       const newMedication = {
         ...data,
         times: medicationData.times || [],
-        ...status,
+        notes: medicationData.notes || "",
       }
 
       setMedications((prev) => [newMedication, ...prev])
@@ -228,7 +144,6 @@ export function useMedicationTracking() {
 
     try {
       const today = new Date().toISOString().split("T")[0]
-      const logId = `${medicationId}_${scheduledTime}_${today}`
 
       // Check if log already exists for this medication, time, and date
       const { data: existingLog } = await supabase
@@ -282,12 +197,7 @@ export function useMedicationTracking() {
     const today = new Date().toISOString().split("T")[0]
 
     return medications
-      .filter((med) => {
-        // Filter out expired medications unless they are "as_needed"
-        if (med.duration_type === "as_needed") return true
-        if (med.duration_type === "lifelong") return true
-        return !med.isExpired
-      })
+      .filter((med) => med.is_active)
       .map((med) => {
         const todaysLogs = medicationLogs.filter(
           (log) => log.medication_id === med.id && log.taken_at.startsWith(today),
@@ -308,7 +218,6 @@ export function useMedicationTracking() {
           logs,
         }
       })
-      .filter((med) => med.is_active)
   }
 
   const getAdherenceRate = (days = 7) => {

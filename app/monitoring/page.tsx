@@ -17,7 +17,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   Heart,
   Activity,
@@ -29,7 +40,8 @@ import {
   AlertTriangle,
   CheckCircle2,
   Circle,
-  Timer,
+  Trash2,
+  X,
 } from "lucide-react"
 import { useBPTracking } from "@/hooks/use-bp-tracking"
 import { useMedicationTracking } from "@/hooks/use-medication-tracking"
@@ -43,11 +55,11 @@ export default function MonitoringPage() {
   const {
     medications,
     addMedication,
-    updateMedication,
     markMedicationTaken,
     getAdherenceRate,
     getTodaysMedications,
     getMissedDoses,
+    deleteMedication,
   } = useMedicationTracking()
 
   // BP Form State
@@ -60,11 +72,8 @@ export default function MonitoringPage() {
   // Medication Form State
   const [medName, setMedName] = useState("")
   const [medDosage, setMedDosage] = useState("")
-  const [medFrequency, setMedFrequency] = useState("")
   const [medTimes, setMedTimes] = useState<string[]>([""])
   const [medNotes, setMedNotes] = useState("")
-  const [durationType, setDurationType] = useState<"lifelong" | "days" | "weeks" | "months" | "as_needed">("lifelong")
-  const [durationValue, setDurationValue] = useState("")
   const [isAddingMed, setIsAddingMed] = useState(false)
 
   const handleAddBP = () => {
@@ -79,25 +88,17 @@ export default function MonitoringPage() {
   }
 
   const handleAddMedication = () => {
-    if (medName && medDosage && medFrequency) {
+    if (medName && medDosage) {
       addMedication({
         name: medName,
         dosage: medDosage,
-        frequency: medFrequency,
         times: medTimes.filter((time) => time !== ""),
-        start_date: new Date().toISOString(),
-        duration_type: durationType,
-        duration_value:
-          durationType !== "lifelong" && durationType !== "as_needed" ? Number.parseInt(durationValue) : undefined,
         notes: medNotes || undefined,
       })
       setMedName("")
       setMedDosage("")
-      setMedFrequency("")
       setMedTimes([""])
       setMedNotes("")
-      setDurationType("lifelong")
-      setDurationValue("")
       setIsAddingMed(false)
     }
   }
@@ -120,40 +121,8 @@ export default function MonitoringPage() {
     await markMedicationTaken(medicationId, scheduledTime, checked)
   }
 
-  const getDurationText = (durationType?: string, durationValue?: number) => {
-    if (!durationType) return ""
-
-    switch (durationType) {
-      case "lifelong":
-        return t("monitoring.lifelong")
-      case "as_needed":
-        return t("monitoring.asNeeded")
-      case "days":
-        return `${durationValue} ${durationValue === 1 ? t("monitoring.day") : t("monitoring.days")}`
-      case "weeks":
-        return `${durationValue} ${durationValue === 1 ? t("monitoring.week") : t("monitoring.weeks")}`
-      case "months":
-        return `${durationValue} ${durationValue === 1 ? t("monitoring.month") : t("monitoring.months")}`
-      default:
-        return ""
-    }
-  }
-
-  const getFrequencyText = (frequency?: string) => {
-    if (!frequency) return ""
-
-    switch (frequency) {
-      case "once-daily":
-        return t("monitoring.onceDailyFreq")
-      case "twice-daily":
-        return t("monitoring.twiceDailyFreq")
-      case "three-times-daily":
-        return t("monitoring.threeTimesDailyFreq")
-      case "as-needed":
-        return t("monitoring.asNeededFreq")
-      default:
-        return frequency
-    }
+  const handleDeleteMedication = async (medicationId: string) => {
+    await deleteMedication(medicationId)
   }
 
   const stats = getStats(30)
@@ -381,7 +350,7 @@ export default function MonitoringPage() {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{todaysMeds?.length || 0}</div>
+                  <div className="text-2xl font-bold">{medications?.length || 0}</div>
                   <p className="text-xs text-muted-foreground">{t("meds.currentMedications")}</p>
                 </CardContent>
               </Card>
@@ -433,20 +402,6 @@ export default function MonitoringPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="med-frequency">{t("meds.frequency")}</Label>
-                    <Select value={medFrequency} onValueChange={setMedFrequency}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("meds.frequency")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="once-daily">{t("monitoring.onceDailyFreq")}</SelectItem>
-                        <SelectItem value="twice-daily">{t("monitoring.twiceDailyFreq")}</SelectItem>
-                        <SelectItem value="three-times-daily">{t("monitoring.threeTimesDailyFreq")}</SelectItem>
-                        <SelectItem value="as-needed">{t("monitoring.asNeededFreq")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
                     <Label>{t("monitoring.scheduleTimes")}</Label>
                     {medTimes.map((time, index) => (
                       <div key={index} className="flex gap-2">
@@ -458,7 +413,7 @@ export default function MonitoringPage() {
                         />
                         {medTimes.length > 1 && (
                           <Button type="button" variant="outline" size="sm" onClick={() => removeTimeSlot(index)}>
-                            {t("monitoring.remove")}
+                            <X className="h-4 w-4" />
                           </Button>
                         )}
                       </div>
@@ -470,37 +425,10 @@ export default function MonitoringPage() {
                       onClick={addTimeSlot}
                       className="w-full bg-transparent"
                     >
-                      + {t("monitoring.addTime")}
+                      <Plus className="h-4 w-4 mr-2" />
+                      {t("monitoring.addTime")}
                     </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="duration-type">{t("monitoring.duration")}</Label>
-                    <Select value={durationType} onValueChange={(value: any) => setDurationType(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("monitoring.selectDuration")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="lifelong">{t("monitoring.lifelong")}</SelectItem>
-                        <SelectItem value="days">{t("monitoring.days")}</SelectItem>
-                        <SelectItem value="weeks">{t("monitoring.weeks")}</SelectItem>
-                        <SelectItem value="months">{t("monitoring.months")}</SelectItem>
-                        <SelectItem value="as_needed">{t("monitoring.asNeeded")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {durationType !== "lifelong" && durationType !== "as_needed" && (
-                    <div className="space-y-2">
-                      <Label htmlFor="duration-value">{t("monitoring.durationValue")}</Label>
-                      <Input
-                        id="duration-value"
-                        type="number"
-                        value={durationValue}
-                        onChange={(e) => setDurationValue(e.target.value)}
-                        placeholder={`${t("monitoring.enter")} ${durationType === "days" ? t("monitoring.numberOfDays") : durationType === "weeks" ? t("monitoring.numberOfWeeks") : t("monitoring.numberOfMonths")}`}
-                        min="1"
-                      />
-                    </div>
-                  )}
                   <div className="space-y-2">
                     <Label htmlFor="med-notes">{t("meds.notes")}</Label>
                     <Textarea
@@ -520,6 +448,88 @@ export default function MonitoringPage() {
               </DialogContent>
             </Dialog>
 
+            {/* Current Medications Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Pill className="w-5 h-5" />
+                  Current Medications
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">Manage your medication list</p>
+              </CardHeader>
+              <CardContent>
+                {medications && medications.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Medication Name</TableHead>
+                        <TableHead>Dosage</TableHead>
+                        <TableHead>Schedule</TableHead>
+                        <TableHead>Notes</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {medications.map((medication) => (
+                        <TableRow key={medication.id}>
+                          <TableCell className="font-medium">{medication.name}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{medication.dosage}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {medication.times?.map((time, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {time}
+                                </Badge>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-xs truncate">{medication.notes || "-"}</TableCell>
+                          <TableCell className="text-right">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 bg-transparent"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Medication</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{medication.name}"? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteMedication(medication.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Pill className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>No medications added yet</p>
+                    <p className="text-sm">Add your first medication to start tracking</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Today's Medication Checklist */}
             <Card>
               <CardHeader>
@@ -538,21 +548,7 @@ export default function MonitoringPage() {
                           <div>
                             <h3 className="font-semibold text-lg">{med.name}</h3>
                             <p className="text-sm text-muted-foreground">{med.dosage}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Timer className="w-3 h-3 text-muted-foreground" />
-                              <span className="text-xs text-muted-foreground">
-                                {getDurationText(med.duration_type, med.duration_value)}
-                              </span>
-                              {med.daysRemaining !== null &&
-                                med.daysRemaining !== undefined &&
-                                med.daysRemaining > 0 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {med.daysRemaining} {t("monitoring.daysLeft")}
-                                  </Badge>
-                                )}
-                            </div>
                           </div>
-                          <Badge variant="outline">{getFrequencyText(med.frequency)}</Badge>
                         </div>
 
                         <div className="space-y-3">

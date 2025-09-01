@@ -30,13 +30,8 @@ export interface Medication {
   user_id: string
   name: string
   dosage?: string
-  frequency?: string
-  start_date?: string
-  end_date?: string
-  duration_type?: "lifelong" | "days" | "weeks" | "months" | "as_needed"
-  duration_value?: number
   is_active: boolean
-  notes?: string
+  notes?: string // JSON string containing {"times": ["08:00", "20:00"], "notes": "Additional notes"}
   created_at: string
   updated_at: string
 }
