@@ -1,48 +1,268 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
-import { User, Mail, Calendar, Settings, Shield, Bell } from "lucide-react"
+import { User, Calendar, Settings, Shield, Bell, MapPin, Loader2 } from "lucide-react"
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth()
+  const { user, logout, updateProfile } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
 
   const [isEditing, setIsEditing] = useState(false)
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false)
   const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
+    full_name: user?.full_name || "",
+    gender: user?.gender || "",
+    birth_date: user?.birth_date || "",
+    address: user?.address || "",
+    postal_code: user?.postal_code || "",
     bio: "",
     notifications: true,
     dataSharing: false,
   })
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        full_name: user.full_name || "",
+        gender: user.gender || "",
+        birth_date: user.birth_date || "",
+        address: user.address || "",
+        postal_code: user.postal_code || "",
+      }))
+    }
+  }, [user])
 
   if (!user) {
     router.push("/login")
     return null
   }
 
-  const handleSave = () => {
-    // In a real app, this would update the user profile in the database
-    setIsEditing(false)
-    toast({
-      title: "Profile Updated",
-      description: "Your profile has been successfully updated.",
-    })
+  const handleSave = async () => {
+    try {
+      const profileData = {
+        full_name: formData.full_name,
+        gender: formData.gender as "male" | "female" | "other",
+        birth_date: formData.birth_date,
+        address: formData.address,
+        postal_code: formData.postal_code,
+      }
+
+      const result = await updateProfile(profileData)
+
+      if (result.success) {
+        setIsEditing(false)
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        })
+      } else {
+        toast({
+          title: "Update Failed",
+          description: result.error || "Failed to update profile",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while updating your profile",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const reverseGeocode = async (latitude: number, longitude: number) => {
+    try {
+      // Try multiple geocoding services for better coverage
+
+      // First try: Nominatim (OpenStreetMap) - Free and reliable
+      try {
+        const nominatimResponse = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=id,en`,
+          {
+            headers: {
+              "User-Agent": "HyperCare-App/1.0",
+            },
+          },
+        )
+
+        if (nominatimResponse.ok) {
+          const data = await nominatimResponse.json()
+          if (data && data.display_name) {
+            const address = data.display_name
+            const postalCode = data.address?.postcode || ""
+
+            return {
+              address,
+              postalCode,
+              source: "Nominatim",
+            }
+          }
+        }
+      } catch (error) {
+        console.log("Nominatim failed, trying next service")
+      }
+
+      // Second try: BigDataCloud - Free reverse geocoding
+      try {
+        const bigDataResponse = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=id`,
+        )
+
+        if (bigDataResponse.ok) {
+          const data = await bigDataResponse.json()
+          if (data && data.locality) {
+            const addressParts = [data.locality, data.principalSubdivision, data.countryName].filter(Boolean)
+
+            const address = addressParts.join(", ")
+            const postalCode = data.postcode || ""
+
+            return {
+              address,
+              postalCode,
+              source: "BigDataCloud",
+            }
+          }
+        }
+      } catch (error) {
+        console.log("BigDataCloud failed, trying next service")
+      }
+
+      // Third try: LocationIQ (requires API key but has free tier)
+      try {
+        const locationIQResponse = await fetch(
+          `https://us1.locationiq.com/v1/reverse.php?key=pk.0123456789abcdef&lat=${latitude}&lon=${longitude}&format=json&accept-language=id`,
+        )
+
+        if (locationIQResponse.ok) {
+          const data = await locationIQResponse.json()
+          if (data && data.display_name) {
+            const address = data.display_name
+            const postalCode = data.address?.postcode || ""
+
+            return {
+              address,
+              postalCode,
+              source: "LocationIQ",
+            }
+          }
+        }
+      } catch (error) {
+        console.log("LocationIQ failed")
+      }
+
+      // Fallback: Create a readable address from coordinates
+      return {
+        address: `Coordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+        postalCode: "",
+        source: "Coordinates",
+      }
+    } catch (error) {
+      console.error("All geocoding services failed:", error)
+      return {
+        address: `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`,
+        postalCode: "",
+        source: "Fallback",
+      }
+    }
+  }
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Location Not Supported",
+        description: "Your browser doesn't support geolocation",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoadingLocation(true)
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords
+
+          toast({
+            title: "Getting Location...",
+            description: "Converting coordinates to address...",
+          })
+
+          const geocodeResult = await reverseGeocode(latitude, longitude)
+
+          setFormData((prev) => ({
+            ...prev,
+            address: geocodeResult.address,
+            postal_code: geocodeResult.postalCode,
+          }))
+
+          toast({
+            title: "Location Retrieved",
+            description: `Address found using ${geocodeResult.source}`,
+          })
+        } catch (error) {
+          console.error("Error getting address:", error)
+
+          // Fallback: just show coordinates
+          const { latitude, longitude } = position.coords
+          setFormData((prev) => ({
+            ...prev,
+            address: `Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+          }))
+
+          toast({
+            title: "Location Retrieved",
+            description: "GPS coordinates saved. Please update address manually if needed.",
+          })
+        } finally {
+          setIsLoadingLocation(false)
+        }
+      },
+      (error) => {
+        setIsLoadingLocation(false)
+        let errorMessage = "Could not retrieve your location"
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied. Please enable location permissions in your browser."
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable. Please check your GPS/internet connection."
+            break
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out. Please try again."
+            break
+        }
+
+        toast({
+          title: "Location Error",
+          description: errorMessage,
+          variant: "destructive",
+        })
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000, // Increased timeout
+        maximumAge: 60000,
+      },
+    )
   }
 
   const handleDeleteAccount = () => {
     if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      // In a real app, this would delete the user account
       logout()
       router.push("/")
       toast({
@@ -50,6 +270,15 @@ export default function ProfilePage() {
         description: "Your account has been successfully deleted.",
       })
     }
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
   }
 
   return (
@@ -76,24 +305,90 @@ export default function ProfilePage() {
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="full_name">Full Name / Nama Lengkap</Label>
                     <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                      id="full_name"
+                      value={formData.full_name}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
                       disabled={!isEditing}
+                      placeholder="Enter your full name"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                    <Label htmlFor="gender">Gender / Jenis Kelamin</Label>
+                    <Select
+                      value={formData.gender}
+                      onValueChange={(value) => setFormData((prev) => ({ ...prev, gender: value }))}
                       disabled={!isEditing}
-                    />
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male / Laki-laki</SelectItem>
+                        <SelectItem value="female">Female / Perempuan</SelectItem>
+                        <SelectItem value="other">Other / Lainnya</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="birth_date">Date of Birth / Tanggal Lahir</Label>
+                  <Input
+                    id="birth_date"
+                    type="date"
+                    value={formData.birth_date}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, birth_date: e.target.value }))}
+                    disabled={!isEditing}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address">Complete Address / Alamat Lengkap</Label>
+                  <div className="flex gap-2">
+                    <Textarea
+                      id="address"
+                      placeholder="Enter your complete address"
+                      value={formData.address}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))}
+                      disabled={!isEditing}
+                      rows={3}
+                      className="flex-1"
+                    />
+                    {isEditing && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGetLocation}
+                        disabled={isLoadingLocation}
+                        className="shrink-0 bg-transparent"
+                      >
+                        {isLoadingLocation ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <MapPin className="w-4 h-4" />
+                        )}
+                        GPS
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Click GPS button to automatically detect and fill your current address
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="postal_code">Postal Code / Kode Pos</Label>
+                  <Input
+                    id="postal_code"
+                    value={formData.postal_code}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, postal_code: e.target.value }))}
+                    disabled={!isEditing}
+                    placeholder="Enter postal code"
+                    maxLength={5}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -199,17 +494,24 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center space-x-3">
-                  <Mail className="w-4 h-4 text-gray-400" />
+                  <User className="w-4 h-4 text-gray-400" />
                   <div>
-                    <p className="text-sm font-medium">Email</p>
-                    <p className="text-xs text-gray-600">{user.email}</p>
+                    <p className="text-sm font-medium">Phone Number</p>
+                    <p className="text-xs text-gray-600">{user.phone_number}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Calendar className="w-4 h-4 text-gray-400" />
                   <div>
-                    <p className="text-sm font-medium">Member Since</p>
-                    <p className="text-xs text-gray-600">January 2024</p>
+                    <p className="text-sm font-medium">Date of Birth</p>
+                    <p className="text-xs text-gray-600">{user.birth_date ? formatDate(user.birth_date) : "Not set"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <MapPin className="w-4 h-4 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium">Postal Code</p>
+                    <p className="text-xs text-gray-600">{user.postal_code || "Not set"}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -248,6 +550,20 @@ export default function ProfilePage() {
                   onClick={() => router.push("/self-help")}
                 >
                   Self-Help Resources
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-transparent"
+                  onClick={() => router.push("/bp-tracking")}
+                >
+                  Blood Pressure Tracking
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-transparent"
+                  onClick={() => router.push("/medications")}
+                >
+                  Medication Management
                 </Button>
               </CardContent>
             </Card>
