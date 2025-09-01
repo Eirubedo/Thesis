@@ -10,6 +10,7 @@ export interface BPStats {
   last7DaysAvg: { systolic: number; diastolic: number; heartRate: number }
   last30DaysAvg: { systolic: number; diastolic: number; heartRate: number }
   averageHeartRate: number
+  lastReading?: BPReading
 }
 
 export type BPCategory = "normal" | "elevated" | "stage1" | "stage2" | "crisis"
@@ -116,7 +117,7 @@ export function useBPTracking() {
     }
   }
 
-  const getStats = (): BPStats => {
+  const getStats = (days = 30): BPStats => {
     const now = new Date()
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
     const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -150,6 +151,7 @@ export function useBPTracking() {
       last7DaysAvg: calculateAverage(last7DaysReadings),
       last30DaysAvg: calculateAverage(last30DaysReadings),
       averageHeartRate: calculateAverage(readings).heartRate,
+      lastReading: readings[0] || undefined,
     }
   }
 
@@ -176,7 +178,7 @@ export function useBPTracking() {
   }
 
   const getAverageReading = (days = 30) => {
-    const stats = getStats()
+    const stats = getStats(days)
     return days <= 7 ? stats.last7DaysAvg : stats.last30DaysAvg
   }
 

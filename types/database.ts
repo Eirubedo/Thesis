@@ -1,94 +1,269 @@
-export interface User {
-  id: string
-  phone_number: string
-  password_hash: string
-  full_name: string
-  gender?: "male" | "female" | "other"
-  birth_date?: string
-  address?: string
-  postal_code?: string
-  created_at: string
-  updated_at: string
-}
-
-export interface HypertensionProfile {
-  id: string
-  user_id: string
-  medical_history?: string
-  risk_factors?: string[]
-  family_history?: boolean
-  smoking_status?: "never" | "former" | "current"
-  alcohol_consumption?: "none" | "light" | "moderate" | "heavy"
-  exercise_frequency?: "none" | "rare" | "weekly" | "daily"
-  stress_level?: number
-  created_at: string
-  updated_at: string
-}
-
-export interface Medication {
-  id: string
-  user_id: string
-  name: string
-  dosage?: string
-  frequency?: string
-  start_date?: string
-  end_date?: string
-  is_active: boolean
-  notes?: string
-  created_at: string
-  updated_at: string
-}
-
-export interface BPReading {
-  id: string
-  user_id: string
-  systolic: number
-  diastolic: number
-  heart_rate?: number
-  measurement_date: string
-  notes?: string
-  category?: "normal" | "elevated" | "stage1" | "stage2" | "crisis"
-  created_at: string
-}
-
-export interface MedicationLog {
-  id: string
-  user_id: string
-  medication_id: string
-  taken_at: string
-  was_taken: boolean
-  notes?: string
-  created_at: string
-}
-
 export interface Database {
   public: {
     Tables: {
       users: {
-        Row: User
-        Insert: Omit<User, "id" | "created_at" | "updated_at">
-        Update: Partial<Omit<User, "id" | "created_at" | "updated_at">>
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          created_at?: string
+          updated_at?: string
+        }
       }
       hypertension_profiles: {
-        Row: HypertensionProfile
-        Insert: Omit<HypertensionProfile, "id" | "created_at" | "updated_at">
-        Update: Partial<Omit<HypertensionProfile, "id" | "created_at" | "updated_at">>
-      }
-      medications: {
-        Row: Medication
-        Insert: Omit<Medication, "id" | "created_at" | "updated_at">
-        Update: Partial<Omit<Medication, "id" | "created_at" | "updated_at">>
+        Row: {
+          id: string
+          user_id: string
+          age: number | null
+          gender: string | null
+          height: number | null
+          weight: number | null
+          activity_level: string | null
+          smoking_status: string | null
+          alcohol_consumption: string | null
+          family_history: boolean | null
+          current_medications: string | null
+          medical_conditions: string | null
+          stress_level: number | null
+          sleep_hours: number | null
+          dietary_restrictions: string | null
+          emergency_contact: string | null
+          doctor_name: string | null
+          doctor_phone: string | null
+          preferred_language: string | null
+          location: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          age?: number | null
+          gender?: string | null
+          height?: number | null
+          weight?: number | null
+          activity_level?: string | null
+          smoking_status?: string | null
+          alcohol_consumption?: string | null
+          family_history?: boolean | null
+          current_medications?: string | null
+          medical_conditions?: string | null
+          stress_level?: number | null
+          sleep_hours?: number | null
+          dietary_restrictions?: string | null
+          emergency_contact?: string | null
+          doctor_name?: string | null
+          doctor_phone?: string | null
+          preferred_language?: string | null
+          location?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          age?: number | null
+          gender?: string | null
+          height?: number | null
+          weight?: number | null
+          activity_level?: string | null
+          smoking_status?: string | null
+          alcohol_consumption?: string | null
+          family_history?: boolean | null
+          current_medications?: string | null
+          medical_conditions?: string | null
+          stress_level?: number | null
+          sleep_hours?: number | null
+          dietary_restrictions?: string | null
+          emergency_contact?: string | null
+          doctor_name?: string | null
+          doctor_phone?: string | null
+          preferred_language?: string | null
+          location?: string | null
+          created_at?: string
+          updated_at?: string
+        }
       }
       bp_readings: {
-        Row: BPReading
-        Insert: Omit<BPReading, "id" | "created_at">
-        Update: Partial<Omit<BPReading, "id" | "created_at">>
+        Row: {
+          id: string
+          user_id: string
+          systolic: number
+          diastolic: number
+          heart_rate: number | null
+          notes: string | null
+          recorded_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          systolic: number
+          diastolic: number
+          heart_rate?: number | null
+          notes?: string | null
+          recorded_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          systolic?: number
+          diastolic?: number
+          heart_rate?: number | null
+          notes?: string | null
+          recorded_at?: string
+          created_at?: string
+        }
+      }
+      medications: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          dosage: string
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          dosage: string
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          dosage?: string
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
       }
       medication_logs: {
-        Row: MedicationLog
-        Insert: Omit<MedicationLog, "id" | "created_at">
-        Update: Partial<Omit<MedicationLog, "id" | "created_at">>
+        Row: {
+          id: string
+          user_id: string
+          medication_id: string
+          date: string
+          scheduled_time: string
+          taken_at: string | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          medication_id: string
+          date: string
+          scheduled_time: string
+          taken_at?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          medication_id?: string
+          date?: string
+          scheduled_time?: string
+          taken_at?: string | null
+          notes?: string | null
+          created_at?: string
+        }
       }
+      health_assessments: {
+        Row: {
+          id: string
+          user_id: string
+          assessment_type: string
+          responses: any
+          score: number | null
+          recommendations: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          assessment_type: string
+          responses: any
+          score?: number | null
+          recommendations?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          assessment_type?: string
+          responses?: any
+          score?: number | null
+          recommendations?: string | null
+          created_at?: string
+        }
+      }
+      progress_tracking: {
+        Row: {
+          id: string
+          user_id: string
+          category: string
+          item_id: string
+          completed_at: string | null
+          practice_time: number | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          category: string
+          item_id: string
+          completed_at?: string | null
+          practice_time?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          category?: string
+          item_id?: string
+          completed_at?: string | null
+          practice_time?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
     }
   }
 }

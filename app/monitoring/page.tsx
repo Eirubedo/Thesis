@@ -1,466 +1,366 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
-import { Navigation } from "@/components/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Heart, Activity, Pill, Plus, Calendar, Clock, TrendingUp, AlertTriangle } from "lucide-react"
-import { useBPTracking } from "@/hooks/use-bp-tracking"
+import { Plus, X, Trash2, Clock, CheckCircle, AlertCircle } from "lucide-react"
 import { useMedicationTracking } from "@/hooks/use-medication-tracking"
 import { useLanguage } from "@/contexts/language-context"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 export default function MonitoringPage() {
-  const { language, t } = useLanguage()
-  const {
-    readings,
-    addReading,
-    deleteReading,
-    getStats,
-    getAverageReading,
-    getBPCategory,
-    getCategoryColor,
-    getCategoryLabel,
-  } = useBPTracking()
+  const { t } = useLanguage()
+  const { medications, todaysMedications, addMedication, markMedicationTaken, deleteMedication } =
+    useMedicationTracking()
 
-  const {
-    medications,
-    addMedication,
-    updateMedication,
-    markMedicationTaken,
-    getAdherenceRate,
-    getTodaysMedications,
-    getMissedDoses,
-  } = useMedicationTracking()
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newMedication, setNewMedication] = useState({
+    name: "",
+    dosage: "",
+    times: [""],
+    notes: "",
+  })
 
-  // BP Form State
-  const [systolic, setSystolic] = useState("")
-  const [diastolic, setDiastolic] = useState("")
-  const [pulse, setPulse] = useState("")
-  const [bpNotes, setBpNotes] = useState("")
-  const [isAddingBP, setIsAddingBP] = useState(false)
+  const addTime = () => {
+    setNewMedication((prev) => ({
+      ...prev,
+      times: [...prev.times, ""],
+    }))
+  }
 
-  // Medication Form State
-  const [medName, setMedName] = useState("")
-  const [medDosage, setMedDosage] = useState("")
-  const [medFrequency, setMedFrequency] = useState("")
-  const [medTimes, setMedTimes] = useState<string[]>([""])
-  const [medNotes, setMedNotes] = useState("")
-  const [isAddingMed, setIsAddingMed] = useState(false)
+  const removeTime = (index: number) => {
+    setNewMedication((prev) => ({
+      ...prev,
+      times: prev.times.filter((_, i) => i !== index),
+    }))
+  }
 
-  const handleAddBP = () => {
-    if (systolic && diastolic && pulse) {
-      addReading(Number.parseInt(systolic), Number.parseInt(diastolic), Number.parseInt(pulse), bpNotes || undefined)
-      setSystolic("")
-      setDiastolic("")
-      setPulse("")
-      setBpNotes("")
-      setIsAddingBP(false)
+  const updateTime = (index: number, value: string) => {
+    setNewMedication((prev) => ({
+      ...prev,
+      times: prev.times.map((time, i) => (i === index ? value : time)),
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!newMedication.name || !newMedication.dosage || newMedication.times.some((time) => !time)) {
+      return
+    }
+
+    await addMedication({
+      name: newMedication.name,
+      dosage: newMedication.dosage,
+      times: newMedication.times.filter((time) => time),
+      notes: newMedication.notes,
+    })
+
+    setNewMedication({
+      name: "",
+      dosage: "",
+      times: [""],
+      notes: "",
+    })
+    setShowAddForm(false)
+  }
+
+  const handleDeleteMedication = async (medicationId: string) => {
+    await deleteMedication(medicationId)
+  }
+
+  const getMedicationStatus = (medication: any) => {
+    const now = new Date()
+    const currentTime = now.getHours() * 60 + now.getMinutes()
+
+    if (medication.taken_at) {
+      return { status: "taken", color: "bg-green-100 text-green-800" }
+    }
+
+    const [hours, minutes] = medication.scheduled_time.split(":").map(Number)
+    const scheduledTime = hours * 60 + minutes
+    const timeDiff = currentTime - scheduledTime
+
+    if (timeDiff > 60) {
+      return { status: t("monitoring.overdue"), color: "bg-red-100 text-red-800" }
+    } else if (timeDiff > -30) {
+      return { status: t("monitoring.dueSoon"), color: "bg-yellow-100 text-yellow-800" }
+    } else {
+      return { status: t("monitoring.scheduled"), color: "bg-blue-100 text-blue-800" }
     }
   }
 
-  const handleAddMedication = () => {
-    if (medName && medDosage && medFrequency) {
-      addMedication({
-        name: medName,
-        dosage: medDosage,
-        frequency: medFrequency,
-        times: medTimes.filter((time) => time !== ""),
-        startDate: new Date(),
-        isActive: true,
-        notes: medNotes || undefined,
-      })
-      setMedName("")
-      setMedDosage("")
-      setMedFrequency("")
-      setMedTimes([""])
-      setMedNotes("")
-      setIsAddingMed(false)
-    }
-  }
-
-  const addTimeSlot = () => {
-    setMedTimes([...medTimes, ""])
-  }
-
-  const updateTimeSlot = (index: number, value: string) => {
-    const newTimes = [...medTimes]
-    newTimes[index] = value
-    setMedTimes(newTimes)
-  }
-
-  const removeTimeSlot = (index: number) => {
-    setMedTimes(medTimes.filter((_, i) => i !== index))
-  }
-
-  const stats = getStats(30)
-  const averageReading = getAverageReading(30)
-  const adherenceStats = getAdherenceRate(30)
-  const todaysMeds = getTodaysMedications()
-  const missedDoses = getMissedDoses(7)
+  const takenCount = todaysMedications.filter((med) => med.taken_at).length
+  const totalCount = todaysMedications.length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 pt-20 pb-12">
-      <Navigation />
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold">{t("monitoring.title")}</h1>
+        <p className="text-muted-foreground">{t("monitoring.subtitle")}</p>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("monitoring.title")}</h1>
-          <p className="text-gray-600">{t("monitoring.subtitle")}</p>
-        </div>
+      {/* Today's Progress */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5" />
+            {t("monitoring.todaysProgress")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center space-y-2">
+            <div className="text-3xl font-bold">
+              {takenCount}/{totalCount}
+            </div>
+            <p className="text-muted-foreground">{t("monitoring.medicationsTaken")}</p>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Tabs defaultValue="bp" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="bp" className="flex items-center gap-2">
-              <Heart className="w-4 h-4" />
-              {t("monitoring.bpInput")}
-            </TabsTrigger>
-            <TabsTrigger value="medication" className="flex items-center gap-2">
-              <Pill className="w-4 h-4" />
-              {t("monitoring.medicationInput")}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="bp" className="space-y-6">
-            {/* BP Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("bp.last30days")}</CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {averageReading.systolic}/{averageReading.diastolic}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("bp.average")} • {stats.totalReadings} {t("bp.recentReadings").toLowerCase()}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("bp.heartRate")}</CardTitle>
-                  <Heart className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{averageReading.pulse}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("bp.bpm")} {t("bp.average").toLowerCase()}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("reports.latestBP")}</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {stats.lastReading ? (
-                    <>
-                      <div className="text-2xl font-bold">
-                        {stats.lastReading.systolic}/{stats.lastReading.diastolic}
+      {/* Today's Medication Checklist */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            {t("monitoring.todaysChecklist")}
+          </CardTitle>
+          <CardDescription>{t("monitoring.checklistDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {todaysMedications.length === 0 ? (
+            <div className="text-center py-8 space-y-2">
+              <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground" />
+              <h3 className="text-lg font-medium">{t("monitoring.noMedicationsToday")}</h3>
+              <p className="text-muted-foreground">{t("monitoring.noMedicationsDesc")}</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {todaysMedications.map((medication) => {
+                const status = getMedicationStatus(medication)
+                return (
+                  <div
+                    key={`${medication.id}-${medication.scheduled_time}`}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <h4 className="font-medium">{medication.name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {medication.dosage} • {medication.scheduled_time}
+                          </p>
+                        </div>
                       </div>
-                      <Badge className={getCategoryColor(stats.lastReading.category)}>
-                        {getCategoryLabel(stats.lastReading.category)}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className={status.color}>
+                        {medication.taken_at ? t("monitoring.taken") : status.status}
                       </Badge>
-                    </>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">{t("bp.noReadings")}</div>
-                  )}
-                </CardContent>
-              </Card>
+                      {medication.taken_at ? (
+                        <span className="text-sm text-muted-foreground">
+                          {t("monitoring.takenAt")}{" "}
+                          {new Date(medication.taken_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      ) : (
+                        <Button size="sm" onClick={() => markMedicationTaken(medication.id, medication.scheduled_time)}>
+                          {t("monitoring.taken")}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
+          )}
+        </CardContent>
+      </Card>
 
-            {/* Add BP Button */}
-            <Dialog open={isAddingBP} onOpenChange={setIsAddingBP}>
-              <DialogTrigger asChild>
-                <Button className="w-full md:w-auto">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t("bp.addReading")}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>{t("bp.addReading")}</DialogTitle>
-                  <DialogDescription>{t("bp.noReadingsDesc")}</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="systolic">{t("bp.systolic")}</Label>
-                      <Input
-                        id="systolic"
-                        type="number"
-                        value={systolic}
-                        onChange={(e) => setSystolic(e.target.value)}
-                        placeholder="120"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="diastolic">{t("bp.diastolic")}</Label>
-                      <Input
-                        id="diastolic"
-                        type="number"
-                        value={diastolic}
-                        onChange={(e) => setDiastolic(e.target.value)}
-                        placeholder="80"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="pulse">{t("bp.heartRate")}</Label>
-                      <Input
-                        id="pulse"
-                        type="number"
-                        value={pulse}
-                        onChange={(e) => setPulse(e.target.value)}
-                        placeholder="70"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bp-notes">{t("bp.notes")}</Label>
-                    <Textarea
-                      id="bp-notes"
-                      value={bpNotes}
-                      onChange={(e) => setBpNotes(e.target.value)}
-                      placeholder={t("bp.notes")}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsAddingBP(false)}>
-                    {t("bp.cancel")}
-                  </Button>
-                  <Button onClick={handleAddBP}>{t("bp.save")}</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            {/* BP Readings List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("bp.recentReadings")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {readings.slice(0, 10).map((reading) => (
-                    <div key={reading.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="text-lg font-semibold">
-                          {reading.systolic}/{reading.diastolic}
-                        </div>
-                        <Badge className={getCategoryColor(reading.category)}>
-                          {getCategoryLabel(reading.category)}
-                        </Badge>
-                        <div className="text-sm text-muted-foreground">
-                          {reading.pulse} {t("bp.bpm")}
-                        </div>
+      {/* Current Medications Table */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>{t("monitoring.currentMedications")}</CardTitle>
+            <CardDescription>{t("monitoring.currentMedicationsDesc")}</CardDescription>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {medications.length} {t("monitoring.activeMedications")}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {medications.length === 0 ? (
+            <div className="text-center py-8 space-y-2">
+              <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground" />
+              <h3 className="text-lg font-medium">{t("monitoring.noCurrentMedications")}</h3>
+              <p className="text-muted-foreground">{t("monitoring.noCurrentMedicationsDesc")}</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("meds.medicationName")}</TableHead>
+                  <TableHead>{t("meds.dosage")}</TableHead>
+                  <TableHead>{t("monitoring.schedule")}</TableHead>
+                  <TableHead>{t("meds.notes")}</TableHead>
+                  <TableHead className="text-right">{t("monitoring.actions")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {medications.map((medication) => (
+                  <TableRow key={medication.id}>
+                    <TableCell className="font-medium">{medication.name}</TableCell>
+                    <TableCell>{medication.dosage}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {medication.times?.map((time, index) => (
+                          <Badge key={index} variant="outline">
+                            {time}
+                          </Badge>
+                        ))}
                       </div>
-                      <div className="text-sm text-muted-foreground">{reading.date.toLocaleDateString()}</div>
-                    </div>
-                  ))}
-                  {readings.length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">{t("bp.noReadingsDesc")}</div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate">{medication.notes || "-"}</TableCell>
+                    <TableCell className="text-right">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t("monitoring.deleteMedication")}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t("monitoring.deleteMedicationConfirm")} "{medication.name}"?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t("monitoring.cancel")}</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteMedication(medication.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              {t("monitoring.delete")}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
 
-          <TabsContent value="medication" className="space-y-6">
-            {/* Medication Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("meds.adherence")}</CardTitle>
-                  <Pill className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{adherenceStats.monthly}%</div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("meds.thisMonth")} • {adherenceStats.weekly}% {t("meds.thisWeek").toLowerCase()}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t("meds.currentMedications")}</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{todaysMeds.length}</div>
-                  <p className="text-xs text-muted-foreground">{t("meds.currentMedications")}</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("meds.missed")} (7 {t("common.days")})
-                  </CardTitle>
-                  <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{missedDoses}</div>
-                  <p className="text-xs text-muted-foreground">{t("bp.last7days")}</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Add Medication Button */}
-            <Dialog open={isAddingMed} onOpenChange={setIsAddingMed}>
-              <DialogTrigger asChild>
-                <Button className="w-full md:w-auto">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t("meds.addMedication")}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
+      {/* Add Medication Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            {t("monitoring.medicationInput")}
+          </CardTitle>
+          <CardDescription>{t("monitoring.addMedicationDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+            <DialogTrigger asChild>
+              <Button className="w-full">
+                <Plus className="h-4 w-4 mr-2" />
+                {t("monitoring.addMedication")}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <form onSubmit={handleSubmit}>
                 <DialogHeader>
-                  <DialogTitle>{t("meds.addMedication")}</DialogTitle>
-                  <DialogDescription>{t("meds.noMedicationsDesc")}</DialogDescription>
+                  <DialogTitle>{t("monitoring.addMedication")}</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="med-name">{t("meds.medicationName")}</Label>
+                    <Label htmlFor="name">{t("meds.medicationName")}</Label>
                     <Input
-                      id="med-name"
-                      value={medName}
-                      onChange={(e) => setMedName(e.target.value)}
-                      placeholder="Lisinopril"
+                      id="name"
+                      value={newMedication.name}
+                      onChange={(e) => setNewMedication((prev) => ({ ...prev, name: e.target.value }))}
+                      required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="med-dosage">{t("meds.dosage")}</Label>
+                    <Label htmlFor="dosage">{t("meds.dosage")}</Label>
                     <Input
-                      id="med-dosage"
-                      value={medDosage}
-                      onChange={(e) => setMedDosage(e.target.value)}
-                      placeholder="10mg"
+                      id="dosage"
+                      value={newMedication.dosage}
+                      onChange={(e) => setNewMedication((prev) => ({ ...prev, dosage: e.target.value }))}
+                      placeholder="e.g., 10mg, 1 tablet"
+                      required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="med-frequency">{t("meds.frequency")}</Label>
-                    <Select value={medFrequency} onValueChange={setMedFrequency}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("meds.frequency")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="once-daily">
-                          {t("common.once")} {t("common.daily")}
-                        </SelectItem>
-                        <SelectItem value="twice-daily">
-                          {t("common.twice")} {t("common.daily")}
-                        </SelectItem>
-                        <SelectItem value="three-times-daily">
-                          {t("common.threeTimes")} {t("common.daily")}
-                        </SelectItem>
-                        <SelectItem value="as-needed">{t("common.asNeeded")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t("meds.time")}</Label>
-                    {medTimes.map((time, index) => (
+                    <Label>{t("monitoring.scheduleTimes")}</Label>
+                    {newMedication.times.map((time, index) => (
                       <div key={index} className="flex gap-2">
-                        <Input type="time" value={time} onChange={(e) => updateTimeSlot(index, e.target.value)} />
-                        {medTimes.length > 1 && (
-                          <Button type="button" variant="outline" size="sm" onClick={() => removeTimeSlot(index)}>
-                            {t("common.delete")}
+                        <Input type="time" value={time} onChange={(e) => updateTime(index, e.target.value)} required />
+                        {newMedication.times.length > 1 && (
+                          <Button type="button" variant="outline" size="icon" onClick={() => removeTime(index)}>
+                            <X className="h-4 w-4" />
                           </Button>
                         )}
                       </div>
                     ))}
-                    <Button type="button" variant="outline" size="sm" onClick={addTimeSlot}>
-                      {t("meds.time")} +
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addTime}
+                      className="w-full bg-transparent"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      {t("monitoring.addTime")}
                     </Button>
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="med-notes">{t("meds.notes")}</Label>
+                    <Label htmlFor="notes">{t("monitoring.additionalNotes")}</Label>
                     <Textarea
-                      id="med-notes"
-                      value={medNotes}
-                      onChange={(e) => setMedNotes(e.target.value)}
-                      placeholder={t("meds.notes")}
+                      id="notes"
+                      value={newMedication.notes}
+                      onChange={(e) => setNewMedication((prev) => ({ ...prev, notes: e.target.value }))}
+                      placeholder={t("monitoring.additionalNotes")}
                     />
                   </div>
                 </div>
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsAddingMed(false)}>
-                    {t("meds.cancel")}
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setShowAddForm(false)}>
+                    {t("monitoring.cancel")}
                   </Button>
-                  <Button onClick={handleAddMedication}>{t("meds.save")}</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            {/* Today's Medications */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("meds.currentMedications")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {todaysMeds.map((med) => (
-                    <div key={med.id} className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold">{med.name}</h3>
-                          <p className="text-sm text-muted-foreground">{med.dosage}</p>
-                        </div>
-                        <Badge variant="outline">{med.frequency}</Badge>
-                      </div>
-                      <div className="space-y-2">
-                        {med.times.map((time, index) => {
-                          const log = med.logs?.find((l) => l.scheduledTime === time)
-                          const isTaken = log?.taken || false
-
-                          return (
-                            <div key={index} className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <Clock className="w-4 h-4" />
-                                <span className="text-sm">{time}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Switch
-                                  checked={isTaken}
-                                  onCheckedChange={(checked) => markMedicationTaken(med.id, time, checked)}
-                                />
-                                <span className="text-sm">{isTaken ? t("meds.taken") : t("meds.missed")}</span>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                  {todaysMeds.length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">{t("meds.noMedicationsDesc")}</div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                  <Button type="submit">{t("monitoring.addMedication")}</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
     </div>
   )
 }
