@@ -443,7 +443,7 @@ const translations = {
     "assessment.comprehensiveDesc": "Evaluasi AI mendalam menggunakan Dify API untuk analisis kesehatan lengkap",
     "assessment.quick": "Asesmen AI Cepat",
     "assessment.quickDesc": "Skrining cepat untuk pemantauan rutin dan deteksi dini",
-    "assessment.knowledge": "Tes Pengetahuan Hipertensi",
+    "assessment.knowledge": "Tes Pengetahuan",
     "assessment.knowledgeDesc": "Evaluasi pemahaman Anda tentang pengelolaan hipertensi",
 
     // Monitoring
@@ -689,6 +689,9 @@ const translations = {
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+
+// Add this line to export LanguageContext as a named export
+export { LanguageContext }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>("en")

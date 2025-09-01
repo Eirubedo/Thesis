@@ -185,24 +185,14 @@ export default function AssessmentPage() {
                   <div className={`w-12 h-12 rounded-lg ${assessment.color} flex items-center justify-center mb-4`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <CardTitle className="text-xl">{assessment.title}</CardTitle>
-                  <CardDescription className="text-sm">{assessment.description}</CardDescription>
+                  <CardTitle className="text-xl w-auto h-5">{assessment.title}</CardTitle>
+                  <CardDescription className="text-sm h-14">{assessment.description}</CardDescription>
                   <div className="flex items-center gap-2 mt-2">
                     <Clock className="w-4 h-4 text-gray-500" />
                     <span className="text-sm text-gray-600">{assessment.duration}</span>
                   </div>
-                </CardHeader>
-                <CardContent className="flex flex-col h-full">
-                  <ul className="space-y-2 flex-grow">
-                    {assessment.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
                   <Button
-                    className="w-full mt-6 bg-red-600 hover:bg-red-700 text-white font-medium"
+                    className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-medium flex-row items-center"
                     onClick={(e) => {
                       e.stopPropagation()
                       if (assessment.id === "comprehensive") {
@@ -219,6 +209,16 @@ export default function AssessmentPage() {
                     Mulai Asesmen
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
+                </CardHeader>
+                <CardContent className="flex flex-col h-full">
+                  <ul className="space-y-2 flex-grow">
+                    {assessment.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-2 text-sm">
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </CardContent>
               </Card>
             )

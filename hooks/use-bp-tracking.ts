@@ -1,59 +1,51 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { supabase } from "@/lib/supabase"
+import { useAuth } from "./use-auth"
+import type { BPReading } from "@/types/database"
 
-export interface BPReading {
-  id: string
-  systolic: number
-  diastolic: number
-  pulse: number
-  date: Date
-  notes?: string
-  category: BPCategory
+export interface BPStats {
+  totalReadings: number
+  last7DaysAvg: { systolic: number; diastolic: number; heartRate: number }
+  last30DaysAvg: { systolic: number; diastolic: number; heartRate: number }
+  averageHeartRate: number
 }
 
 export type BPCategory = "normal" | "elevated" | "stage1" | "stage2" | "crisis"
 
-export interface BPStats {
-  totalReadings: number
-  averageSystolic: number
-  averageDiastolic: number
-  averagePulse: number
-  lastReading?: BPReading
-}
-
 export function useBPTracking() {
+  const { user } = useAuth()
   const [readings, setReadings] = useState<BPReading[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    loadReadings()
-  }, [])
+    if (user) {
+      loadReadings()
+    }
+  }, [user])
 
-  const loadReadings = () => {
+  const loadReadings = async () => {
+    if (!user) return
+
     try {
-      const stored = localStorage.getItem("bp-readings")
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        const readingsWithDates = parsed.map((reading: any) => ({
-          ...reading,
-          date: new Date(reading.date),
-        }))
-        setReadings(readingsWithDates)
+      const { data, error } = await supabase
+        .from("bp_readings")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("measurement_date", { ascending: false })
+        .limit(100)
+
+      if (error) {
+        console.error("Error loading BP readings:", error)
+        return
       }
+
+      setReadings(data || [])
     } catch (error) {
       console.error("Error loading BP readings:", error)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const saveReadings = (newReadings: BPReading[]) => {
-    try {
-      localStorage.setItem("bp-readings", JSON.stringify(newReadings))
-      setReadings(newReadings)
-    } catch (error) {
-      console.error("Error saving BP readings:", error)
     }
   }
 
@@ -65,20 +57,39 @@ export function useBPTracking() {
     return "normal"
   }
 
-  const addReading = (systolic: number, diastolic: number, pulse: number, notes?: string): boolean => {
+  const addReading = async (
+    systolic: number,
+    diastolic: number,
+    heartRate?: number,
+    notes?: string,
+    measurementDate?: Date,
+  ): Promise<boolean> => {
+    if (!user) return false
+
     try {
-      const newReading: BPReading = {
-        id: Date.now().toString(),
-        systolic,
-        diastolic,
-        pulse,
-        date: new Date(),
-        notes,
-        category: categorizeBP(systolic, diastolic),
+      const category = categorizeBP(systolic, diastolic)
+      const measurement_date = measurementDate || new Date()
+
+      const { data, error } = await supabase
+        .from("bp_readings")
+        .insert({
+          user_id: user.id,
+          systolic,
+          diastolic,
+          heart_rate: heartRate,
+          measurement_date: measurement_date.toISOString(),
+          notes,
+          category,
+        })
+        .select()
+        .single()
+
+      if (error || !data) {
+        console.error("Error adding BP reading:", error)
+        return false
       }
 
-      const newReadings = [newReading, ...readings].slice(0, 100) // Keep only last 100 readings
-      saveReadings(newReadings)
+      setReadings((prev) => [data, ...prev].slice(0, 100))
       return true
     } catch (error) {
       console.error("Error adding BP reading:", error)
@@ -86,10 +97,18 @@ export function useBPTracking() {
     }
   }
 
-  const deleteReading = (id: string): boolean => {
+  const deleteReading = async (id: string): Promise<boolean> => {
+    if (!user) return false
+
     try {
-      const newReadings = readings.filter((reading) => reading.id !== id)
-      saveReadings(newReadings)
+      const { error } = await supabase.from("bp_readings").delete().eq("id", id).eq("user_id", user.id)
+
+      if (error) {
+        console.error("Error deleting BP reading:", error)
+        return false
+      }
+
+      setReadings((prev) => prev.filter((reading) => reading.id !== id))
       return true
     } catch (error) {
       console.error("Error deleting BP reading:", error)
@@ -97,92 +116,80 @@ export function useBPTracking() {
     }
   }
 
-  const getStats = (days: number): BPStats => {
-    const cutoffDate = new Date()
-    cutoffDate.setDate(cutoffDate.getDate() - days)
+  const getStats = (): BPStats => {
+    const now = new Date()
+    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-    const recentReadings = readings.filter((reading) => reading.date >= cutoffDate)
+    const last7DaysReadings = readings.filter((r) => new Date(r.measurement_date) >= last7Days)
+    const last30DaysReadings = readings.filter((r) => new Date(r.measurement_date) >= last30Days)
 
-    if (recentReadings.length === 0) {
+    const calculateAverage = (readings: BPReading[]) => {
+      if (readings.length === 0) return { systolic: 0, diastolic: 0, heartRate: 0 }
+
+      const totals = readings.reduce(
+        (acc, reading) => ({
+          systolic: acc.systolic + reading.systolic,
+          diastolic: acc.diastolic + reading.diastolic,
+          heartRate: acc.heartRate + (reading.heart_rate || 0),
+        }),
+        { systolic: 0, diastolic: 0, heartRate: 0 },
+      )
+
+      const heartRateReadings = readings.filter((r) => r.heart_rate).length
+
       return {
-        totalReadings: 0,
-        averageSystolic: 0,
-        averageDiastolic: 0,
-        averagePulse: 0,
+        systolic: Math.round(totals.systolic / readings.length),
+        diastolic: Math.round(totals.diastolic / readings.length),
+        heartRate: heartRateReadings > 0 ? Math.round(totals.heartRate / heartRateReadings) : 0,
       }
     }
 
-    const totalSystolic = recentReadings.reduce((sum, reading) => sum + reading.systolic, 0)
-    const totalDiastolic = recentReadings.reduce((sum, reading) => sum + reading.diastolic, 0)
-    const totalPulse = recentReadings.reduce((sum, reading) => sum + reading.pulse, 0)
-
     return {
-      totalReadings: recentReadings.length,
-      averageSystolic: Math.round(totalSystolic / recentReadings.length),
-      averageDiastolic: Math.round(totalDiastolic / recentReadings.length),
-      averagePulse: Math.round(totalPulse / recentReadings.length),
-      lastReading: readings[0],
+      totalReadings: readings.length,
+      last7DaysAvg: calculateAverage(last7DaysReadings),
+      last30DaysAvg: calculateAverage(last30DaysReadings),
+      averageHeartRate: calculateAverage(readings).heartRate,
     }
   }
 
-  const getAverageReading = (days: number) => {
-    const stats = getStats(days)
-    return {
-      systolic: stats.averageSystolic,
-      diastolic: stats.averageDiastolic,
-      pulse: stats.averagePulse,
-    }
-  }
-
-  const getBPCategory = (systolic: number, diastolic: number): string => {
-    const category = categorizeBP(systolic, diastolic)
-    const categoryLabels = {
-      normal: "Normal",
-      elevated: "Elevated",
-      stage1: "Stage 1 Hypertension",
-      stage2: "Stage 2 Hypertension",
-      crisis: "Hypertensive Crisis",
-    }
-    return categoryLabels[category]
-  }
-
-  const getCategoryColor = (category: BPCategory | string): string => {
+  const getCategoryColor = (category: BPCategory): string => {
     const colorMap = {
       normal: "bg-green-100 text-green-800",
       elevated: "bg-yellow-100 text-yellow-800",
       stage1: "bg-orange-100 text-orange-800",
       stage2: "bg-red-100 text-red-800",
-      crisis: "bg-red-200 text-red-900",
-      Normal: "bg-green-100 text-green-800",
-      Elevated: "bg-yellow-100 text-yellow-800",
-      "Stage 1 Hypertension": "bg-orange-100 text-orange-800",
-      "Stage 2 Hypertension": "bg-red-100 text-red-800",
-      "Hypertensive Crisis": "bg-red-200 text-red-900",
+      crisis: "bg-red-600 text-white",
     }
-    return colorMap[category as keyof typeof colorMap] || "bg-gray-100 text-gray-800"
+    return colorMap[category]
   }
 
-  const getCategoryLabel = (category: BPCategory | string): string => {
-    if (typeof category === "string") return category
-    const categoryLabels = {
+  const getCategoryLabel = (category: BPCategory, t?: any): string => {
+    const labels = {
       normal: "Normal",
       elevated: "Elevated",
-      stage1: "Stage 1 Hypertension",
-      stage2: "Stage 2 Hypertension",
-      crisis: "Hypertensive Crisis",
+      stage1: "Stage 1",
+      stage2: "Stage 2",
+      crisis: "Crisis",
     }
-    return categoryLabels[category]
+    return labels[category]
+  }
+
+  const getAverageReading = (days = 30) => {
+    const stats = getStats()
+    return days <= 7 ? stats.last7DaysAvg : stats.last30DaysAvg
   }
 
   return {
     readings,
+    isLoading,
     addReading,
     deleteReading,
     getStats,
     getAverageReading,
-    getBPCategory,
     getCategoryColor,
     getCategoryLabel,
-    isLoading,
+    categorizeBP,
+    loadReadings,
   }
 }

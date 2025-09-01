@@ -12,16 +12,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Menu, User, FileText, Heart, Activity, BarChart3, Info, ChevronDown, Settings, LogOut } from "lucide-react"
+import { Menu, User, Info, ChevronDown, Settings, LogOut } from "lucide-react"
 import { useAuth } from "./auth-provider"
 import { useLanguage } from "@/contexts/language-context"
 import { LanguageSelector } from "./language-selector"
 
 const navigationItems = [
-  { name: "nav.assessment", href: "/assessment", icon: FileText },
-  { name: "nav.monitoring", href: "/monitoring", icon: Activity },
-  { name: "nav.education", href: "/self-help", icon: Heart },
-  { name: "nav.reports", href: "/reports", icon: BarChart3 },
+  { name: "nav.assessment", href: "/assessment" },
+  { name: "nav.monitoring", href: "/monitoring" },
+  { name: "nav.education", href: "/self-help" },
+  { name: "nav.reports", href: "/reports" },
 ]
 
 export function Navigation() {
@@ -46,23 +46,19 @@ export function Navigation() {
           <div className="hidden md:flex items-center space-x-2">
             {user &&
               navigationItems.map((item) => {
-                const Icon = item.icon
                 const isActive = pathname === item.href
                 return (
                   <Link key={item.name} href={item.href}>
                     <Button
                       variant={isActive ? "default" : "ghost"}
-                      className={`
-                        w-36 h-10 flex items-center justify-center space-x-2 text-sm font-medium transition-all duration-200
-                        ${
+                      className={`h-10 flex items-center justify-center text-sm font-medium transition-all duration-200 w-24 ${
                           isActive
                             ? "bg-red-100 text-red-700 hover:bg-red-200"
                             : "text-gray-600 hover:text-gray-900 hover:bg-red-50"
                         }
                       `}
                     >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate text-xs">{t(item.name)}</span>
+                      <span className="text-sm">{t(item.name)}</span>
                     </Button>
                   </Link>
                 )
@@ -141,7 +137,6 @@ export function Navigation() {
 
                   {user &&
                     navigationItems.map((item) => {
-                      const Icon = item.icon
                       const isActive = pathname === item.href
                       return (
                         <Link key={item.name} href={item.href} onClick={() => setIsOpen(false)}>
@@ -156,7 +151,6 @@ export function Navigation() {
                               }
                             `}
                           >
-                            <Icon className="w-5 h-5 flex-shrink-0" />
                             <span className="text-sm">{t(item.name)}</span>
                           </Button>
                         </Link>
