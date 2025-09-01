@@ -2,184 +2,195 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
-import { useAuth } from "./use-auth"
-import type { Medication, MedicationLog } from "@/types/database"
 
-export interface MedicationWithLogs extends Medication {
-  logs?: MedicationLog[]
+export interface Medication {
+  id: string
+  name: string
+  dosage: string
+  frequency: string
+  times: string[]
+  isActive: boolean
+  createdAt: string
+}
+
+export interface MedicationLog {
+  id: string
+  medicationId: string
+  takenAt: string
+  missed: boolean
 }
 
 export function useMedicationTracking() {
-  const { user } = useAuth()
-  const [medications, setMedications] = useState<MedicationWithLogs[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [medications, setMedications] = useState<Medication[]>([])
+  const [medicationLogs, setMedicationLogs] = useState<MedicationLog[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Get user ID from localStorage (client-side only)
+  const getUserId = () => {
+    if (typeof window === "undefined") return null
+    return localStorage.getItem("userId")
+  }
 
   useEffect(() => {
-    if (user) {
+    if (typeof window !== "undefined") {
       loadMedications()
+      loadMedicationLogs()
     }
-  }, [user])
+  }, [])
 
   const loadMedications = async () => {
-    if (!user) return
-
     try {
+      const userId = getUserId()
+      if (!userId) return
+
       const { data, error } = await supabase
         .from("medications")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("is_active", true)
         .order("created_at", { ascending: false })
 
-      if (error) {
-        console.error("Error loading medications:", error)
-        return
-      }
-
+      if (error) throw error
       setMedications(data || [])
-    } catch (error) {
-      console.error("Error loading medications:", error)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load medications")
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
-  const addMedication = async (medicationData: {
-    name: string
-    dosage?: string
-    frequency?: string
-    start_date?: string
-    notes?: string
-  }): Promise<boolean> => {
-    if (!user) return false
-
+  const loadMedicationLogs = async () => {
     try {
-      const { data, error } = await supabase
-        .from("medications")
-        .insert({
-          user_id: user.id,
-          ...medicationData,
-          is_active: true,
-        })
-        .select()
-        .single()
-
-      if (error || !data) {
-        console.error("Error adding medication:", error)
-        return false
-      }
-
-      setMedications((prev) => [data, ...prev])
-      return true
-    } catch (error) {
-      console.error("Error adding medication:", error)
-      return false
-    }
-  }
-
-  const updateMedication = async (id: string, updates: Partial<Medication>): Promise<boolean> => {
-    if (!user) return false
-
-    try {
-      const { error } = await supabase.from("medications").update(updates).eq("id", id).eq("user_id", user.id)
-
-      if (error) {
-        console.error("Error updating medication:", error)
-        return false
-      }
-
-      setMedications((prev) => prev.map((med) => (med.id === id ? { ...med, ...updates } : med)))
-      return true
-    } catch (error) {
-      console.error("Error updating medication:", error)
-      return false
-    }
-  }
-
-  const deleteMedication = async (id: string): Promise<boolean> => {
-    if (!user) return false
-
-    try {
-      const { error } = await supabase
-        .from("medications")
-        .update({ is_active: false })
-        .eq("id", id)
-        .eq("user_id", user.id)
-
-      if (error) {
-        console.error("Error deleting medication:", error)
-        return false
-      }
-
-      setMedications((prev) => prev.filter((med) => med.id !== id))
-      return true
-    } catch (error) {
-      console.error("Error deleting medication:", error)
-      return false
-    }
-  }
-
-  const logMedicationTaken = async (medicationId: string, wasTaken: boolean, notes?: string): Promise<boolean> => {
-    if (!user) return false
-
-    try {
-      const { error } = await supabase.from("medication_logs").insert({
-        user_id: user.id,
-        medication_id: medicationId,
-        taken_at: new Date().toISOString(),
-        was_taken: wasTaken,
-        notes,
-      })
-
-      if (error) {
-        console.error("Error logging medication:", error)
-        return false
-      }
-
-      return true
-    } catch (error) {
-      console.error("Error logging medication:", error)
-      return false
-    }
-  }
-
-  const getAdherenceRate = async (medicationId: string, days = 30): Promise<number> => {
-    if (!user) return 0
-
-    try {
-      const startDate = new Date()
-      startDate.setDate(startDate.getDate() - days)
+      const userId = getUserId()
+      if (!userId) return
 
       const { data, error } = await supabase
         .from("medication_logs")
-        .select("was_taken")
-        .eq("user_id", user.id)
-        .eq("medication_id", medicationId)
-        .gte("taken_at", startDate.toISOString())
+        .select("*")
+        .eq("user_id", userId)
+        .order("taken_at", { ascending: false })
 
-      if (error || !data) {
-        console.error("Error getting adherence rate:", error)
-        return 0
-      }
-
-      if (data.length === 0) return 0
-
-      const takenCount = data.filter((log) => log.was_taken).length
-      return Math.round((takenCount / data.length) * 100)
-    } catch (error) {
-      console.error("Error getting adherence rate:", error)
-      return 0
+      if (error) throw error
+      setMedicationLogs(data || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load medication logs")
     }
+  }
+
+  const addMedication = async (medication: Omit<Medication, "id" | "createdAt">) => {
+    try {
+      const userId = getUserId()
+      if (!userId) throw new Error("User not authenticated")
+
+      const { data, error } = await supabase
+        .from("medications")
+        .insert([
+          {
+            user_id: userId,
+            name: medication.name,
+            dosage: medication.dosage,
+            frequency: medication.frequency,
+            times: medication.times,
+            is_active: medication.isActive,
+          },
+        ])
+        .select()
+
+      if (error) throw error
+      if (data) {
+        const newMedication: Medication = {
+          id: data[0].id,
+          name: data[0].name,
+          dosage: data[0].dosage,
+          frequency: data[0].frequency,
+          times: data[0].times,
+          isActive: data[0].is_active,
+          createdAt: data[0].created_at,
+        }
+        setMedications((prev) => [newMedication, ...prev])
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add medication")
+      throw err
+    }
+  }
+
+  const markMedicationTaken = async (medicationId: string, missed = false) => {
+    try {
+      const userId = getUserId()
+      if (!userId) throw new Error("User not authenticated")
+
+      const { data, error } = await supabase
+        .from("medication_logs")
+        .insert([
+          {
+            user_id: userId,
+            medication_id: medicationId,
+            taken_at: new Date().toISOString(),
+            missed,
+          },
+        ])
+        .select()
+
+      if (error) throw error
+      if (data) {
+        const newLog: MedicationLog = {
+          id: data[0].id,
+          medicationId: data[0].medication_id,
+          takenAt: data[0].taken_at,
+          missed: data[0].missed,
+        }
+        setMedicationLogs((prev) => [newLog, ...prev])
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to log medication")
+      throw err
+    }
+  }
+
+  const getTodaysMedications = () => {
+    return medications.filter((med) => med.isActive)
+  }
+
+  const getAdherenceRate = () => {
+    if (medicationLogs.length === 0) return 0
+
+    const today = new Date()
+    const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+    const recentLogs = medicationLogs.filter((log) => {
+      const logDate = new Date(log.takenAt)
+      return logDate >= sevenDaysAgo && logDate <= today
+    })
+
+    if (recentLogs.length === 0) return 0
+
+    const takenLogs = recentLogs.filter((log) => !log.missed)
+    return Math.round((takenLogs.length / recentLogs.length) * 100)
+  }
+
+  const getMissedDoses = () => {
+    const today = new Date()
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
+    return medicationLogs.filter((log) => {
+      const logDate = new Date(log.takenAt)
+      return logDate >= startOfDay && log.missed
+    }).length
   }
 
   return {
     medications,
-    isLoading,
+    medicationLogs,
+    loading,
+    error,
     addMedication,
-    updateMedication,
-    deleteMedication,
-    logMedicationTaken,
+    markMedicationTaken,
+    getTodaysMedications,
     getAdherenceRate,
+    getMissedDoses,
     loadMedications,
+    loadMedicationLogs,
   }
 }
