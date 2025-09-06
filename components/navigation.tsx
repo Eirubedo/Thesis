@@ -37,8 +37,8 @@ export function Navigation() {
           {/* Logo - Left Side */}
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center space-x-3">
-              <img src="/images/hypercare-logo.png" alt="HyperCare Logo" className="w-8 h-8" />
-              <span className="text-2xl font-bold text-red-600">HyperCare</span>
+              <img src="/images/asked-logo.png" alt="ASKED Logo" className="w-8 h-8" />
+              <span className="text-2xl font-bold text-red-600">ASKED</span>
             </Link>
           </div>
 
@@ -52,10 +52,10 @@ export function Navigation() {
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       className={`h-10 flex items-center justify-center text-sm font-medium transition-all duration-200 w-24 ${
-                          isActive
-                            ? "bg-red-100 text-red-700 hover:bg-red-200"
-                            : "text-gray-600 hover:text-gray-900 hover:bg-red-50"
-                        }
+                        isActive
+                          ? "bg-red-100 text-red-700 hover:bg-red-200"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-red-50"
+                      }
                       `}
                     >
                       <span className="text-sm">{t(item.name)}</span>

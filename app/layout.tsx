@@ -4,14 +4,13 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/components/auth-provider"
 import { LanguageProvider } from "@/contexts/language-context"
-import { EmergencySupport } from "@/components/emergency-support"
 import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "ASKED - AI Mental Health Assistant",
-  description: "AI-powered mental health support with RAG chatbot",
+  description: "Your comprehensive hypertension management companion powered by AI technology",
     generator: 'v0.app'
 }
 
@@ -26,7 +25,6 @@ export default function RootLayout({
         <LanguageProvider>
           <AuthProvider>
             {children}
-            <EmergencySupport />
             <Toaster />
           </AuthProvider>
         </LanguageProvider>

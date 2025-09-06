@@ -28,8 +28,8 @@ export default function AboutPage() {
       icon: Brain,
       title: "AI-Powered Assessments",
       titleId: "Asesmen Bertenaga AI",
-      description: "Comprehensive health evaluations using advanced Dify AI technology",
-      descriptionId: "Evaluasi kesehatan komprehensif menggunakan teknologi Dify AI canggih",
+      description: "Comprehensive health evaluations using advanced RAG technology",
+      descriptionId: "Evaluasi kesehatan komprehensif menggunakan teknologi RAG yang canggih",
     },
     {
       icon: Activity,

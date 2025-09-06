@@ -25,7 +25,7 @@ const translations = {
     "nav.support": "Support",
 
     // Home
-    "home.title": "Welcome to HyperCare",
+    "home.title": "Welcome to ASKED",
     "home.subtitle":
       "Your comprehensive hypertension management companion. Get personalized support, health assessments, and resources powered by advanced AI technology for both your physical and mental well-being.",
     "home.startChat": "Start Health Chat",
@@ -51,10 +51,10 @@ const translations = {
     "home.progressTrackingTitle": "Progress Monitoring",
     "home.progressTrackingDescription": "Comprehensive tracking of your hypertension management journey",
     "home.readyToStart": "Ready to take control of your hypertension?",
-    "home.joinThousands": "Join thousands of users managing their hypertension with HyperCare's comprehensive platform",
+    "home.joinThousands": "Join thousands of users managing their hypertension with ASKED's comprehensive platform",
 
     // Login
-    "login.title": "HyperCare",
+    "login.title": "ASKED",
     "login.subtitle": "Welcome back to your hypertension management journey",
     "login.subtitleRegister": "Start managing your hypertension today",
     "login.fullName": "Full Name",
@@ -331,7 +331,7 @@ const translations = {
     "timer.completedExercise": "You've completed the {title} exercise.",
 
     // About page translations
-    "about.title": "About HyperCare",
+    "about.title": "About ASKED",
     "about.subtitle":
       "We're revolutionizing hypertension management through AI-powered technology, making professional-grade assistance accessible to everyone, everywhere.",
     "about.badges.aiPowered": "AI-Powered",
@@ -342,7 +342,7 @@ const translations = {
       "To democratize access to hypertension management by combining cutting-edge AI technology with evidence-based medical approaches, ensuring that quality cardiovascular care is available to everyone, regardless of location, time, or circumstances.",
     "about.features.title": "Key Features",
     "about.team.title": "Our Team",
-    "about.howItWorks.title": "How HyperCare Works",
+    "about.howItWorks.title": "How ASKED Works",
     "about.howItWorks.steps.signUp": "Sign Up",
     "about.howItWorks.steps.signUpDescription": "Create your secure account and complete your health profile",
     "about.howItWorks.steps.assessment": "Assessment",
@@ -355,11 +355,11 @@ const translations = {
     "about.openSource.title": "Open Source & Deployment",
     "about.openSource.openSource": "Open Source",
     "about.openSource.openSourceDescription":
-      "HyperCare is built with transparency in mind. Our codebase is available on GitHub, allowing developers and researchers to contribute to hypertension management technology advancement.",
+      "ASKED is built with transparency in mind. Our codebase is available on GitHub, allowing developers and researchers to contribute to hypertension management technology advancement.",
     "about.openSource.viewOnGitHub": "View on GitHub",
     "about.openSource.easyDeployment": "Easy Deployment",
     "about.openSource.easyDeploymentDescription":
-      "Deploy HyperCare to your own infrastructure with our comprehensive deployment guide. Compatible with major cloud providers and supports custom configurations.",
+      "Deploy ASKED to your own infrastructure with our comprehensive deployment guide. Compatible with major cloud providers and supports custom configurations.",
     "about.openSource.deploymentGuide": "Deployment Guide",
     "about.contact.title": "Get Involved",
     "about.contact.description":
@@ -410,7 +410,7 @@ const translations = {
     "nav.support": "Bantuan",
 
     // Home
-    "home.title": "Selamat Datang di HyperCare",
+    "home.title": "Selamat Datang di ASKED",
     "home.subtitle":
       "Teman komprehensif pengelolaan hipertensi Anda. Dapatkan dukungan personal, asesmen kesehatan, dan sumber daya dengan teknologi AI canggih untuk kesehatan fisik dan mental Anda.",
     "home.startChat": "Mulai Obrolan Kesehatan",
@@ -436,10 +436,10 @@ const translations = {
     "home.progressTrackingDescription": "Pelacakan komprehensif perjalanan pengelolaan hipertensi Anda",
     "home.readyToStart": "Siap mengendalikan hipertensi Anda?",
     "home.joinThousands":
-      "Bergabunglah dengan ribuan pengguna yang mengelola hipertensi mereka dengan platform komprehensif HyperCare",
+      "Bergabunglah dengan ribuan pengguna yang mengelola hipertensi mereka dengan platform komprehensif ASKED",
 
     // Login
-    "login.title": "HyperCare",
+    "login.title": "ASKED",
     "login.subtitle": "Selamat datang kembali di perjalanan pengelolaan hipertensi Anda",
     "login.subtitleRegister": "Mulai mengelola hipertensi Anda hari ini",
     "login.fullName": "Nama Lengkap",
@@ -716,7 +716,7 @@ const translations = {
     "timer.completedExercise": "Anda telah menyelesaikan latihan {title}.",
 
     // About page translations
-    "about.title": "Tentang HyperCare",
+    "about.title": "Tentang ASKED",
     "about.subtitle":
       "Kami merevolusi pengelolaan hipertensi melalui teknologi bertenaga AI, membuat bantuan tingkat profesional dapat diakses oleh semua orang, di mana saja.",
     "about.badges.aiPowered": "Bertenaga AI",
@@ -727,7 +727,7 @@ const translations = {
       "Untuk mendemokratisasi akses ke pengelolaan hipertensi dengan menggabungkan teknologi AI mutakhir dengan pendekatan medis berbasis bukti, memastikan bahwa perawatan kardiovaskular berkualitas tersedia untuk semua orang, terlepas dari lokasi, waktu, atau keadaan.",
     "about.features.title": "Fitur Utama",
     "about.team.title": "Tim Kami",
-    "about.howItWorks.title": "Cara Kerja HyperCare",
+    "about.howItWorks.title": "Cara Kerja ASKED",
     "about.howItWorks.steps.signUp": "Daftar",
     "about.howItWorks.steps.signUpDescription": "Buat akun aman Anda dan lengkapi profil kesehatan Anda",
     "about.howItWorks.steps.assessment": "Asesmen",
@@ -741,11 +741,11 @@ const translations = {
     "about.openSource.title": "Sumber Terbuka & Deployment",
     "about.openSource.openSource": "Sumber Terbuka",
     "about.openSource.openSourceDescription":
-      "HyperCare dibangun dengan transparansi dalam pikiran. Basis kode kami tersedia di GitHub, memungkinkan pengembang dan peneliti untuk berkontribusi pada kemajuan teknologi pengelolaan hipertensi.",
+      "ASKED dibangun dengan transparansi dalam pikiran. Basis kode kami tersedia di GitHub, memungkinkan pengembang dan peneliti untuk berkontribusi pada kemajuan teknologi pengelolaan hipertensi.",
     "about.openSource.viewOnGitHub": "Lihat di GitHub",
     "about.openSource.easyDeployment": "Deployment Mudah",
     "about.openSource.easyDeploymentDescription":
-      "Deploy HyperCare ke infrastruktur Anda sendiri dengan panduan deployment komprehensif kami. Kompatibel dengan penyedia cloud utama dan mendukung konfigurasi kustom.",
+      "Deploy ASKED ke infrastruktur Anda sendiri dengan panduan deployment komprehensif kami. Kompatibel dengan penyedia cloud utama dan mendukung konfigurasi kustom.",
     "about.openSource.deploymentGuide": "Panduan Deployment",
     "about.contact.title": "Terlibat",
     "about.contact.description":
