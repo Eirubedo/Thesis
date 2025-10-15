@@ -49,8 +49,8 @@ export function DifyChatInterface({
       id: "welcome",
       content:
         language === "id"
-          ? "Halo! Saya asisten kesehatan mental AI Anda. Saya di sini untuk mendengarkan, mendukung, dan memberikan bimbingan. Bagaimana perasaan Anda hari ini?"
-          : "Hello! I'm your AI mental health assistant. I'm here to listen, support, and provide guidance. How are you feeling today?",
+          ? "Halo! Saya asisten kesehatan AI Anda. Saya di sini untuk mendengarkan, mendukung, dan memberikan bimbingan. Bagaimana perasaan Anda hari ini?"
+          : "Hello! I'm your AI health assistant. I'm here to listen, support, and provide guidance. How are you feeling today?",
       role: "assistant",
       timestamp: new Date(),
     },
