@@ -101,6 +101,7 @@ export default function AssessmentPage() {
                 minHeight="calc(100vh - 250px)"
                 className="shadow-lg"
                 placeholder={t("assessment.chatPlaceholder")}
+                apiPath="/api/dify/assessment"
               />
             </div>
 

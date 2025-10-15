@@ -32,7 +32,7 @@ export default function SelfHelpPage() {
   const { user } = useAuth()
   const { t, language } = useLanguage()
   const router = useRouter()
-  const { userStats, getResourceProgress, markResourceCompleted, getLastPracticedText, formatDuration, isLoading } =
+  const { userStats, getResourceProgress, markResourceCompleted, getLastPracticedText, formatDuration } =
     useProgressTracking()
 
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -920,6 +920,7 @@ Based on 2024 Hypertension Guidelines, there's a bidirectional relationship betw
             minHeight="calc(100vh - 200px)"
             className="shadow-lg"
             placeholder={t("selfHelp.aiPlaceholder")}
+            apiPath="/api/dify/education"
           />
         </div>
       </div>

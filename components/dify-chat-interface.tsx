@@ -27,6 +27,8 @@ interface DifyChatInterfaceProps {
   className?: string
   minHeight?: string
   placeholder?: string
+  // New: API path to use for Dify requests
+  apiPath?: string
 }
 
 export function DifyChatInterface({
@@ -35,11 +37,12 @@ export function DifyChatInterface({
   className = "",
   minHeight = "600px",
   placeholder,
+  apiPath = "/api/dify/chat",
 }: DifyChatInterfaceProps) {
   const { user } = useAuth()
   const { t, language } = useLanguage()
   const { toast } = useToast()
-  const { speak, manualSpeak, stopSpeech, isPlaying, isLoading: ttsLoading, currentProvider, settings } = useTTS()
+  const { speak, manualSpeak, stopSpeech, isPlaying, isLoading: ttsLoading, currentProvider } = useTTS()
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -111,7 +114,7 @@ export function DifyChatInterface({
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/dify/chat", {
+      const response = await fetch(apiPath, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -225,6 +228,7 @@ export function DifyChatInterface({
                         size="sm"
                         className="ml-2 h-6 w-6 p-0 hover:bg-gray-200"
                         disabled={ttsLoading}
+                        aria-label="Play assistant message"
                       >
                         <Play className="w-3 h-3" />
                       </Button>
@@ -252,7 +256,6 @@ export function DifyChatInterface({
       </ScrollArea>
 
       <div className="border-t border-gray-200 p-4">
-        {/* TTS Status Bar */}
         {(isPlaying || ttsLoading) && (
           <div className="flex items-center justify-between mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div className="flex items-center space-x-2">
@@ -281,6 +284,8 @@ export function DifyChatInterface({
             onClick={isListening ? stopListening : startListening}
             disabled={isLoading}
             className={isListening ? "bg-yellow-100 text-yellow-600 border-yellow-300" : ""}
+            aria-pressed={isListening}
+            aria-label={isListening ? "Stop voice input" : "Start voice input"}
           >
             {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </Button>
@@ -288,6 +293,7 @@ export function DifyChatInterface({
             type="submit"
             disabled={isLoading || !input.trim()}
             className="bg-sky-500 hover:bg-sky-600 text-white"
+            aria-label="Send message"
           >
             <Send className="w-4 h-4" />
           </Button>
