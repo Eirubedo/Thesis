@@ -18,6 +18,9 @@ import {
   Activity,
   Stethoscope,
   Award,
+  GraduationCap,
+  Lightbulb,
+  Target,
 } from "lucide-react"
 
 export default function AboutPage() {
@@ -70,25 +73,31 @@ export default function AboutPage() {
 
   const team = [
     {
-      name: "Dr. Sarah Johnson",
-      role: "Chief Medical Officer",
-      roleId: "Kepala Petugas Medis",
-      description: "Cardiologist with 15+ years experience in hypertension management",
-      descriptionId: "Kardiolog dengan pengalaman 15+ tahun dalam pengelolaan hipertensi",
+      name: "Prof. Dr. Budi Anna Keliat, S.Kp., M.App.Sc",
+      role: "Mental Health Nursing Expert",
+      roleId: "Ahli Keperawatan Jiwa",
+      description:
+        "Professor of Mental Health Nursing at Faculty of Nursing, Universitas Indonesia. Leading expert in community mental health nursing, psychosocial interventions, and research-based mental health education since 1990s.",
+      descriptionId:
+        "Guru Besar Keperawatan Jiwa di Fakultas Ilmu Keperawatan Universitas Indonesia. Ahli terkemuka dalam keperawatan jiwa komunitas, intervensi psikososial, dan pendidikan kesehatan jiwa berbasis riset sejak dekade 1990-an.",
     },
     {
-      name: "Michael Chen",
-      role: "AI Research Director",
-      roleId: "Direktur Penelitian AI",
-      description: "Leading AI researcher specializing in healthcare applications",
-      descriptionId: "Peneliti AI terkemuka yang mengkhususkan diri dalam aplikasi kesehatan",
+      name: "Prof. Dr. Achmad Nizar Hidayanto, S.Kom., M.Kom",
+      role: "Information Systems Professor",
+      roleId: "Profesor Sistem Informasi",
+      description:
+        "Professor of Information Systems at Faculty of Computer Science, Universitas Indonesia. Expert in information technology adoption and health information systems with extensive publications in digital health systems and AI applications.",
+      descriptionId:
+        "Profesor Sistem Informasi di Fakultas Ilmu Komputer Universitas Indonesia. Pakar adopsi teknologi informasi dan sistem informasi kesehatan dengan ratusan publikasi dalam sistem digital kesehatan dan aplikasi AI.",
     },
     {
-      name: "Dr. Maria Rodriguez",
-      role: "Clinical Psychology Lead",
-      roleId: "Kepala Psikologi Klinis",
-      description: "Expert in mental health aspects of chronic disease management",
-      descriptionId: "Ahli dalam aspek kesehatan mental pengelolaan penyakit kronis",
+      name: "Ns. Eka Putri Yulianti, S.Kep.",
+      role: "Mental Health Nurse & Researcher",
+      roleId: "Perawat & Peneliti Kesehatan Jiwa",
+      description:
+        "Nurse and researcher at Faculty of Nursing, Universitas Indonesia. Specializes in mental health nursing and nursing informatics, with Q1 systematic review on NLP for mental health assessment, providing scientific foundation for AI chatbot development.",
+      descriptionId:
+        "Perawat dan peneliti di Fakultas Ilmu Keperawatan Universitas Indonesia. Fokus pada keperawatan jiwa dan informatik keperawatan, dengan telaah sistematik Q1 tentang NLP untuk asesmen kesehatan mental yang menjadi landasan ilmiah pengembangan chatbot AI.",
     },
   ]
 
@@ -102,7 +111,7 @@ export default function AboutPage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
-            <img src="/images/hypercare-logo.png" alt="HyperCare Logo" className="w-16 h-16" />
+            <img src="/images/asked-logo.png" alt="ASKED Logo" className="w-16 h-16" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{t("about.title")}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">{t("about.subtitle")}</p>
@@ -134,6 +143,80 @@ export default function AboutPage() {
             </p>
           </CardContent>
         </Card>
+
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">{t("about.foundation.title")}</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card className="border-purple-100 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-4">
+                  <Brain className="w-6 h-6" />
+                </div>
+                <CardTitle className="text-lg">{t("about.foundation.stuartModel.title")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">{t("about.foundation.stuartModel.description")}</p>
+                <ul className="space-y-2">
+                  {[
+                    t("about.foundation.stuartModel.biological"),
+                    t("about.foundation.stuartModel.psychological"),
+                    t("about.foundation.stuartModel.sociocultural"),
+                    t("about.foundation.stuartModel.environmental"),
+                    t("about.foundation.stuartModel.legal"),
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start text-sm text-gray-600">
+                      <span className="text-purple-600 mr-2">•</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-blue-100 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4">
+                  <Lightbulb className="w-6 h-6" />
+                </div>
+                <CardTitle className="text-lg">{t("about.foundation.designScience.title")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">{t("about.foundation.designScience.description")}</p>
+                <ul className="space-y-2">
+                  {[
+                    t("about.foundation.designScience.problemIdentification"),
+                    t("about.foundation.designScience.requirementsAnalysis"),
+                    t("about.foundation.designScience.design"),
+                    t("about.foundation.designScience.development"),
+                    t("about.foundation.designScience.evaluation"),
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start text-sm text-gray-600">
+                      <span className="text-blue-600 mr-2">•</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* AI Chatbot Purpose */}
+          <Card className="mt-8 border-green-100">
+            <CardHeader>
+              <div className="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Target className="w-6 h-6" />
+              </div>
+              <CardTitle className="text-xl text-center text-green-700">
+                {t("about.foundation.chatbotPurpose.title")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 text-center max-w-4xl mx-auto leading-relaxed">
+                {t("about.foundation.chatbotPurpose.description")}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Features Section */}
         <div className="mb-16">
@@ -211,21 +294,28 @@ export default function AboutPage() {
 
         {/* Team Section */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">{t("about.team.title")}</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">{t("about.team.title")}</h2>
+          <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+            {isIndonesian
+              ? "Tim ahli dari Universitas Indonesia yang mengembangkan platform ASKED dengan pendekatan berbasis riset dan evidence-based practice."
+              : "Expert team from Universitas Indonesia developing the ASKED platform with research-based and evidence-based practice approach."}
+          </p>
           <div className="grid md:grid-cols-3 gap-8">
             {team.map((member, index) => (
-              <Card key={index} className="border-green-100 text-center">
+              <Card key={index} className="border-green-100 hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="w-20 h-20 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Users className="w-10 h-10 text-green-600" />
+                    <GraduationCap className="w-10 h-10 text-green-600" />
                   </div>
-                  <CardTitle className="text-lg">{member.name}</CardTitle>
+                  <CardTitle className="text-base leading-tight mb-2">{member.name}</CardTitle>
                   <CardDescription className="text-green-600 font-medium">
                     {isIndonesian ? member.roleId : member.role}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 text-sm">{isIndonesian ? member.descriptionId : member.description}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {isIndonesian ? member.descriptionId : member.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
