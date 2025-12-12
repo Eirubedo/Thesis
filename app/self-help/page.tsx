@@ -915,12 +915,16 @@ Based on 2024 Hypertension Guidelines, there's a bidirectional relationship betw
           </div>
 
           <DifyChatInterface
-            title={t("selfHelp.aiAssistantTitle")}
+            title={
+              language === "id"
+                ? "Pelatih Kesehatan AI - Edukasi Hipertensi"
+                : "AI Health Coach - Hypertension Education"
+            }
             showHeader={true}
-            minHeight="calc(100vh - 200px)"
+            minHeight="600px"
             className="shadow-lg"
-            placeholder={t("selfHelp.aiPlaceholder")}
             apiPath="/api/dify/education"
+            conversationType="education"
           />
         </div>
       </div>

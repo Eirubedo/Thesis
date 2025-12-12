@@ -102,6 +102,7 @@ export default function AssessmentPage() {
                 className="shadow-lg"
                 placeholder={t("assessment.chatPlaceholder")}
                 apiPath="/api/dify/assessment"
+                conversationType="assessment"
               />
             </div>
 

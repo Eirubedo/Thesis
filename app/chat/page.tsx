@@ -45,6 +45,7 @@ export default function ChatPage() {
               showHeader={true}
               minHeight="calc(100vh - 250px)"
               className="shadow-lg"
+              conversationType="chat"
             />
           </div>
 

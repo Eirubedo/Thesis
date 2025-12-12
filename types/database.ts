@@ -58,6 +58,30 @@ export interface MedicationLog {
   created_at: string
 }
 
+export interface Conversation {
+  id: string
+  user_id: string
+  conversation_type: "chat" | "assessment" | "education"
+  dify_conversation_id?: string
+  title?: string
+  summary?: string
+  message_count: number
+  started_at: string
+  ended_at?: string
+  is_archived: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ConversationMessage {
+  id: string
+  conversation_id: string
+  message_id?: string
+  content: string
+  role: "user" | "assistant"
+  created_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -85,6 +109,16 @@ export interface Database {
         Row: MedicationLog
         Insert: Omit<MedicationLog, "id" | "created_at">
         Update: Partial<Omit<MedicationLog, "id" | "created_at">>
+      }
+      conversations: {
+        Row: Conversation
+        Insert: Omit<Conversation, "id" | "created_at" | "updated_at">
+        Update: Partial<Omit<Conversation, "id" | "created_at" | "updated_at">>
+      }
+      conversation_messages: {
+        Row: ConversationMessage
+        Insert: Omit<ConversationMessage, "id" | "created_at">
+        Update: Partial<Omit<ConversationMessage, "id" | "created_at">>
       }
     }
   }

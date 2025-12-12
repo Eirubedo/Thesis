@@ -27,8 +27,8 @@ interface DifyChatInterfaceProps {
   className?: string
   minHeight?: string
   placeholder?: string
-  // New: API path to use for Dify requests
   apiPath?: string
+  conversationType?: "chat" | "assessment" | "education"
 }
 
 export function DifyChatInterface({
@@ -38,6 +38,7 @@ export function DifyChatInterface({
   minHeight = "600px",
   placeholder,
   apiPath = "/api/dify/chat",
+  conversationType = "chat",
 }: DifyChatInterfaceProps) {
   const { user } = useAuth()
   const { t, language } = useLanguage()
@@ -59,6 +60,7 @@ export function DifyChatInterface({
   const [isLoading, setIsLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [conversationId, setConversationId] = useState<string>("")
+  const [dbConversationId, setDbConversationId] = useState<string>("")
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
@@ -98,6 +100,35 @@ export function DifyChatInterface({
     }
   }, [toast, language])
 
+  const saveConversation = async (message: Message, role: "user" | "assistant") => {
+    if (!user?.id) return
+
+    try {
+      const response = await fetch("/api/conversations/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: dbConversationId || undefined,
+          user_id: user.id,
+          conversation_type: conversationType,
+          dify_conversation_id: conversationId,
+          message: {
+            message_id: message.id,
+            content: message.content,
+            role: role,
+          },
+        }),
+      })
+
+      const data = await response.json()
+      if (data.conversation_id && !dbConversationId) {
+        setDbConversationId(data.conversation_id)
+      }
+    } catch (error) {
+      console.error("[v0] Failed to save conversation:", error)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
@@ -112,6 +143,8 @@ export function DifyChatInterface({
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
+
+    await saveConversation(userMessage, "user")
 
     try {
       const response = await fetch(apiPath, {
@@ -145,6 +178,8 @@ export function DifyChatInterface({
 
       setMessages((prev) => [...prev, assistantMessage])
       setConversationId(data.conversation_id)
+
+      await saveConversation(assistantMessage, "assistant")
 
       // Use TTS hook for speech synthesis
       await speak(assistantMessage.content, language === "id" ? "id-ID" : "en-US")
