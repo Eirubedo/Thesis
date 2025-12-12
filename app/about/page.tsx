@@ -95,9 +95,9 @@ export default function AboutPage() {
       role: "Mental Health Nurse & Researcher",
       roleId: "Perawat & Peneliti Kesehatan Jiwa",
       description:
-        "Nurse and researcher at Faculty of Nursing, Universitas Indonesia. Specializes in mental health nursing and nursing informatics, with Q1 systematic review on NLP for mental health assessment, providing scientific foundation for AI chatbot development.",
+        "Nurse and researcher at Faculty of Nursing, Universitas Indonesia. Specializes in mental health nursing and nursing informatics, with systematic review on NLP for mental health assessment, providing scientific foundation for AI chatbot development.",
       descriptionId:
-        "Perawat dan peneliti di Fakultas Ilmu Keperawatan Universitas Indonesia. Fokus pada keperawatan jiwa dan informatik keperawatan, dengan telaah sistematik Q1 tentang NLP untuk asesmen kesehatan mental yang menjadi landasan ilmiah pengembangan chatbot AI.",
+        "Perawat dan peneliti di Fakultas Ilmu Keperawatan Universitas Indonesia. Fokus pada keperawatan jiwa dan informatik keperawatan, dengan telaah sistematik tentang NLP untuk asesmen kesehatan mental yang menjadi landasan ilmiah pengembangan chatbot AI.",
     },
   ]
 
