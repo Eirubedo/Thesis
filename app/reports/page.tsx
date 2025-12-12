@@ -34,7 +34,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import type { Conversation, ConversationMessage } from "@/types/database"
 
 interface AssessmentResult {
   id: string
@@ -46,17 +45,27 @@ interface AssessmentResult {
   data: any
 }
 
+interface DailyConversation {
+  date: string
+  messageCount: number
+  messages: Array<{
+    id: string
+    role: "user" | "assistant"
+    content: string
+    created_at: string
+    conversation_type: string
+    conversation_title: string
+  }>
+}
+
 export default function ReportsPage() {
   const { user } = useAuth()
   const { t } = useLanguage()
   const router = useRouter()
   const { toast } = useToast()
   const [results, setResults] = useState<AssessmentResult[]>([])
-  const [conversations, setConversations] = useState<Conversation[]>([])
-  const [selectedConversation, setSelectedConversation] = useState<{
-    conversation: Conversation
-    messages: ConversationMessage[]
-  } | null>(null)
+  const [dailyConversations, setDailyConversations] = useState<DailyConversation[]>([])
+  const [selectedDay, setSelectedDay] = useState<DailyConversation | null>(null)
 
   useEffect(() => {
     if (!user) {
@@ -73,33 +82,18 @@ export default function ReportsPage() {
       ),
     )
 
-    fetchConversations()
+    fetchDailyConversations()
   }, [user, router])
 
-  const fetchConversations = async () => {
+  const fetchDailyConversations = async () => {
     if (!user?.id) return
 
     try {
-      const response = await fetch(`/api/conversations/list?user_id=${user.id}`)
+      const response = await fetch(`/api/conversations/daily?user_id=${user.id}`)
       const data = await response.json()
-      setConversations(data)
+      setDailyConversations(data)
     } catch (error) {
-      console.error("Failed to fetch conversations:", error)
-    }
-  }
-
-  const viewConversationDetails = async (conversationId: string) => {
-    try {
-      const response = await fetch(`/api/conversations/detail?conversation_id=${conversationId}`)
-      const data = await response.json()
-      setSelectedConversation(data)
-    } catch (error) {
-      console.error("Failed to fetch conversation details:", error)
-      toast({
-        title: "Error",
-        description: "Failed to load conversation details",
-        variant: "destructive",
-      })
+      console.error("Failed to fetch daily conversations:", error)
     }
   }
 
@@ -149,10 +143,6 @@ export default function ReportsPage() {
   const quickResults = results.filter((r) => r.type === "quick")
   const knowledgeResults = results.filter((r) => r.type === "knowledge")
 
-  const chatConversations = conversations.filter((c) => c.conversation_type === "chat")
-  const assessmentConversations = conversations.filter((c) => c.conversation_type === "assessment")
-  const educationConversations = conversations.filter((c) => c.conversation_type === "education")
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 pt-20 pb-12">
       <Navigation />
@@ -198,12 +188,12 @@ export default function ReportsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="w-5 h-5 text-blue-500" />
-                  Riwayat Percakapan AI
+                  Riwayat Percakapan Harian
                 </CardTitle>
-                <CardDescription>Semua percakapan Anda dengan asisten AI tersimpan di sini</CardDescription>
+                <CardDescription>Semua percakapan Anda dengan AI dikelompokkan per hari</CardDescription>
               </CardHeader>
               <CardContent>
-                {conversations.length === 0 ? (
+                {dailyConversations.length === 0 ? (
                   <div className="text-center py-8">
                     <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Percakapan</h3>
@@ -212,95 +202,112 @@ export default function ReportsPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {conversations.map((conversation) => {
-                      const typeInfo = getConversationType(conversation.conversation_type)
-                      return (
-                        <Card key={conversation.id} className="border-l-4 border-l-blue-500">
-                          <CardContent className="pt-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Badge className={typeInfo.color}>{typeInfo.label}</Badge>
-                                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                                    <Calendar className="w-4 h-4" />
-                                    {new Date(conversation.started_at).toLocaleDateString("id-ID", {
+                    {dailyConversations.map((day) => (
+                      <Card key={day.date} className="border-l-4 border-l-blue-500">
+                        <CardContent className="pt-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Calendar className="w-5 h-5 text-gray-500" />
+                                <h3 className="text-lg font-semibold">
+                                  {new Date(day.date).toLocaleDateString("id-ID", {
+                                    weekday: "long",
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                  })}
+                                </h3>
+                              </div>
+                              <p className="text-sm text-gray-600">
+                                {day.messageCount} pesan dalam percakapan hari ini
+                              </p>
+                            </div>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button size="sm" variant="outline" onClick={() => setSelectedDay(day)}>
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  Lihat Percakapan
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl max-h-[85vh]">
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Percakapan -{" "}
+                                    {new Date(day.date).toLocaleDateString("id-ID", {
                                       day: "numeric",
                                       month: "long",
                                       year: "numeric",
                                     })}
-                                  </div>
-                                </div>
-                                <h3 className="font-semibold mb-1">{conversation.title || "Percakapan"}</h3>
-                                <p className="text-sm text-gray-600">{conversation.message_count} pesan</p>
-                              </div>
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => viewConversationDetails(conversation.id)}
-                                  >
-                                    <FileText className="w-4 h-4 mr-2" />
-                                    Lihat Detail
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-3xl max-h-[80vh]">
-                                  <DialogHeader>
-                                    <DialogTitle>{conversation.title}</DialogTitle>
-                                    <DialogDescription>
-                                      {new Date(conversation.started_at).toLocaleString("id-ID")} •{" "}
-                                      {conversation.message_count} pesan
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  <ScrollArea className="h-[60vh] pr-4">
-                                    {selectedConversation?.conversation.id === conversation.id && (
-                                      <div className="space-y-4">
-                                        {selectedConversation.messages.map((message) => (
-                                          <div
-                                            key={message.id}
-                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                                          >
+                                  </DialogTitle>
+                                  <DialogDescription>{day.messageCount} pesan dari semua percakapan</DialogDescription>
+                                </DialogHeader>
+                                <ScrollArea className="h-[65vh] pr-4">
+                                  {selectedDay?.date === day.date && (
+                                    <div className="space-y-4">
+                                      {selectedDay.messages.map((message, index) => {
+                                        const typeInfo = getConversationType(message.conversation_type)
+                                        const showTypeLabel =
+                                          index === 0 ||
+                                          message.conversation_type !==
+                                            selectedDay.messages[index - 1]?.conversation_type
+
+                                        return (
+                                          <div key={message.id}>
+                                            {showTypeLabel && (
+                                              <div className="flex items-center gap-2 my-4">
+                                                <div className="h-px flex-1 bg-gray-200" />
+                                                <Badge className={typeInfo.color}>{typeInfo.label}</Badge>
+                                                <div className="h-px flex-1 bg-gray-200" />
+                                              </div>
+                                            )}
                                             <div
-                                              className={`flex items-start space-x-3 max-w-[85%] ${
-                                                message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-                                              }`}
+                                              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                             >
                                               <div
-                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                                  message.role === "user" ? "bg-sky-500" : "bg-yellow-500"
+                                                className={`flex items-start space-x-3 max-w-[80%] ${
+                                                  message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
                                                 }`}
                                               >
-                                                {message.role === "user" ? (
-                                                  <User className="w-4 h-4 text-white" />
-                                                ) : (
-                                                  <Bot className="w-4 h-4 text-white" />
-                                                )}
-                                              </div>
-                                              <div
-                                                className={`p-3 rounded-lg ${
-                                                  message.role === "user"
-                                                    ? "bg-sky-500 text-white"
-                                                    : "bg-gray-100 text-gray-900"
-                                                }`}
-                                              >
-                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                                <p className="text-xs opacity-70 mt-1">
-                                                  {new Date(message.created_at).toLocaleTimeString("id-ID")}
-                                                </p>
+                                                <div
+                                                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                                    message.role === "user" ? "bg-sky-500" : "bg-yellow-500"
+                                                  }`}
+                                                >
+                                                  {message.role === "user" ? (
+                                                    <User className="w-4 h-4 text-white" />
+                                                  ) : (
+                                                    <Bot className="w-4 h-4 text-white" />
+                                                  )}
+                                                </div>
+                                                <div
+                                                  className={`p-3 rounded-lg ${
+                                                    message.role === "user"
+                                                      ? "bg-sky-500 text-white"
+                                                      : "bg-gray-100 text-gray-900"
+                                                  }`}
+                                                >
+                                                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                                  <p className="text-xs opacity-70 mt-1">
+                                                    {new Date(message.created_at).toLocaleTimeString("id-ID", {
+                                                      hour: "2-digit",
+                                                      minute: "2-digit",
+                                                    })}
+                                                  </p>
+                                                </div>
                                               </div>
                                             </div>
                                           </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </ScrollArea>
-                                </DialogContent>
-                              </Dialog>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )
-                    })}
+                                        )
+                                      })}
+                                    </div>
+                                  )}
+                                </ScrollArea>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
                 )}
               </CardContent>
@@ -433,47 +440,32 @@ export default function ReportsPage() {
                   <div className="text-center py-8">
                     <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Tes Pengetahuan</h3>
-                    <p className="text-gray-600 mb-4">Ikuti tes pengetahuan hipertensi untuk melihat level Anda</p>
+                    <p className="text-gray-600 mb-4">Uji pengetahuan hipertensi Anda untuk melihat perkembangan</p>
                     <Button onClick={() => router.push("/assessment")}>Mulai Tes Pengetahuan</Button>
                   </div>
                 ) : (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {knowledgeResults.map((result) => (
                       <Card key={result.id} className="border-l-4 border-l-green-500">
-                        <CardContent className="pt-6">
-                          <div className="flex items-start justify-between mb-6">
-                            <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm text-gray-600">
-                                  {new Date(result.completedAt).toLocaleDateString()}
-                                </span>
+                        <CardContent className="pt-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Calendar className="w-4 h-4 text-gray-500" />
+                                  <span className="text-sm text-gray-600">
+                                    {new Date(result.completedAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div className="font-semibold">Tes Pengetahuan</div>
                               </div>
-                              <h3 className="text-lg font-semibold">Tes Pengetahuan Hipertensi</h3>
-                            </div>
-                            <div className="text-right">
-                              <div className={`text-2xl font-bold ${getScoreColor(result.score, result.maxScore)}`}>
-                                {result.score}/{result.maxScore}
-                              </div>
-                              <Badge className="bg-green-100 text-green-700 flex items-center gap-1">
-                                <Award className="w-3 h-3" />
-                                {Math.round((result.score / result.maxScore) * 100) >= 80
-                                  ? "Advanced"
-                                  : Math.round((result.score / result.maxScore) * 100) >= 60
-                                    ? "Intermediate"
-                                    : "Beginner"}
+                              <Badge variant="secondary" className="bg-green-100 text-green-700">
+                                {Math.round((result.score / result.maxScore) * 100)}% Benar
                               </Badge>
                             </div>
-                          </div>
-
-                          <div className="mt-6 flex gap-2">
                             <Button size="sm" variant="outline">
                               <FileText className="w-4 h-4 mr-2" />
-                              Lihat Sertifikat
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <BookOpen className="w-4 h-4 mr-2" />
-                              Ulangi Tes
+                              Detail
                             </Button>
                           </div>
                         </CardContent>
@@ -494,11 +486,11 @@ export default function ReportsPage() {
                   <MessageCircle className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">{conversations.length}</div>
-                  <div className="text-sm text-gray-600">Percakapan AI</div>
+                  <div className="text-2xl font-bold">{dailyConversations.length}</div>
+                  <div className="text-sm text-gray-600">Riwayat Harian</div>
                 </div>
               </div>
-              {conversations.length > 0 && (
+              {dailyConversations.length > 0 && (
                 <div className="mt-4 flex items-center gap-2 text-sm">
                   <CheckCircle className="w-4 h-4 text-green-500" />
                   <span className="text-green-600">Aktif berkomunikasi</span>
