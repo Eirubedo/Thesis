@@ -111,7 +111,7 @@ export default function AboutPage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
-            <img src="/images/asked-logo.png" alt="ASKED Logo" className="w-16 h-16" />
+            <img src="/images/asked-logo.png" alt="ANSWA Logo" className="w-16 h-16" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{t("about.title")}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">{t("about.subtitle")}</p>
@@ -297,8 +297,8 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">{t("about.team.title")}</h2>
           <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
             {isIndonesian
-              ? "Tim ahli dari Universitas Indonesia yang mengembangkan platform ASKED dengan pendekatan berbasis riset dan evidence-based practice."
-              : "Expert team from Universitas Indonesia developing the ASKED platform with research-based and evidence-based practice approach."}
+              ? "Tim ahli dari Universitas Indonesia yang mengembangkan platform ANSWA dengan pendekatan berbasis riset dan evidence-based practice."
+              : "Expert team from Universitas Indonesia developing the ANSWA platform with research-based and evidence-based practice approach."}
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             {team.map((member, index) => (

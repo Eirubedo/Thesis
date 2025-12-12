@@ -9,8 +9,9 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "ASKED - AI Mental Health Assistant",
-  description: "Your comprehensive hypertension management companion powered by AI technology",
+  title: "ANSWA - Asisten Keperawatan Jiwa | Answering Your Mental Health Needs",
+  description:
+    "Menjawab kebutuhan kesehatan jiwa Anda. ANSWA adalah platform komprehensif pengelolaan hipertensi dengan dukungan AI untuk kesehatan fisik dan mental Anda.",
     generator: 'v0.app'
 }
 

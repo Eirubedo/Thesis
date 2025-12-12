@@ -37,8 +37,8 @@ export function Navigation() {
           {/* Logo - Left Side */}
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center space-x-3">
-              <img src="/images/asked-logo.png" alt="ASKED Logo" className="w-8 h-8" />
-              <span className="text-2xl font-bold text-red-600">ASKED</span>
+              <img src="/images/asked-logo.png" alt="ANSWA Logo" className="w-8 h-8" />
+              <span className="text-2xl font-bold text-red-600">ANSWA</span>
             </Link>
           </div>
 

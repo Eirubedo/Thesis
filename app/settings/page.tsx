@@ -43,7 +43,7 @@ export default function SettingsPage() {
       <div className="pt-16 max-w-4xl mx-auto p-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("settings.title")}</h1>
-          <p className="text-gray-600">Customize your ASKED experience</p>
+          <p className="text-gray-600">Customize your ANSWA experience</p>
         </div>
 
         <div className="space-y-6">
@@ -209,10 +209,10 @@ export default function SettingsPage() {
                   <strong>AI Model:</strong> Dify.ai RAG + OpenAI GPT
                 </p>
                 <p>
-                  <strong>Application Name:</strong> Venti (ASKED)
+                  <strong>Application Name:</strong> ANSWA (Asisten Keperawatan Jiwa)
                 </p>
                 <p>
-                  <strong>Voice:</strong> ElevenLabs AI with Browser Fallback
+                  <strong>Voice:</strong> Browser Speech Synthesis
                 </p>
               </div>
               <Button
@@ -221,7 +221,7 @@ export default function SettingsPage() {
                 onClick={() => router.push("/about")}
               >
                 <Info className="w-4 h-4 mr-2" />
-                Learn More About ASKED
+                Learn More About ANSWA
               </Button>
             </CardContent>
           </Card>

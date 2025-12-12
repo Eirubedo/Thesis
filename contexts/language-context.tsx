@@ -25,9 +25,9 @@ const translations = {
     "nav.support": "Support",
 
     // Home
-    "home.title": "Welcome to ASKED",
+    "home.title": "Welcome to ANSWA",
     "home.subtitle":
-      "Your comprehensive hypertension management companion. Get personalized support, health assessments, and resources powered by advanced AI technology for both your physical and mental well-being.",
+      "Answering your health needs. A trusted companion for managing hypertension and mental well‑being. Receive personalized support, health assessments, and resources powered by advanced AI technology.",
     "home.startChat": "Start Health Chat",
     "home.takeAssessment": "Health Assessment",
     "home.getStarted": "Get Started",
@@ -51,10 +51,10 @@ const translations = {
     "home.progressTrackingTitle": "Progress Monitoring",
     "home.progressTrackingDescription": "Comprehensive tracking of your hypertension management journey",
     "home.readyToStart": "Ready to take control of your hypertension?",
-    "home.joinThousands": "Join thousands of users managing their hypertension with ASKED's comprehensive platform",
+    "home.joinThousands": "Join thousands of users managing their hypertension with ANSWA's comprehensive platform",
 
     // Login
-    "login.title": "ASKED",
+    "login.title": "ANSWA",
     "login.subtitle": "Welcome back to your hypertension management journey",
     "login.subtitleRegister": "Start managing your hypertension today",
     "login.fullName": "Full Name",
@@ -331,9 +331,9 @@ const translations = {
     "timer.completedExercise": "You've completed the {title} exercise.",
 
     // About page translations
-    "about.title": "About ASKED",
+    "about.title": "About ANSWA",
     "about.subtitle":
-      "We're revolutionizing hypertension management through AI-powered technology, making professional-grade assistance accessible to everyone, everywhere.",
+      "We're revolutionizing hypertension and mental health management through AI-powered technology, making professional-grade nursing assistance accessible to everyone, everywhere.",
     "about.badges.aiPowered": "AI-Powered",
     "about.badges.hipaaCompliant": "HIPAA Compliant",
     "about.badges.evidenceBased": "Evidence-Based",
@@ -362,7 +362,7 @@ const translations = {
     "about.foundation.chatbotPurpose.title": "AI Chatbot Purpose",
     "about.foundation.chatbotPurpose.description":
       "The chatbot is designed to comprehensively identify stressors, cognitive-emotional responses, and coping patterns in hypertensive clients, enabling early detection and response to mental health issues through a holistic, evidence-based approach that is contextually appropriate for Indonesia.",
-    "about.howItWorks.title": "How ASKED Works",
+    "about.howItWorks.title": "How ANSWA Works",
     "about.howItWorks.steps.signUp": "Sign Up",
     "about.howItWorks.steps.signUpDescription": "Create your secure account and complete your health profile",
     "about.howItWorks.steps.assessment": "Assessment",
@@ -375,11 +375,11 @@ const translations = {
     "about.openSource.title": "Open Source & Deployment",
     "about.openSource.openSource": "Open Source",
     "about.openSource.openSourceDescription":
-      "ASKED is built with transparency in mind. Our codebase is available on GitHub, allowing developers and researchers to contribute to hypertension management technology advancement.",
+      "ANSWA is built with transparency in mind. Our codebase is available on GitHub, allowing developers and researchers to contribute to mental health nursing technology advancement.",
     "about.openSource.viewOnGitHub": "View on GitHub",
     "about.openSource.easyDeployment": "Easy Deployment",
     "about.openSource.easyDeploymentDescription":
-      "Deploy ASKED to your own infrastructure with our comprehensive deployment guide. Compatible with major cloud providers and supports custom configurations.",
+      "Deploy ANSWA to your own infrastructure with our comprehensive deployment guide. Compatible with major cloud providers and supports custom configurations.",
     "about.openSource.deploymentGuide": "Deployment Guide",
     "about.contact.title": "Get Involved",
     "about.contact.description":
@@ -430,9 +430,9 @@ const translations = {
     "nav.support": "Bantuan",
 
     // Home
-    "home.title": "Selamat Datang di ASKED",
+    "home.title": "Selamat Datang di ANSWA",
     "home.subtitle":
-      "Teman komprehensif pengelolaan hipertensi Anda. Dapatkan dukungan personal, asesmen kesehatan, dan sumber daya dengan teknologi AI canggih untuk kesehatan fisik dan mental Anda.",
+      "Jawaban kebutuhan kesehatan Anda. Pendamping terpercaya dalam mengelola hipertensi dan kesehatan mental. Nikmati dukungan personal, asesmen kesehatan, serta akses sumber daya dengan teknologi AI yang cerdas.",
     "home.startChat": "Mulai Obrolan Kesehatan",
     "home.takeAssessment": "Asesmen Kesehatan",
     "home.getStarted": "Mulai Sekarang",
@@ -456,10 +456,10 @@ const translations = {
     "home.progressTrackingDescription": "Pelacakan komprehensif perjalanan pengelolaan hipertensi Anda",
     "home.readyToStart": "Siap mengendalikan hipertensi Anda?",
     "home.joinThousands":
-      "Bergabunglah dengan ribuan pengguna yang mengelola hipertensi mereka dengan platform komprehensif ASKED",
+      "Bergabunglah dengan ribuan pengguna yang mengelola hipertensi mereka dengan platform komprehensif ANSWA",
 
     // Login
-    "login.title": "ASKED",
+    "login.title": "ANSWA",
     "login.subtitle": "Selamat datang kembali di perjalanan pengelolaan hipertensi Anda",
     "login.subtitleRegister": "Mulai mengelola hipertensi Anda hari ini",
     "login.fullName": "Nama Lengkap",
@@ -736,9 +736,9 @@ const translations = {
     "timer.completedExercise": "Anda telah menyelesaikan latihan {title}.",
 
     // About page translations
-    "about.title": "Tentang ASKED",
+    "about.title": "Tentang ANSWA",
     "about.subtitle":
-      "Kami merevolusi pengelolaan hipertensi melalui teknologi bertenaga AI, membuat bantuan tingkat profesional dapat diakses oleh semua orang, di mana saja.",
+      "Kami merevolusi pengelolaan hipertensi dan kesehatan mental melalui teknologi bertenaga AI, membuat bantuan keperawatan tingkat profesional dapat diakses oleh semua orang, di mana saja.",
     "about.badges.aiPowered": "Bertenaga AI",
     "about.badges.hipaaCompliant": "Sesuai HIPAA",
     "about.badges.evidenceBased": "Berbasis Bukti",
@@ -767,7 +767,7 @@ const translations = {
     "about.foundation.chatbotPurpose.title": "Tujuan Chatbot AI",
     "about.foundation.chatbotPurpose.description":
       "Chatbot dirancang untuk mengidentifikasi stresor, respons kognitif-emosional, dan pola koping klien hipertensi secara komprehensif, memungkinkan deteksi dan respons dini terhadap masalah kejiwaan melalui pendekatan holistik berbasis bukti yang sesuai dengan konteks Indonesia.",
-    "about.howItWorks.title": "Cara Kerja ASKED",
+    "about.howItWorks.title": "Cara Kerja ANSWA",
     "about.howItWorks.steps.signUp": "Daftar",
     "about.howItWorks.steps.signUpDescription": "Buat akun aman Anda dan lengkapi profil kesehatan Anda",
     "about.howItWorks.steps.assessment": "Asesmen",
@@ -781,11 +781,11 @@ const translations = {
     "about.openSource.title": "Sumber Terbuka & Deployment",
     "about.openSource.openSource": "Sumber Terbuka",
     "about.openSource.openSourceDescription":
-      "ASKED dibangun dengan transparansi dalam pikiran. Basis kode kami tersedia di GitHub, memungkinkan pengembang dan peneliti untuk berkontribusi pada kemajuan teknologi pengelolaan hipertensi.",
+      "ANSWA dibangun dengan transparansi dalam pikiran. Basis kode kami tersedia di GitHub, memungkinkan pengembang dan peneliti untuk berkontribusi pada kemajuan teknologi keperawatan kesehatan mental.",
     "about.openSource.viewOnGitHub": "Lihat di GitHub",
     "about.openSource.easyDeployment": "Deployment Mudah",
     "about.openSource.easyDeploymentDescription":
-      "Deploy ASKED ke infrastruktur Anda sendiri dengan panduan deployment komprehensif kami. Kompatibel dengan penyedia cloud utama dan mendukung konfigurasi kustom.",
+      "Deploy ANSWA ke infrastruktur Anda sendiri dengan panduan deployment komprehensif kami. Kompatibel dengan penyedia cloud utama dan mendukung konfigurasi kustom.",
     "about.openSource.deploymentGuide": "Panduan Deployment",
     "about.contact.title": "Terlibat",
     "about.contact.description":

@@ -281,7 +281,7 @@ export default function SupportPage() {
         <Card className="mt-8 bg-gray-100">
           <CardContent className="p-6">
             <p className="text-sm text-gray-600">
-              <strong>Disclaimer:</strong> Asked is designed to provide support and resources for mental health
+              <strong>Disclaimer:</strong> ANSWA is designed to provide support and resources for mental health
               wellness. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the
               advice of qualified health providers with any questions you may have regarding a medical condition. If you
               are experiencing a mental health emergency, please contact emergency services immediately.
