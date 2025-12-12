@@ -44,6 +44,20 @@ export function Navigation() {
 
           {/* Desktop Navigation - Right Side */}
           <div className="hidden md:flex items-center space-x-2">
+            <Link href="/about">
+              <Button
+                variant={pathname === "/about" ? "default" : "ghost"}
+                className={`h-10 flex items-center justify-center text-sm font-medium transition-all duration-200 w-24 ${
+                  pathname === "/about"
+                    ? "bg-red-100 text-red-700 hover:bg-red-200"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-red-50"
+                }
+                `}
+              >
+                <span className="text-sm">{t("nav.about")}</span>
+              </Button>
+            </Link>
+
             {user &&
               navigationItems.map((item) => {
                 const isActive = pathname === item.href
@@ -92,12 +106,6 @@ export function Navigation() {
                       {t("nav.appSettings")}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/about" className="flex items-center">
-                      <Info className="w-4 h-4 mr-2" />
-                      {t("nav.about")}
-                    </Link>
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="flex items-center text-red-600">
                     <LogOut className="w-4 h-4 mr-2" />
@@ -135,6 +143,23 @@ export function Navigation() {
                     </div>
                   </div>
 
+                  <Link href="/about" onClick={() => setIsOpen(false)}>
+                    <Button
+                      variant={pathname === "/about" ? "default" : "ghost"}
+                      className={`
+                        w-full h-12 flex items-center justify-start space-x-3 text-sm font-medium
+                        ${
+                          pathname === "/about"
+                            ? "bg-red-100 text-red-700"
+                            : "text-gray-600 hover:text-gray-900 hover:bg-red-50"
+                        }
+                      `}
+                    >
+                      <Info className="w-5 h-5 flex-shrink-0" />
+                      <span className="text-sm">{t("nav.about")}</span>
+                    </Button>
+                  </Link>
+
                   {user &&
                     navigationItems.map((item) => {
                       const isActive = pathname === item.href
@@ -170,12 +195,6 @@ export function Navigation() {
                           <Button variant="ghost" className="w-full h-12 justify-start space-x-3 hover:bg-red-50">
                             <Settings className="w-5 h-5 flex-shrink-0" />
                             <span>{t("nav.appSettings")}</span>
-                          </Button>
-                        </Link>
-                        <Link href="/about" onClick={() => setIsOpen(false)}>
-                          <Button variant="ghost" className="w-full h-12 justify-start space-x-3 hover:bg-red-50">
-                            <Info className="w-5 h-5 flex-shrink-0" />
-                            <span>{t("nav.about")}</span>
                           </Button>
                         </Link>
                         <Button
