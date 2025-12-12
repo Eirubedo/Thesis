@@ -135,6 +135,10 @@ export default function ReportsPage() {
     }
   }
 
+  const getConversationsByType = (type: string) => {
+    return dailyConversations.filter((day) => day.messages.some((msg) => msg.conversation_type === type))
+  }
+
   if (!user) {
     return null
   }
@@ -318,57 +322,113 @@ export default function ReportsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-red-500" />
-                  Hasil Asesmen AI Lengkap
+                  <Brain className="w-5 h-5 text-purple-500" />
+                  {t("reports.comprehensiveResults")}
                 </CardTitle>
-                <CardDescription>Hasil evaluasi komprehensif menggunakan Dify API</CardDescription>
+                <CardDescription>Riwayat percakapan asesmen AI lengkap</CardDescription>
               </CardHeader>
               <CardContent>
-                {comprehensiveResults.length === 0 ? (
+                {getConversationsByType("assessment").length === 0 ? (
                   <div className="text-center py-8">
                     <Brain className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Hasil Asesmen Lengkap</h3>
-                    <p className="text-gray-600 mb-4">Ikuti asesmen AI lengkap untuk melihat hasil di sini</p>
-                    <Button onClick={() => router.push("/assessment")}>Mulai Asesmen Lengkap</Button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Asesmen Lengkap</h3>
+                    <p className="text-gray-600 mb-4">Mulai asesmen lengkap untuk melihat riwayat di sini</p>
+                    <Button onClick={() => router.push("/assessment")}>Mulai Asesmen</Button>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    {comprehensiveResults.map((result) => (
-                      <Card key={result.id} className="border-l-4 border-l-red-500">
-                        <CardContent className="pt-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm text-gray-600">
-                                  {new Date(result.completedAt).toLocaleDateString()}
-                                </span>
+                  <div className="space-y-4">
+                    {getConversationsByType("assessment").map((day) => {
+                      const assessmentMessages = day.messages.filter((msg) => msg.conversation_type === "assessment")
+                      return (
+                        <Card key={day.date} className="border-l-4 border-l-purple-500">
+                          <CardContent className="pt-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Calendar className="w-5 h-5 text-gray-500" />
+                                  <h3 className="text-lg font-semibold">
+                                    {new Date(day.date).toLocaleDateString("id-ID", {
+                                      weekday: "long",
+                                      day: "numeric",
+                                      month: "long",
+                                      year: "numeric",
+                                    })}
+                                  </h3>
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                  {assessmentMessages.length} pesan dalam asesmen lengkap
+                                </p>
                               </div>
-                              <h3 className="text-lg font-semibold">Asesmen AI Komprehensif</h3>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button size="sm" variant="outline">
+                                    <FileText className="w-4 h-4 mr-2" />
+                                    Lihat Percakapan
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl max-h-[85vh]">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Asesmen Lengkap -{" "}
+                                      {new Date(day.date).toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                      })}
+                                    </DialogTitle>
+                                    <DialogDescription>{assessmentMessages.length} pesan</DialogDescription>
+                                  </DialogHeader>
+                                  <ScrollArea className="h-[65vh] pr-4">
+                                    <div className="space-y-4">
+                                      {assessmentMessages.map((message) => (
+                                        <div key={message.id}>
+                                          <div
+                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                                          >
+                                            <div
+                                              className={`flex items-start space-x-3 max-w-[80%] ${
+                                                message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
+                                              }`}
+                                            >
+                                              <div
+                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                                  message.role === "user" ? "bg-purple-500" : "bg-purple-100"
+                                                }`}
+                                              >
+                                                {message.role === "user" ? (
+                                                  <User className="w-4 h-4 text-white" />
+                                                ) : (
+                                                  <Bot className="w-4 h-4 text-purple-600" />
+                                                )}
+                                              </div>
+                                              <div
+                                                className={`p-3 rounded-lg ${
+                                                  message.role === "user"
+                                                    ? "bg-purple-500 text-white"
+                                                    : "bg-purple-50 text-gray-900"
+                                                }`}
+                                              >
+                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                                <p className="text-xs opacity-70 mt-1">
+                                                  {new Date(message.created_at).toLocaleTimeString("id-ID", {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                  })}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </ScrollArea>
+                                </DialogContent>
+                              </Dialog>
                             </div>
-                            <div className="text-right">
-                              <div className={`text-2xl font-bold ${getScoreColor(result.score, result.maxScore)}`}>
-                                {result.score}/{result.maxScore}
-                              </div>
-                              <Badge className={getScoreBg(result.score, result.maxScore)}>
-                                {Math.round((result.score / result.maxScore) * 100)}%
-                              </Badge>
-                            </div>
-                          </div>
-
-                          <div className="mt-4 flex gap-2">
-                            <Button size="sm" variant="outline">
-                              <FileText className="w-4 h-4 mr-2" />
-                              Lihat Detail
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Download className="w-4 h-4 mr-2" />
-                              Download
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -380,46 +440,112 @@ export default function ReportsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-blue-500" />
-                  Hasil Asesmen AI Cepat
+                  {t("reports.quickResults")}
                 </CardTitle>
-                <CardDescription>Hasil screening cepat dan monitoring rutin</CardDescription>
+                <CardDescription>Riwayat percakapan asesmen cepat</CardDescription>
               </CardHeader>
               <CardContent>
-                {quickResults.length === 0 ? (
+                {getConversationsByType("quick-assessment").length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Hasil Asesmen Cepat</h3>
-                    <p className="text-gray-600 mb-4">Ikuti asesmen AI cepat untuk monitoring rutin</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Asesmen Cepat</h3>
+                    <p className="text-gray-600 mb-4">Mulai asesmen cepat untuk melihat riwayat di sini</p>
                     <Button onClick={() => router.push("/assessment")}>Mulai Asesmen Cepat</Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {quickResults.map((result) => (
-                      <Card key={result.id} className="border-l-4 border-l-blue-500">
-                        <CardContent className="pt-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <Calendar className="w-4 h-4 text-gray-500" />
-                                  <span className="text-sm text-gray-600">
-                                    {new Date(result.completedAt).toLocaleDateString()}
-                                  </span>
+                    {getConversationsByType("quick-assessment").map((day) => {
+                      const quickMessages = day.messages.filter((msg) => msg.conversation_type === "quick-assessment")
+                      return (
+                        <Card key={day.date} className="border-l-4 border-l-blue-500">
+                          <CardContent className="pt-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Calendar className="w-5 h-5 text-gray-500" />
+                                  <h3 className="text-lg font-semibold">
+                                    {new Date(day.date).toLocaleDateString("id-ID", {
+                                      weekday: "long",
+                                      day: "numeric",
+                                      month: "long",
+                                      year: "numeric",
+                                    })}
+                                  </h3>
                                 </div>
-                                <div className="font-semibold">Asesmen Cepat</div>
+                                <p className="text-sm text-gray-600">
+                                  {quickMessages.length} pesan dalam asesmen cepat
+                                </p>
                               </div>
-                              <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                                {Math.round((result.score / result.maxScore) * 100)}% Skor
-                              </Badge>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button size="sm" variant="outline">
+                                    <FileText className="w-4 h-4 mr-2" />
+                                    Lihat Percakapan
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl max-h-[85vh]">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Asesmen Cepat -{" "}
+                                      {new Date(day.date).toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                      })}
+                                    </DialogTitle>
+                                    <DialogDescription>{quickMessages.length} pesan</DialogDescription>
+                                  </DialogHeader>
+                                  <ScrollArea className="h-[65vh] pr-4">
+                                    <div className="space-y-4">
+                                      {quickMessages.map((message) => (
+                                        <div key={message.id}>
+                                          <div
+                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                                          >
+                                            <div
+                                              className={`flex items-start space-x-3 max-w-[80%] ${
+                                                message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
+                                              }`}
+                                            >
+                                              <div
+                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                                  message.role === "user" ? "bg-blue-500" : "bg-blue-100"
+                                                }`}
+                                              >
+                                                {message.role === "user" ? (
+                                                  <User className="w-4 h-4 text-white" />
+                                                ) : (
+                                                  <Bot className="w-4 h-4 text-blue-600" />
+                                                )}
+                                              </div>
+                                              <div
+                                                className={`p-3 rounded-lg ${
+                                                  message.role === "user"
+                                                    ? "bg-blue-500 text-white"
+                                                    : "bg-blue-50 text-gray-900"
+                                                }`}
+                                              >
+                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                                <p className="text-xs opacity-70 mt-1">
+                                                  {new Date(message.created_at).toLocaleTimeString("id-ID", {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                  })}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </ScrollArea>
+                                </DialogContent>
+                              </Dialog>
                             </div>
-                            <Button size="sm" variant="outline">
-                              <FileText className="w-4 h-4 mr-2" />
-                              Detail
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -431,46 +557,112 @@ export default function ReportsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-green-500" />
-                  Level Pengetahuan Hipertensi
+                  {t("reports.knowledgeLevel")}
                 </CardTitle>
-                <CardDescription>Perkembangan pemahaman tentang hipertensi dan pengelolaannya</CardDescription>
+                <CardDescription>Riwayat percakapan tes pengetahuan</CardDescription>
               </CardHeader>
               <CardContent>
-                {knowledgeResults.length === 0 ? (
+                {getConversationsByType("knowledge-test").length === 0 ? (
                   <div className="text-center py-8">
                     <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Tes Pengetahuan</h3>
-                    <p className="text-gray-600 mb-4">Uji pengetahuan hipertensi Anda untuk melihat perkembangan</p>
+                    <p className="text-gray-600 mb-4">Mulai tes pengetahuan untuk melihat riwayat di sini</p>
                     <Button onClick={() => router.push("/assessment")}>Mulai Tes Pengetahuan</Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {knowledgeResults.map((result) => (
-                      <Card key={result.id} className="border-l-4 border-l-green-500">
-                        <CardContent className="pt-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <Calendar className="w-4 h-4 text-gray-500" />
-                                  <span className="text-sm text-gray-600">
-                                    {new Date(result.completedAt).toLocaleDateString()}
-                                  </span>
+                    {getConversationsByType("knowledge-test").map((day) => {
+                      const knowledgeMessages = day.messages.filter((msg) => msg.conversation_type === "knowledge-test")
+                      return (
+                        <Card key={day.date} className="border-l-4 border-l-green-500">
+                          <CardContent className="pt-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Calendar className="w-5 h-5 text-gray-500" />
+                                  <h3 className="text-lg font-semibold">
+                                    {new Date(day.date).toLocaleDateString("id-ID", {
+                                      weekday: "long",
+                                      day: "numeric",
+                                      month: "long",
+                                      year: "numeric",
+                                    })}
+                                  </h3>
                                 </div>
-                                <div className="font-semibold">Tes Pengetahuan</div>
+                                <p className="text-sm text-gray-600">
+                                  {knowledgeMessages.length} pesan dalam tes pengetahuan
+                                </p>
                               </div>
-                              <Badge variant="secondary" className="bg-green-100 text-green-700">
-                                {Math.round((result.score / result.maxScore) * 100)}% Benar
-                              </Badge>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button size="sm" variant="outline">
+                                    <FileText className="w-4 h-4 mr-2" />
+                                    Lihat Percakapan
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl max-h-[85vh]">
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Tes Pengetahuan -{" "}
+                                      {new Date(day.date).toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                      })}
+                                    </DialogTitle>
+                                    <DialogDescription>{knowledgeMessages.length} pesan</DialogDescription>
+                                  </DialogHeader>
+                                  <ScrollArea className="h-[65vh] pr-4">
+                                    <div className="space-y-4">
+                                      {knowledgeMessages.map((message) => (
+                                        <div key={message.id}>
+                                          <div
+                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                                          >
+                                            <div
+                                              className={`flex items-start space-x-3 max-w-[80%] ${
+                                                message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
+                                              }`}
+                                            >
+                                              <div
+                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                                  message.role === "user" ? "bg-green-500" : "bg-green-100"
+                                                }`}
+                                              >
+                                                {message.role === "user" ? (
+                                                  <User className="w-4 h-4 text-white" />
+                                                ) : (
+                                                  <Bot className="w-4 h-4 text-green-600" />
+                                                )}
+                                              </div>
+                                              <div
+                                                className={`p-3 rounded-lg ${
+                                                  message.role === "user"
+                                                    ? "bg-green-500 text-white"
+                                                    : "bg-green-50 text-gray-900"
+                                                }`}
+                                              >
+                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                                <p className="text-xs opacity-70 mt-1">
+                                                  {new Date(message.created_at).toLocaleTimeString("id-ID", {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                  })}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </ScrollArea>
+                                </DialogContent>
+                              </Dialog>
                             </div>
-                            <Button size="sm" variant="outline">
-                              <FileText className="w-4 h-4 mr-2" />
-                              Detail
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
                   </div>
                 )}
               </CardContent>

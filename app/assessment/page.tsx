@@ -77,6 +77,75 @@ export default function AssessmentPage() {
     },
   ]
 
+  if (assessmentMode === "quick") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+        <Navigation />
+
+        <div className="pt-16 max-w-7xl mx-auto p-4 py-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("assessment.quick")}</h1>
+              <p className="text-gray-600">{t("assessment.quickDesc")}</p>
+            </div>
+            <Button onClick={() => setAssessmentMode("overview")} variant="outline" className="bg-transparent">
+              {t("assessment.backToOverview")}
+            </Button>
+          </div>
+
+          <div className="grid lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3">
+              <DifyChatInterface
+                title={t("assessment.quick")}
+                showHeader={true}
+                minHeight="calc(100vh - 250px)"
+                className="shadow-lg"
+                placeholder={t("assessment.chatPlaceholder")}
+                apiPath="/api/dify/quick-assessment"
+                conversationType="quick-assessment"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <Card className="border-blue-100">
+                <CardHeader>
+                  <CardTitle className="text-lg">{t("assessment.progressTitle")}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm">{t("assessment.startedConversation")}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
+                    <span className="text-sm text-gray-500">Screening cepat</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
+                    <span className="text-sm text-gray-500">{t("assessment.receiveInsights")}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-blue-100 bg-blue-50">
+                <CardHeader>
+                  <CardTitle className="text-lg text-blue-900">{t("assessment.tipsTitle")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-blue-800 space-y-2">
+                    <div>• Siapkan data tekanan darah terbaru</div>
+                    <div>• Sebutkan gejala yang sedang dialami</div>
+                    <div>• Jawab dengan cepat dan jujur</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (assessmentMode === "comprehensive") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-50">
@@ -148,6 +217,77 @@ export default function AssessmentPage() {
     )
   }
 
+  if (assessmentMode === "knowledge") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
+        <Navigation />
+
+        <div className="pt-16 max-w-7xl mx-auto p-4 py-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("assessment.knowledge")}</h1>
+              <p className="text-gray-600">{t("assessment.knowledgeDesc")}</p>
+            </div>
+            <Button onClick={() => setAssessmentMode("overview")} variant="outline" className="bg-transparent">
+              {t("assessment.backToOverview")}
+            </Button>
+          </div>
+
+          <div className="grid lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3">
+              <DifyChatInterface
+                title={t("assessment.knowledge")}
+                showHeader={true}
+                minHeight="calc(100vh - 250px)"
+                className="shadow-lg"
+                placeholder={t("assessment.chatPlaceholder")}
+                apiPath="/api/dify/knowledge-test"
+                conversationType="knowledge-test"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <Card className="border-green-100">
+                <CardHeader>
+                  <CardTitle className="text-lg">{t("assessment.progressTitle")}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm">{t("assessment.startedConversation")}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
+                    <span className="text-sm text-gray-500">{t("assessment.completeAssessment")}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
+                    <span className="text-sm text-gray-500">{t("assessment.receiveInsights")}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-green-100 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="text-lg text-green-900">{t("assessment.tipsTitle")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-green-800 space-y-2">
+                    {t("assessment.knowledgeTips")
+                      .split("\n")
+                      .map((tip, index) => (
+                        <div key={index}>{tip}</div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-50 pt-20 pb-12">
       <Navigation />
@@ -200,11 +340,9 @@ export default function AssessmentPage() {
                       if (assessment.id === "comprehensive") {
                         setAssessmentMode("comprehensive")
                       } else if (assessment.id === "quick") {
-                        // Handle quick assessment
-                        console.log(`Starting ${assessment.id} assessment`)
+                        setAssessmentMode("quick")
                       } else if (assessment.id === "knowledge") {
-                        // Handle knowledge test
-                        console.log(`Starting ${assessment.id} assessment`)
+                        setAssessmentMode("knowledge")
                       }
                     }}
                   >

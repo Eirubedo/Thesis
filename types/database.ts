@@ -61,7 +61,7 @@ export interface MedicationLog {
 export interface Conversation {
   id: string
   user_id: string
-  conversation_type: "chat" | "assessment" | "education"
+  conversation_type: "chat" | "assessment" | "education" | "quick-assessment" | "knowledge-test"
   dify_conversation_id?: string
   title?: string
   summary?: string

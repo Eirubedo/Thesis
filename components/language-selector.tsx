@@ -8,15 +8,12 @@ import { useLanguage } from "@/contexts/language-context"
 export function LanguageSelector() {
   const { language, setLanguage, t } = useLanguage()
 
-  console.log("[v0] Current language:", language)
-
   const languages = [
     { code: "en" as const, name: "English", flag: "🇺🇸" },
     { code: "id" as const, name: "Bahasa Indonesia", flag: "🇮🇩" },
   ]
 
   const handleLanguageChange = (langCode: "en" | "id") => {
-    console.log("[v0] Switching language to:", langCode)
     setLanguage(langCode)
   }
 

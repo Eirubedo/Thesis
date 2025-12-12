@@ -72,39 +72,6 @@ export default function SelfHelpPage() {
         duration: "10:15",
       },
       content: `
-# Pernapasan Dalam untuk Kontrol Tekanan Darah
-
-## Bagaimana Membantu:
-Pernapasan dalam mengaktifkan sistem saraf parasimpatis, yang membantu:
-- Menurunkan detak jantung
-- Mengurangi tekanan darah
-- Mengurangi hormon stres
-- Meningkatkan sirkulasi
-
-## Instruksi:
-1. Duduk dengan nyaman dengan punggung lurus
-2. Letakkan satu tangan di dada, satu di perut
-3. Tarik napas perlahan melalui hidung selama 4 hitungan
-4. Tahan napas selama 4 hitungan
-5. Buang napas perlahan melalui mulut selama 6 hitungan
-6. Ulangi selama 10 menit
-
-## Praktik Terbaik:
-- Latihan dua kali sehari (pagi dan sore)
-- Gunakan sebelum situasi stres
-- Kombinasikan dengan pemantauan tekanan darah
-- Lacak kemajuan Anda dari waktu ke waktu
-
-## Manfaat Berdasarkan Penelitian:
-Berdasarkan Pedoman Hipertensi 2024, teknik pernapasan dalam dapat menurunkan tekanan darah sistolik hingga 5-10 mmHg dan diastolik 3-6 mmHg ketika dipraktikkan secara konsisten.
-
-## Mekanisme Fisiologis:
-- Aktivasi sistem saraf parasimpatis mengurangi aktivitas simpatis
-- Penurunan pelepasan katekolamin (adrenalin dan noradrenalin)
-- Relaksasi otot polos pembuluh darah
-- Perbaikan variabilitas detak jantung
-      `,
-      contentId: `
 # Deep Breathing for Blood Pressure Control
 
 ## How It Helps:
@@ -137,6 +104,39 @@ According to the 2024 Hypertension Guidelines, deep breathing techniques can red
 - Smooth muscle relaxation in blood vessels
 - Improved heart rate variability
       `,
+      contentId: `
+# Pernapasan Dalam untuk Kontrol Tekanan Darah
+
+## Bagaimana Membantu:
+Pernapasan dalam mengaktifkan sistem saraf parasimpatis, yang membantu:
+- Menurunkan detak jantung
+- Mengurangi tekanan darah
+- Mengurangi hormon stres
+- Meningkatkan sirkulasi
+
+## Instruksi:
+1. Duduk dengan nyaman dengan punggung lurus
+2. Letakkan satu tangan di dada, satu di perut
+3. Tarik napas perlahan melalui hidung selama 4 hitungan
+4. Tahan napas selama 4 hitungan
+5. Buang napas perlahan melalui mulut selama 6 hitungan
+6. Ulangi selama 10 menit
+
+## Praktik Terbaik:
+- Latihan dua kali sehari (pagi dan sore)
+- Gunakan sebelum situasi stres
+- Kombinasikan dengan pemantauan tekanan darah
+- Lacak kemajuan Anda dari waktu ke waktu
+
+## Manfaat Berdasarkan Penelitian:
+Berdasarkan Pedoman Hipertensi 2024, teknik pernapasan dalam dapat menurunkan tekanan darah sistolik hingga 5-10 mmHg dan diastolik 3-6 mmHg ketika dipraktikkan secara konsisten.
+
+## Mekanisme Fisiologis:
+- Aktivasi sistem saraf parasimpatis mengurangi aktivitas simpatis
+- Penurunan pelepasan katekolamin (adrenalin dan noradrenalin)
+- Relaksasi otot polos pembuluh darah
+- Perbaikan variabilitas detak jantung
+      `,
     },
     {
       id: 2,
@@ -151,14 +151,6 @@ According to the 2024 Hypertension Guidelines, deep breathing techniques can red
       rating: 4.9,
       type: "guide",
       timerDuration: 900,
-      video: {
-        videoId: "6K8AnxrnROE",
-        title: "DASH Diet Explained",
-        titleId: "Diet DASH Dijelaskan",
-        description: "Complete guide to the DASH diet for blood pressure control",
-        descriptionId: "Panduan lengkap diet DASH untuk kontrol tekanan darah",
-        duration: "12:30",
-      },
       content: `
 # Diet DASH untuk Hipertensi
 
@@ -430,6 +422,75 @@ DASH (Dietary Approaches to Stop Hypertension) is an eating plan designed to hel
       type: "guide",
       timerDuration: 900,
       content: `
+# Stres Management for Hypertension
+
+## How Stress Affects Blood Pressure:
+Based on 2024 Hypertension Guidelines, chronic stress can:
+- Temporarily increase blood pressure by 10-20 mmHg
+- Trigger fight-or-flight response increasing heart rate
+- Constrict blood vessels through adrenaline release
+- Release cortisol hormone increasing sodium retention
+- Lead to unhealthy behaviors (smoking, overeating, poor sleep)
+
+## Proven Effective Stress Management Techniques:
+
+### 1. Breathing Techniques (High Effectiveness):
+- **4-7-8 Breathing**: Inhale 4 seconds, hold 7 seconds, exhale 8 seconds
+- **Diaphragmatic Breathing**: Focus on belly breathing, not chest
+- **Box Breathing**: 4 seconds in, 4 seconds hold, 4 seconds out, 4 seconds hold
+- Practice: 10-15 minutes, 2-3 times daily
+
+### 2. Progressive Muscle Relaxation:
+- Tense and release each muscle group sequentially
+- Start from feet to head
+- Hold tension 5 seconds, release 15 seconds
+- Duration: 15-20 minutes before bedtime
+
+### 3. Mindfulness Meditation:
+- Focus on present moment without judgment
+- Start with 5-10 minutes daily
+- Use guided apps or relaxation music
+- Proven to lower blood pressure by 5-10 mmHg
+
+### 4. Regular Exercise:
+- Physical activity releases natural endorphins
+- Reduces stress hormone cortisol
+- Target: 150 minutes moderate activity per week
+- Yoga and Tai Chi particularly effective for stress
+
+### 5. Quality Sleep:
+- 7-9 hours sleep per night for adults
+- Less than 6 hours increases hypertension risk by 20%
+- Create consistent sleep routine
+- Avoid caffeine 6 hours before bedtime
+
+## Daily Stress Management Strategies:
+
+### Morning:
+- Wake up 15 minutes earlier for calm routine
+- Practice deep breathing for 5 minutes
+- Avoid immediately checking phone
+- Eat healthy breakfast and hydrate
+
+### Daytime:
+- Take 5-10 minute breaks every 2 hours
+- Short walks during breaks
+- Practice breathing when feeling pressured
+- Limit caffeine intake (maximum 400mg/day)
+
+### Evening:
+- Turn off electronic devices 1 hour before bed
+- Practice progressive muscle relaxation
+- Write gratitude journal
+- Take warm bath for relaxation
+
+## Social and Professional Support:
+- Share with close family and friends
+- Join hypertension support groups
+- Consult psychologist for chronic stress
+- Consider cognitive-behavioral therapy (CBT)
+      `,
+      contentId: `
 # Manajemen Stres untuk Hipertensi
 
 ## Bagaimana Stres Mempengaruhi Tekanan Darah:
@@ -497,75 +558,6 @@ Berdasarkan Pedoman Hipertensi 2024, stres kronis dapat:
 - Bergabung dengan kelompok dukungan hipertensi
 - Konsultasi dengan psikolog jika stres kronis
 - Pertimbangkan terapi kognitif-perilaku (CBT)
-      `,
-      contentId: `
-# Stress Management for Hypertension
-
-## How Stress Affects Blood Pressure:
-Based on 2024 Hypertension Guidelines, chronic stress can:
-- Temporarily increase blood pressure by 10-20 mmHg
-- Trigger fight-or-flight response increasing heart rate
-- Constrict blood vessels through adrenaline release
-- Release cortisol hormone increasing sodium retention
-- Lead to unhealthy behaviors (smoking, overeating, poor sleep)
-
-## Proven Effective Stress Management Techniques:
-
-### 1. Breathing Techniques (High Effectiveness):
-- **4-7-8 Breathing**: Inhale 4 seconds, hold 7 seconds, exhale 8 seconds
-- **Diaphragmatic Breathing**: Focus on belly breathing, not chest
-- **Box Breathing**: 4 seconds in, 4 seconds hold, 4 seconds out, 4 seconds hold
-- Practice: 10-15 minutes, 2-3 times daily
-
-### 2. Progressive Muscle Relaxation:
-- Tense and release each muscle group sequentially
-- Start from feet to head
-- Hold tension 5 seconds, release 15 seconds
-- Duration: 15-20 minutes before bedtime
-
-### 3. Mindfulness Meditation:
-- Focus on present moment without judgment
-- Start with 5-10 minutes daily
-- Use guided apps or relaxation music
-- Proven to lower blood pressure by 5-10 mmHg
-
-### 4. Regular Exercise:
-- Physical activity releases natural endorphins
-- Reduces stress hormone cortisol
-- Target: 150 minutes moderate activity per week
-- Yoga and Tai Chi particularly effective for stress
-
-### 5. Quality Sleep:
-- 7-9 hours sleep per night for adults
-- Less than 6 hours increases hypertension risk by 20%
-- Create consistent sleep routine
-- Avoid caffeine 6 hours before bedtime
-
-## Daily Stress Management Strategies:
-
-### Morning:
-- Wake up 15 minutes earlier for calm routine
-- Practice deep breathing for 5 minutes
-- Avoid immediately checking phone
-- Eat healthy breakfast and hydrate
-
-### Daytime:
-- Take 5-10 minute breaks every 2 hours
-- Short walks during breaks
-- Practice breathing when feeling pressured
-- Limit caffeine intake (maximum 400mg/day)
-
-### Evening:
-- Turn off electronic devices 1 hour before bed
-- Practice progressive muscle relaxation
-- Write gratitude journal
-- Take warm bath for relaxation
-
-## Social and Professional Support:
-- Share with close family and friends
-- Join hypertension support groups
-- Consult psychologist for chronic stress
-- Consider cognitive-behavioral therapy (CBT)
       `,
     },
     {
@@ -884,6 +876,681 @@ Based on 2024 Hypertension Guidelines, there's a bidirectional relationship betw
 - Concentration difficulties
 - Sleep disturbances
 - Physical symptoms (palpitations, sweating, tremor)
+      `,
+    },
+    {
+      id: 7,
+      title: "Cognitive Reconstruction",
+      titleId: "Rekonstruksi Kognitif",
+      description: "Learn to challenge negative thoughts with positive thinking supported by real facts",
+      descriptionId: "Pelajari cara melawan pikiran negatif dengan pikiran positif yang didukung fakta nyata",
+      category: "mentalHealth",
+      duration: "15 min",
+      durationId: "15 mnt",
+      difficulty: t("selfHelp.intermediate"),
+      rating: 4.8,
+      type: "exercise",
+      timerDuration: 900,
+      content: `
+# Latihan Rekonstruksi Kognitif
+
+## Apa itu Rekonstruksi Kognitif?
+Rekonstruksi kognitif adalah cara mengubah pikiran negatif dengan melawannya dengan pikiran positif disertai fakta-fakta positif yang nyata. Saat mengalami kecemasan dan depresi, individu memiliki pikiran yang negatif seperti "Saya tidak berguna", "Tidak ada yang menyukai saya", "Saya telah gagal".
+
+## Ciri-ciri Pikiran Negatif:
+- Pikiran bersifat otomatis; individu tidak memikirkannya dengan sengaja
+- Pikiran yang muncul tampaknya dapat dipercaya dan nyata
+- Jenis pikiran yang muncul dapat berkaitan dengan siapa pun
+
+## Langkah-langkah Praktik:
+
+### Langkah 1: Identifikasi
+1. Tulis peristiwa/pengalaman yang sulit/tidak menyenangkan
+2. Tulis perasaan terhadap peristiwa yang sulit
+3. Beri skor seberapa buruk perasaan Anda (0-10)
+4. Tulis pikiran negatif yang muncul
+5. Beri skor seberapa besar Anda percaya pada pikiran tersebut (0-10)
+
+**Contoh:**
+- Peristiwa: Diabaikan
+- Perasaan: Sedih (8/10)
+- Pikiran: Tidak berharga (8/10)
+
+### Langkah 2: Kumpulkan Fakta
+1. Tetapkan pikiran positif yang berlawanan dengan pikiran negatif
+2. Tuliskan fakta-fakta pikiran negatif
+3. Tuliskan fakta-fakta pikiran positif
+
+**Contoh:**
+- Pikiran Negatif: "Saya tidak berharga"
+- Pikiran Positif: "Saya berharga"
+
+Fakta Pikiran Negatif:
+- Saya dicuekin
+- Saya di-gossipin
+
+Fakta Pikiran Positif:
+- Saya masih bekerja
+- Suami saya menghargai saya
+- Anak saya selalu memuji masakan saya
+- Adik saya sayang pada saya
+
+### Langkah 3: Evaluasi Ulang
+1. Nilai kembali seberapa besar Anda percaya pada pikiran negatif (0-10)
+2. Nilai kembali seberapa buruk perasaan Anda (0-10)
+3. Bandingkan perubahan sebelum dan sesudah
+
+**Contoh:**
+- Pikiran "Tidak berharga": 8/10 → 4/10
+- Perasaan Sedih: 8/10 → 4/10
+
+## Manfaat:
+- Mengurangi intensitas pikiran negatif
+- Meningkatkan kesadaran diri
+- Memperbaiki mood dan perasaan
+- Meningkatkan kepercayaan diri
+- Membantu mengelola kecemasan dan depresi
+
+## Tips Praktik:
+- Lakukan saat pikiran negatif muncul
+- Gunakan jurnal untuk mencatat
+- Praktikkan secara teratur
+- Bersabar dengan prosesnya
+- Diskusikan dengan konselor jika perlu
+      `,
+      contentId: `
+# Cognitive Reconstruction Exercise
+
+## What is Cognitive Reconstruction?
+Cognitive reconstruction is a way to change negative thoughts by countering them with positive thoughts supported by real positive facts. When experiencing anxiety and depression, individuals have negative thoughts like "I'm worthless", "Nobody likes me", "I've failed".
+
+## Characteristics of Negative Thoughts:
+- Thoughts are automatic; individuals don't think about them intentionally
+- The thoughts that appear seem believable and real
+- The type of thoughts can relate to anyone
+
+## Practice Steps:
+
+### Step 1: Identify
+1. Write down difficult/unpleasant events/experiences
+2. Write down feelings about the difficult event
+3. Rate how bad your feeling is (0-10)
+4. Write down negative thoughts that arise
+5. Rate how much you believe in that thought (0-10)
+
+**Example:**
+- Event: Being ignored
+- Feeling: Sad (8/10)
+- Thought: Worthless (8/10)
+
+### Step 2: Collect Facts
+1. Set positive thoughts that oppose negative thoughts
+2. Write down negative thought facts
+3. Write down positive thought facts
+
+**Example:**
+- Negative Thought: "I'm worthless"
+- Positive Thought: "I'm valuable"
+
+Negative Thought Facts:
+- I was ignored
+- I was gossiped about
+
+Positive Thought Facts:
+- I still have work
+- My husband values me
+- My children always praise my cooking
+- My sibling loves me
+
+### Step 3: Re-evaluate
+1. Re-rate how much you believe in the negative thought (0-10)
+2. Re-rate how bad your feeling is (0-10)
+3. Compare the change before and after
+
+**Example:**
+- "Worthless" thought: 8/10 → 4/10
+- Sad feeling: 8/10 → 4/10
+
+## Benefits:
+- Reduces intensity of negative thoughts
+- Increases self-awareness
+- Improves mood and feelings
+- Increases self-confidence
+- Helps manage anxiety and depression
+
+## Practice Tips:
+- Do it when negative thoughts arise
+- Use a journal to record
+- Practice regularly
+- Be patient with the process
+- Discuss with counselor if needed
+      `,
+    },
+    {
+      id: 8,
+      title: "Worry Management",
+      titleId: "Manajemen Kekhawatiran",
+      description: "Learn to schedule and control your worries instead of letting them control you",
+      descriptionId:
+        "Pelajari cara menjadwalkan dan mengontrol kekhawatiran Anda alih-alih membiarkannya mengendalikan Anda",
+      category: "mentalHealth",
+      duration: "20 min",
+      durationId: "20 mnt",
+      difficulty: t("selfHelp.intermediate"),
+      rating: 4.7,
+      type: "exercise",
+      timerDuration: 1200,
+      content: `
+# Latihan Manajemen Kekhawatiran
+
+## Apa itu Manajemen Kekhawatiran?
+Manajemen kekhawatiran adalah melatih pikiran agar tidak langsung merespons setiap kecemasan yang muncul, melainkan secara sadar menyisihkannya untuk dibahas pada "waktu khusus untuk khawatir" yang telah ditentukan.
+
+## Manfaat:
+- Kekhawatiran menjadi tidak terlalu mengganggu aktivitas harian
+- Anda dapat mengelolanya secara lebih efektif
+- Anda kembali memegang kendali atas pikiran Anda
+- Mengurangi kecemasan sepanjang hari
+- Meningkatkan fokus dan produktivitas
+
+## Langkah-langkah Pelaksanaan:
+
+### Langkah 1: Membuat Jadwal Khawatir
+1. Pilih waktu khusus untuk 'waktu khawatir' Anda
+2. Sebaiknya sore hari (jangan larut malam)
+3. Di waktu luang selama 15-30 menit
+4. Contoh: Jam 16.00 - 16.30
+
+**Jadwal Khawatir Saya: _____________**
+
+### Langkah 2: Mengenal Kekhawatiran
+**Menunda Kekhawatiran:**
+- Jika Anda menyadari adanya kekhawatiran, tundalah
+- Katakan: "Akan saya pikirkan nanti pada jam 16.00 - 16.30"
+
+**Mencatat Kekhawatiran:**
+- Tuliskan kekhawatiran secara singkat
+- Gunakan buku catatan, ponsel, atau ingatan
+- Catat semua kekhawatiran yang muncul sepanjang hari
+
+**Contoh Daftar Kekhawatiran:**
+| Waktu | Kekhawatiran |
+|-------|--------------|
+| 08:30 | Bagaimana jika saya terlambat ke kantor? |
+| 11:00 | Apakah presentasi saya cukup baik? |
+| 14:00 | Bagaimana jika saya tidak bisa bayar tagihan? |
+| 15:30 | Apakah keluarga saya baik-baik saja? |
+
+**Ingatkan Diri Anda:**
+- Anda punya waktu khusus untuk memikirkan kekhawatiran
+- Biarkan pikiran itu muncul tetapi jangan terlibat
+- Alihkan fokus ke momen saat ini
+- Lanjutkan kegiatan hari ini
+
+### Langkah 3: Melakukan Jadwal Khawatir
+1. Tenangkan diri di tempat yang telah direncanakan
+2. Luangkan waktu untuk merenungkan kekhawatiran yang telah ditulis
+3. Pikirkan hanya khawatir yang telah Anda tulis
+4. Jika kekhawatiran tidak lagi mengganggu atau tidak relevan, tinggalkan saja
+
+## Setelah Sesi Kekhawatiran:
+- Tutup buku catatan atau aplikasi
+- Lakukan aktivitas yang menenangkan
+- Praktikkan pernapasan dalam
+- Lanjutkan rutinitas normal Anda
+
+## Tips Sukses:
+- Konsisten dengan jadwal yang sama setiap hari
+- Jangan memperpanjang waktu khawatir
+- Jika khawatir di luar jadwal, tuliskan dan tunda
+- Kombinasikan dengan teknik relaksasi
+- Beri waktu minimal 2 minggu untuk melihat hasil
+      `,
+      contentId: `
+# Worry Management Exercise
+
+## What is Worry Management?
+Worry management trains your mind not to immediately respond to every anxiety that arises, but rather to consciously set it aside to be addressed during a designated "worry time" that you've determined.
+
+## Benefits:
+- Worries become less disruptive to daily activities
+- You can manage them more effectively
+- You regain control over your thoughts
+- Reduces anxiety throughout the day
+- Increases focus and productivity
+
+## Implementation Steps:
+
+### Step 1: Create Worry Schedule
+1. Choose a specific time for your 'worry time'
+2. Preferably afternoon (not late at night)
+3. During free time for 15-30 minutes
+4. Example: 4:00 PM - 4:30 PM
+
+**My Worry Schedule: _____________**
+
+### Step 2: Recognize Worries
+**Postponing Worries:**
+- If you notice a worry, postpone it
+- Say: "I'll think about this later at 4:00 PM - 4:30 PM"
+
+**Recording Worries:**
+- Write down worries briefly
+- Use notebook, phone, or memory
+- Record all worries that arise throughout the day
+
+**Example Worry List:**
+| Time | Worry |
+|------|-------|
+| 08:30 | What if I'm late to the office? |
+| 11:00 | Is my presentation good enough? |
+| 14:00 | What if I can't pay the bills? |
+| 15:30 | Is my family okay? |
+
+**Remind Yourself:**
+- You have specific time to think about worries
+- Let the thought arise but don't engage
+- Shift focus to the present moment
+- Continue with today's activities
+
+### Step 3: Conduct Worry Session
+1. Calm yourself in the planned place
+2. Take time to contemplate written worries
+3. Think only about the worries you've written
+4. If worries are no longer bothersome or relevant, let them go
+
+## After Worry Session:
+- Close notebook or app
+- Do calming activities
+- Practice deep breathing
+- Continue your normal routine
+
+## Success Tips:
+- Be consistent with the same schedule every day
+- Don't extend worry time
+- If worried outside schedule, write it down and postpone
+- Combine with relaxation techniques
+- Allow at least 2 weeks to see results
+      `,
+    },
+    {
+      id: 9,
+      title: "Grounding (5-4-3-2-1 Technique)",
+      titleId: "Grounding (Teknik 5-4-3-2-1)",
+      description: "Use your five senses to ground yourself in the present moment and reduce anxiety",
+      descriptionId: "Gunakan lima indra Anda untuk membumi di momen sekarang dan mengurangi kecemasan",
+      category: "mentalHealth",
+      duration: "10 min",
+      durationId: "10 mnt",
+      difficulty: t("selfHelp.beginner"),
+      rating: 4.9,
+      type: "exercise",
+      timerDuration: 600,
+      content: `
+# Latihan Grounding (5-4-3-2-1)
+
+## Apa itu Grounding?
+Grounding adalah metode yang dirancang untuk "membumikan" atau menghubungkan kembali kesadaran pada saat ini (here and now), terutama ketika pikiran sedang diliputi kecemasan.
+
+## Manfaat Berdasarkan Penelitian:
+- Meningkatkan suasana hati secara bermakna (Chevalier, 2015)
+- Mengurangi kecemasan dan stres
+- Dapat dilakukan kapan saja dan di mana saja
+- Tanpa diketahui orang lain
+- Efektif untuk serangan panik
+
+## Langkah-langkah Grounding 5-4-3-2-1:
+
+### 1. LIHAT - 5 Benda
+**Fokus, tunjuk, dan sebutkan 5 benda yang ada di sekitar Anda:**
+- Contoh: foto keluarga di dinding
+- Pensil atau cangkir kopi
+- Tanaman atau bunga yang bergerak tertiup angin
+- Awan atau burung di langit
+- Hewan peliharaan
+
+**Tips:** Perhatikan warna, tekstur, dan pola setiap benda
+
+### 2. RABA - 4 Benda
+**Rasakan dengan tangan 4 benda yang ada di dekat Anda:**
+- Letakkan tangan di bawah air mengalir (hangat/dingin)
+- Rasakan pakaian menyentuh tubuh Anda
+- Sentuh furnitur dan fokus pada teksturnya
+- Sentuh bagian tubuh dengan menekan selama 30 detik
+
+**Tips:** Fokus pada sensasi sentuhan, tekstur, suhu
+
+### 3. DENGAR - 3 Suara
+**Dengan telinga, sebutkan 3 suara yang ada di sekitar Anda:**
+- Gonggongan anjing
+- Perut keroncongan
+- Jam berdetak
+- Lalu lintas di luar
+- Mesin mobil atau kereta
+- Musik
+- Percakapan
+- Kicauan burung
+- Angin yang bertiup
+
+**Tips:** Tutup mata sejenak untuk fokus pada pendengaran
+
+### 4. CIUM - 2 Aroma
+**Hirup udara dan sebutkan 2 aroma/bau yang dirasakan hidung Anda:**
+- Aroma sabun atau sampo
+- Lilin aromaterapi
+- Minyak wangi
+- Aroma sederhana (bantal, pensil)
+- Rumput segar atau bunga
+- Kopi atau teh
+- Makanan
+
+**Tips:** Tarik napas dalam-dalam melalui hidung
+
+### 5. KECAP - 1 Rasa
+**Sebutkan 1 rasa di lidah, mulut, dan bibir Anda:**
+- Sepotong permen karet
+- Permen mint
+- Kopi atau teh
+- Gula atau garam
+- Sepotong makanan
+- Minum air
+
+**Tips:** Fokus pada rasa di lidah dan sensasi di mulut
+
+## Cara Pelaksanaan:
+1. Cari tempat yang tenang
+2. Lakukan relaksasi dan fokus pada lingkungan sekitar
+3. Ikuti langkah 5-4-3-2-1 secara berurutan
+4. Lakukan dengan perlahan dan sadar
+5. Bernapas dalam di antara setiap langkah
+
+## Kapan Menggunakan Grounding:
+- Saat merasa cemas atau panik
+- Ketika pikiran tidak bisa berhenti berputar
+- Sebelum situasi yang menimbulkan stres
+- Saat merasa terlepas dari realitas
+- Sebagai bagian dari rutinitas harian
+
+## Variasi Grounding:
+- **Walking Grounding**: Lakukan sambil berjalan perlahan
+- **Quick Grounding**: Lakukan versi singkat (3-2-1)
+- **Emergency Grounding**: Fokus hanya pada pernapasan dan 1 indra
+      `,
+      contentId: `
+# Grounding Exercise (5-4-3-2-1)
+
+## What is Grounding?
+Grounding is a method designed to "ground" or reconnect consciousness to the present moment (here and now), especially when thoughts are overwhelmed by anxiety.
+
+## Research-Based Benefits:
+- Significantly improves mood (Chevalier, 2015)
+- Reduces anxiety and stress
+- Can be done anytime and anywhere
+- Without others knowing
+- Effective for panic attacks
+
+## Grounding 5-4-3-2-1 Steps:
+
+### 1. SEE - 5 Objects
+**Focus, point, and name 5 objects around you:**
+- Example: family photo on wall
+- Pencil or coffee cup
+- Plant or flower moving in wind
+- Clouds or birds in sky
+- Pet
+
+**Tip:** Notice color, texture, and pattern of each object
+
+### 2. TOUCH - 4 Objects
+**Feel with hands 4 objects near you:**
+- Place hands under running water (warm/cold)
+- Feel clothes touching your body
+- Touch furniture and focus on texture
+- Touch body parts by pressing for 30 seconds
+
+**Tip:** Focus on touch sensation, texture, temperature
+
+### 3. HEAR - 3 Sounds
+**With ears, name 3 sounds around you:**
+- Dog barking
+- Stomach growling
+- Clock ticking
+- Traffic outside
+- Car or train engine
+- Music
+- Conversation
+- Bird chirping
+- Wind blowing
+
+**Tip:** Close eyes briefly to focus on hearing
+
+### 4. SMELL - 2 Aromas
+**Inhale air and name 2 aromas/smells your nose detects:**
+- Soap or shampoo aroma
+- Aromatherapy candle
+- Fragrant oil
+- Simple aromas (pillow, pencil)
+- Fresh grass or flowers
+- Coffee or tea
+- Food
+
+**Tip:** Take deep breath through nose
+
+### 5. TASTE - 1 Flavor
+**Name 1 taste on tongue, mouth, and lips:**
+- Piece of gum
+- Mint candy
+- Coffee or tea
+- Sugar or salt
+- Piece of food
+- Drink water
+
+**Tip:** Focus on taste on tongue and sensation in mouth
+
+## How to Practice:
+1. Find a quiet place
+2. Relax and focus on surroundings
+3. Follow 5-4-3-2-1 steps in order
+4. Do it slowly and mindfully
+5. Breathe deeply between each step
+
+## When to Use Grounding:
+- When feeling anxious or panicked
+- When thoughts won't stop spinning
+- Before stress-inducing situations
+- When feeling detached from reality
+- As part of daily routine
+
+## Grounding Variations:
+- **Walking Grounding**: Do while walking slowly
+- **Quick Grounding**: Do short version (3-2-1)
+- **Emergency Grounding**: Focus only on breathing and 1 sense
+      `,
+    },
+    {
+      id: 10,
+      title: "Butterfly Hug",
+      titleId: "Pelukan Kupu-kupu",
+      description: "A bilateral stimulation technique to support emotional regulation and trauma processing",
+      descriptionId: "Teknik stimulasi bilateral untuk mendukung regulasi emosi dan pemrosesan trauma",
+      category: "mentalHealth",
+      duration: "12 min",
+      durationId: "12 mnt",
+      difficulty: t("selfHelp.beginner"),
+      rating: 4.8,
+      type: "exercise",
+      timerDuration: 720,
+      content: `
+# Latihan Butterfly Hug (Pelukan Kupu-kupu)
+
+## Apa itu Butterfly Hug?
+Pelukan Kupu-kupu adalah intervensi psikologis yang menggunakan prinsip stimulasi bilateral (BLS) untuk mendukung regulasi emosi dan pemrosesan trauma.
+
+## Dasar Neurobiologis:
+Teknik ini bekerja dengan memodulasi sirkuit trauma pada otak:
+- Menurunkan hiperaktivitas amigdala dan hipokampus saat ingatan stres muncul
+- Meningkatkan aktivitas korteks prefrontal medial
+- Menguatkan kontrol emosi dari atas ke bawah (top-down control)
+- Membantu integrasi pengalaman traumatis
+
+## Manfaat:
+- Mengurangi kecemasan dan stres akut
+- Membantu pemrosesan trauma
+- Meningkatkan rasa aman dan tenang
+- Mudah diterapkan dan dilakukan mandiri
+- Tidak memerlukan alat khusus
+- Dapat dilakukan kapan saja dan di mana saja
+
+## Langkah-langkah Butterfly Hug:
+
+### 1. Persiapan Posisi
+- Silangkan kedua tangan di depan dada
+- Letakkan ujung jari masing-masing tangan di bawah tulang selangka atau lengan atas
+- Posisikan tangan senyaman mungkin
+- Seperti memeluk diri sendiri
+
+### 2. Fokus dan Relaksasi
+- Tutup kedua mata Anda
+- Atur napas dengan Teknik Napas Dalam (TND)
+- Tarik napas dalam melalui hidung (4 detik)
+- Tahan napas (4 detik)
+- Buang napas perlahan melalui mulut (6 detik)
+- Fokuskan pikiran selama melakukan butterfly hug
+
+### 3. Stimulasi Bilateral
+- Lakukan gerakan menepuk-nepuk tangan pada pundak
+- Lakukan secara perlahan dan bergantian
+- Tangan kanan menepuk pundak kiri, lalu tangan kiri menepuk pundak kanan
+- Ulangi gerakan ini dengan ritme yang nyaman
+- Lakukan 6-12 kali putaran (1 putaran = kanan-kiri)
+
+### 4. Variasi Kecepatan
+**Untuk Kecemasan:**
+- Lakukan tepukan lebih cepat (2-3 tepukan per detik)
+- Membantu mengurangi arousal yang tinggi
+
+**Untuk Kesedihan:**
+- Lakukan tepukan lebih lambat (1 tepukan per 2-3 detik)
+- Membantu menenangkan dan menghibur
+
+### 5. Durasi
+- Mulai dengan 1-2 menit
+- Tingkatkan secara bertahap hingga 5-10 menit
+- Lakukan 2-3 kali sehari atau saat diperlukan
+
+## Kapan Menggunakan Butterfly Hug:
+- Saat merasa cemas atau panik
+- Setelah mengingat kenangan traumatis
+- Sebelum atau sesudah situasi yang menimbulkan stres
+- Saat merasa kewalahan secara emosional
+- Sebagai bagian dari rutinitas relaksasi harian
+- Sebelum tidur untuk menenangkan pikiran
+
+## Tips Praktik:
+- Temukan ritme yang paling nyaman untuk Anda
+- Fokus pada sensasi tepukan di pundak
+- Perhatikan perubahan perasaan Anda
+- Jangan memaksa jika merasa tidak nyaman
+- Kombinasikan dengan afirmasi positif
+- Praktikkan di tempat yang tenang dan aman
+
+## Kombinasi dengan Teknik Lain:
+- **Butterfly Hug + Pernapasan Dalam**: Untuk relaksasi maksimal
+- **Butterfly Hug + Afirmasi Positif**: "Saya aman", "Saya tenang"
+- **Butterfly Hug + Grounding**: Setelah grounding, lakukan butterfly hug
+- **Butterfly Hug + Visualisasi**: Bayangkan tempat aman sambil melakukan
+
+## Catatan Penting:
+- Jika ingatan traumatis muncul dan tidak terkendali, hentikan dan cari bantuan profesional
+- Butterfly hug bukan pengganti terapi profesional untuk trauma berat
+- Gunakan sebagai alat pendukung dalam proses penyembuhan
+- Konsultasikan dengan psikolog atau konselor jika diperlukan
+      `,
+      contentId: `
+# Butterfly Hug Exercise
+
+## What is Butterfly Hug?
+Butterfly Hug is a psychological intervention that uses bilateral stimulation (BLS) principles to support emotional regulation and trauma processing.
+
+## Neurobiological Basis:
+This technique works by modulating trauma circuits in the brain:
+- Reduces hyperactivity in amygdala and hippocampus when stress memories arise
+- Increases activity in medial prefrontal cortex
+- Strengthens top-down emotional control
+- Helps integrate traumatic experiences
+
+## Benefits:
+- Reduces anxiety and acute stress
+- Helps trauma processing
+- Increases sense of safety and calm
+- Easy to apply and do independently
+- No special tools required
+- Can be done anytime and anywhere
+
+## Butterfly Hug Steps:
+
+### 1. Position Preparation
+- Cross both hands in front of chest
+- Place fingertips of each hand below collarbone or upper arm
+- Position hands as comfortably as possible
+- Like hugging yourself
+
+### 2. Focus and Relaxation
+- Close both eyes
+- Regulate breathing with Deep Breathing Technique (TND)
+- Inhale deeply through nose (4 seconds)
+- Hold breath (4 seconds)
+- Exhale slowly through mouth (6 seconds)
+- Focus thoughts during butterfly hug
+
+### 3. Bilateral Stimulation
+- Tap hands on shoulders
+- Do slowly and alternately
+- Right hand taps left shoulder, then left hand taps right shoulder
+- Repeat this movement with comfortable rhythm
+- Do 6-12 rounds (1 round = right-left)
+
+### 4. Speed Variation
+**For Anxiety:**
+- Do faster taps (2-3 taps per second)
+- Helps reduce high arousal
+
+**For Sadness:**
+- Do slower taps (1 tap per 2-3 seconds)
+- Helps calm and comfort
+
+### 5. Duration
+- Start with 1-2 minutes
+- Gradually increase to 5-10 minutes
+- Do 2-3 times daily or as needed
+
+## When to Use Butterfly Hug:
+- When feeling anxious or panicked
+- After recalling traumatic memories
+- Before or after stress-inducing situations
+- When feeling emotionally overwhelmed
+- As part of daily relaxation routine
+- Before sleep to calm thoughts
+
+## Practice Tips:
+- Find the most comfortable rhythm for you
+- Focus on tap sensation on shoulders
+- Notice changes in your feelings
+- Don't force if feeling uncomfortable
+- Combine with positive affirmations
+- Practice in quiet and safe place
+
+## Combination with Other Techniques:
+- **Butterfly Hug + Deep Breathing**: For maximum relaxation
+- **Butterfly Hug + Positive Affirmations**: "I am safe", "I am calm"
+- **Butterfly Hug + Grounding**: After grounding, do butterfly hug
+- **Butterfly Hug + Visualization**: Imagine safe place while doing
+
+## Important Notes:
+- If traumatic memories arise uncontrollably, stop and seek professional help
+- Butterfly hug is not a replacement for professional therapy for severe trauma
+- Use as supporting tool in healing process
+- Consult with psychologist or counselor if needed
       `,
     },
   ]
