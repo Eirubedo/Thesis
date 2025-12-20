@@ -152,62 +152,6 @@ Berdasarkan Pedoman Hipertensi 2024, teknik pernapasan dalam dapat menurunkan te
       type: "guide",
       timerDuration: 900,
       content: `
-# Diet DASH untuk Hipertensi
-
-## Apa itu DASH?
-DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang dirancang untuk membantu mengobati atau mencegah tekanan darah tinggi.
-
-## Prinsip Utama berdasarkan Pedoman Hipertensi 2024:
-- Menekankan buah dan sayuran (4-5 porsi sehari)
-- Sertakan biji-bijian utuh (6-8 porsi sehari)
-- Pilih protein tanpa lemak (≤6 oz sehari)
-- Batasi asupan natrium (<2.300mg, idealnya 1.500mg)
-- Kurangi lemak jenuh
-- Sertakan produk susu rendah lemak (2-3 porsi sehari)
-
-## Porsi Harian Berdasarkan Kebutuhan 2000 Kalori:
-- Sayuran: 4-5 porsi
-- Buah: 4-5 porsi
-- Biji-bijian: 6-8 porsi
-- Daging tanpa lemak: 6 oz atau kurang
-- Kacang/biji: 4-5 porsi per minggu
-- Lemak dan minyak: 2-3 porsi
-- Makanan manis: ≤5 porsi per minggu
-
-## Manfaat Terbukti:
-- Dapat menurunkan tekanan darah sistolik 8-14 mmHg
-- Mengurangi risiko penyakit jantung hingga 20%
-- Membantu pengelolaan berat badan
-- Meningkatkan kesehatan secara keseluruhan
-- Mengurangi risiko stroke hingga 14%
-
-## Tips Implementasi:
-- Mulai dengan mengurangi natrium secara bertahap
-- Tingkatkan konsumsi buah dan sayuran perlahan
-- Ganti nasi putih dengan nasi merah
-- Pilih ikan 2-3 kali seminggu
-- Batasi makanan olahan dan fast food
-
-## Makanan yang Direkomendasikan:
-### Sayuran (4-5 porsi/hari):
-- Bayam, kangkung, sawi
-- Brokoli, kembang kol
-- Wortel, tomat
-- Labu, terong
-
-### Buah (4-5 porsi/hari):
-- Pisang (tinggi kalium)
-- Jeruk, pepaya
-- Apel, pir
-- Melon, semangka
-
-### Protein Rendah Lemak:
-- Ikan (salmon, tuna, makarel)
-- Ayam tanpa kulit
-- Tahu, tempe
-- Kacang-kacangan
-      `,
-      contentId: `
 # DASH Diet for Hypertension
 
 ## What is DASH?
@@ -262,6 +206,62 @@ DASH (Dietary Approaches to Stop Hypertension) is an eating plan designed to hel
 - Skinless chicken
 - Tofu, tempeh
 - Legumes and nuts
+      `,
+      contentId: `
+# Diet DASH untuk Hipertensi
+
+## Apa itu DASH?
+DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang dirancang untuk membantu mengobati atau mencegah tekanan darah tinggi.
+
+## Prinsip Utama berdasarkan Pedoman Hipertensi 2024:
+- Menekankan buah dan sayuran (4-5 porsi sehari)
+- Sertakan biji-bijian utuh (6-8 porsi sehari)
+- Pilih protein tanpa lemak (≤6 oz sehari)
+- Batasi asupan natrium (<2.300mg, idealnya 1.500mg)
+- Kurangi lemak jenuh
+- Sertakan produk susu rendah lemak (2-3 porsi sehari)
+
+## Porsi Harian Berdasarkan Kebutuhan 2000 Kalori:
+- Sayuran: 4-5 porsi
+- Buah: 4-5 porsi
+- Biji-bijian: 6-8 porsi
+- Daging tanpa lemak: 6 oz atau kurang
+- Kacang/biji: 4-5 porsi per minggu
+- Lemak dan minyak: 2-3 porsi
+- Makanan manis: ≤5 porsi per minggu
+
+## Manfaat Terbukti:
+- Dapat menurunkan tekanan darah sistolik 8-14 mmHg
+- Mengurangi risiko penyakit jantung hingga 20%
+- Membantu pengelolaan berat badan
+- Meningkatkan kesehatan secara keseluruhan
+- Mengurangi risiko stroke hingga 14%
+
+## Tips Implementasi:
+- Mulai dengan mengurangi natrium secara bertahap
+- Tingkatkan konsumsi buah dan sayuran perlahan
+- Ganti nasi putih dengan nasi merah
+- Pilih ikan 2-3 kali seminggu
+- Batasi makanan olahan dan fast food
+
+## Makanan yang Direkomendasikan:
+### Sayuran (4-5 porsi/hari):
+- Bayam, kangkung, sawi
+- Brokoli, kembang kol
+- Wortel, tomat
+- Labu, terong
+
+### Buah (4-5 porsi/hari):
+- Pisang (tinggi kalium)
+- Jeruk, pepaya
+- Apel, pir
+- Melon, semangka
+
+### Protein Rendah Lemak:
+- Ikan (salmon, tuna, makarel)
+- Ayam tanpa kulit
+- Tahu, tempe
+- Kacang-kacangan
       `,
     },
     {
@@ -574,72 +574,6 @@ Berdasarkan Pedoman Hipertensi 2024, stres kronis dapat:
       type: "guide",
       timerDuration: 720,
       content: `
-# Kepatuhan Obat untuk Hipertensi
-
-## Pentingnya Kepatuhan Obat berdasarkan Pedoman 2024:
-- Kepatuhan <80% meningkatkan risiko stroke 2-3 kali lipat
-- Kepatuhan optimal (>90%) dapat mencegah 70% komplikasi kardiovaskular
-- Penghentian obat mendadak dapat menyebabkan rebound hypertension
-- Kontrol tekanan darah yang baik mengurangi risiko kematian hingga 25%
-
-## Jenis Obat Hipertensi dan Cara Kerjanya:
-
-### 1. ACE Inhibitors (Captopril, Lisinopril):
-- **Cara Kerja**: Menghambat enzim pengubah angiotensin
-- **Manfaat**: Melindungi jantung dan ginjal
-- **Waktu Minum**: Pagi hari, perut kosong
-- **Efek Samping**: Batuk kering (10-15% pasien)
-- **Monitoring**: Fungsi ginjal dan kalium darah
-
-### 2. ARB (Valsartan, Telmisartan):
-- **Cara Kerja**: Memblokir reseptor angiotensin II
-- **Manfaat**: Sama dengan ACE inhibitor, tanpa batuk
-- **Waktu Minum**: Pagi atau malam, dengan/tanpa makanan
-- **Efek Samping**: Minimal, kadang pusing ringan
-- **Monitoring**: Fungsi ginjal dan elektrolit
-
-### 3. Calcium Channel Blockers (Amlodipine, Nifedipine):
-- **Cara Kerja**: Menghambat masuknya kalsium ke otot jantung
-- **Manfaat**: Efektif untuk hipertensi sistolik terisolasi
-- **Waktu Minum**: Pagi hari, bersamaan dengan makanan
-- **Efek Samping**: Pembengkakan kaki, pusing
-- **Monitoring**: Detak jantung dan tekanan darah
-
-### 4. Diuretik (Hydrochlorothiazide, Furosemide):
-- **Cara Kerja**: Mengeluarkan kelebihan cairan dan natrium
-- **Manfaat**: Mengurangi volume darah dan beban jantung
-- **Waktu Minum**: Pagi hari untuk menghindari sering buang air kecil malam
-- **Efek Samping**: Sering buang air kecil, kram otot
-- **Monitoring**: Elektrolit (kalium, natrium, magnesium)
-
-### 5. Beta Blockers (Propranolol, Metoprolol):
-- **Cara Kerja**: Menghambat reseptor beta di jantung
-- **Manfaat**: Mengurangi detak jantung dan kontraktilitas
-- **Waktu Minum**: Pagi dan malam (jika 2x sehari)
-- **Efek Samping**: Kelelahan, disfungsi seksual
-- **Monitoring**: Detak jantung dan tekanan darah
-
-## Tips Meningkatkan Kepatuhan:
-
-### 1. Sistem Pengingat:
-- Alarm ponsel untuk waktu minum obat
-- Kotak obat mingguan dengan pembagian hari
-- Aplikasi pengingat obat
-- Hubungkan dengan aktivitas rutin (sikat gigi, sarapan)
-
-### 2. Edukasi dan Pemahaman:
-- Pahami nama obat, dosis, dan waktu minum
-- Ketahui manfaat dan efek samping yang mungkin terjadi
-- Diskusikan kekhawatiran dengan dokter atau apoteker
-- Baca informasi obat yang disediakan
-
-### 3. Komunikasi dengan Tenaga Kesehatan:
-- Laporkan efek samping yang mengganggu
-- Diskusikan kesulitan minum obat (ukuran, rasa, frekuensi)
-- Tanyakan alternatif jika ada masalah finansial
-- Jadwalkan kontrol rutin sesuai anjuran
-      `,
-      contentId: `
 # Medication Adherence for Hypertension
 
 ## Importance of Medication Adherence based on 2024 Guidelines:
@@ -705,6 +639,72 @@ Berdasarkan Pedoman Hipertensi 2024, stres kronis dapat:
 - Ask about alternatives if financial issues exist
 - Schedule regular follow-ups as recommended
       `,
+      contentId: `
+# Kepatuhan Obat untuk Hipertensi
+
+## Pentingnya Kepatuhan Obat berdasarkan Pedoman 2024:
+- Kepatuhan <80% meningkatkan risiko stroke 2-3 kali lipat
+- Kepatuhan optimal (>90%) dapat mencegah 70% komplikasi kardiovaskular
+- Penghentian obat mendadak dapat menyebabkan rebound hypertension
+- Kontrol tekanan darah yang baik mengurangi risiko kematian hingga 25%
+
+## Jenis Obat Hipertensi dan Cara Kerjanya:
+
+### 1. ACE Inhibitors (Captopril, Lisinopril):
+- **Cara Kerja**: Menghambat enzim pengubah angiotensin
+- **Manfaat**: Melindungi jantung dan ginjal
+- **Waktu Minum**: Pagi hari, perut kosong
+- **Efek Samping**: Batuk kering (10-15% pasien)
+- **Monitoring**: Fungsi ginjal dan kalium darah
+
+### 2. ARB (Valsartan, Telmisartan):
+- **Cara Kerja**: Memblokir reseptor angiotensin II
+- **Manfaat**: Sama dengan ACE inhibitor, tanpa batuk
+- **Waktu Minum**: Pagi atau malam, dengan/tanpa makanan
+- **Efek Samping**: Minimal, kadang pusing ringan
+- **Monitoring**: Fungsi ginjal dan elektrolit
+
+### 3. Calcium Channel Blockers (Amlodipine, Nifedipine):
+- **Cara Kerja**: Menghambat masuknya kalsium ke otot jantung
+- **Manfaat**: Efektif untuk hipertensi sistolik terisolasi
+- **Waktu Minum**: Pagi hari, bersamaan dengan makanan
+- **Efek Samping**: Pembengkakan kaki, pusing
+- **Monitoring**: Detak jantung dan tekanan darah
+
+### 4. Diuretik (Hydrochlorothiazide, Furosemide):
+- **Cara Kerja**: Mengeluarkan kelebihan cairan dan natrium
+- **Manfaat**: Mengurangi volume darah dan beban jantung
+- **Waktu Minum**: Pagi hari untuk menghindari sering buang air kecil malam
+- **Efek Samping**: Sering buang air kecil, kram otot
+- **Monitoring**: Elektrolit (kalium, natrium, magnesium)
+
+### 5. Beta Blockers (Propranolol, Metoprolol):
+- **Cara Kerja**: Menghambat reseptor beta di jantung
+- **Manfaat**: Mengurangi detak jantung dan kontraktilitas
+- **Waktu Minum**: Pagi dan malam (jika 2x sehari)
+- **Efek Samping**: Kelelahan, disfungsi seksual
+- **Monitoring**: Detak jantung dan tekanan darah
+
+## Tips Meningkatkan Kepatuhan:
+
+### 1. Sistem Pengingat:
+- Alarm ponsel untuk waktu minum obat
+- Kotak obat mingguan dengan pembagian hari
+- Aplikasi pengingat obat
+- Hubungkan dengan aktivitas rutin (sikat gigi, sarapan)
+
+### 2. Edukasi dan Pemahaman:
+- Pahami nama obat, dosis, dan waktu minum
+- Ketahui manfaat dan efek samping yang mungkin terjadi
+- Diskusikan kekhawatiran dengan dokter atau apoteker
+- Baca informasi obat yang disediakan
+
+### 3. Komunikasi dengan Tenaga Kesehatan:
+- Laporkan efek samping yang mengganggu
+- Diskusikan kesulitan minum obat (ukuran, rasa, frekuensi)
+- Tanyakan alternatif jika ada masalah finansial
+- Jadwalkan kontrol rutin sesuai anjuran
+      `,
     },
     {
       id: 6,
@@ -720,85 +720,6 @@ Berdasarkan Pedoman Hipertensi 2024, stres kronis dapat:
       type: "guide",
       timerDuration: 1080,
       content: `
-# Kesehatan Mental dan Hipertensi
-
-## Hubungan Kesehatan Mental dengan Tekanan Darah:
-Berdasarkan Pedoman Hipertensi 2024, terdapat hubungan dua arah antara kesehatan mental dan hipertensi:
-
-### Dampak Gangguan Mental terhadap Hipertensi:
-- **Depresi**: Meningkatkan risiko hipertensi 42%
-- **Kecemasan**: Meningkatkan tekanan darah 10-15 mmHg saat episode akut
-- **Stres Kronis**: Menyebabkan peningkatan kortisol dan aktivasi sistem saraf simpatis
-- **Gangguan Tidur**: Kurang tidur (<6 jam) meningkatkan risiko hipertensi 20%
-
-### Dampak Hipertensi terhadap Kesehatan Mental:
-- Risiko depresi meningkat 25% pada penderita hipertensi
-- Kecemasan tentang komplikasi dapat memperburuk kontrol tekanan darah
-- Efek samping obat dapat mempengaruhi mood dan fungsi kognitif
-- Pembatasan aktivitas dapat menyebabkan isolasi sosial
-
-## Mekanisme Biologis:
-
-### 1. Sistem Saraf Otonom:
-- Stres mengaktifkan sistem saraf simpatis
-- Pelepasan adrenalin dan noradrenalin
-- Peningkatan detak jantung dan kontraksi pembuluh darah
-- Aktivasi sistem renin-angiotensin-aldosteron
-
-### 2. Sistem Endokrin:
-- Peningkatan kortisol kronis
-- Gangguan regulasi insulin
-- Perubahan hormon tiroid
-- Ketidakseimbangan neurotransmitter (serotonin, dopamin)
-
-### 3. Peradangan:
-- Stres kronis meningkatkan marker inflamasi (CRP, IL-6)
-- Peradangan merusak endotel pembuluh darah
-- Aterosklerosis dan kekakuan arteri
-- Gangguan fungsi ginjal
-
-## Strategi Pengelolaan Terintegrasi:
-
-### 1. Terapi Psikologis:
-- **Cognitive Behavioral Therapy (CBT)**: Terbukti menurunkan TD 5-10 mmHg
-- **Mindfulness-Based Stress Reduction**: Efektif untuk kecemasan dan TD
-- **Terapi Relaksasi**: Progressive muscle relaxation, guided imagery
-- **Konseling**: Untuk mengatasi masalah adaptasi dan kepatuhan
-
-### 2. Intervensi Gaya Hidup:
-- **Olahraga Teratur**: Meningkatkan endorfin dan menurunkan kortisol
-- **Yoga dan Tai Chi**: Kombinasi aktivitas fisik dan meditasi
-- **Hobi dan Aktivitas Menyenangkan**: Mengurangi stres dan meningkatkan mood
-- **Dukungan Sosial**: Bergabung dengan kelompok dukungan atau komunitas
-
-### 3. Manajemen Tidur:
-- Tidur 7-9 jam per malam
-- Rutinitas tidur yang konsisten
-- Lingkungan tidur yang nyaman (gelap, sejuk, tenang)
-- Hindari kafein dan alkohol sebelum tidur
-- Teknik relaksasi sebelum tidur
-
-## Tanda-tanda yang Memerlukan Bantuan Profesional:
-
-### Gejala Depresi:
-- Perasaan sedih atau putus asa >2 minggu
-- Kehilangan minat pada aktivitas yang biasa disukai
-- Perubahan nafsu makan atau berat badan signifikan
-- Gangguan tidur (insomnia atau hipersomnia)
-- Kelelahan atau kehilangan energi
-- Perasaan tidak berharga atau bersalah berlebihan
-- Kesulitan konsentrasi atau membuat keputusan
-- Pikiran tentang kematian atau bunuh diri
-
-### Gejala Kecemasan:
-- Kekhawatiran berlebihan yang sulit dikontrol
-- Ketegangan otot dan gelisah
-- Mudah lelah atau irritable
-- Kesulitan konsentrasi
-- Gangguan tidur
-- Gejala fisik (jantung berdebar, berkeringat, tremor)
-      `,
-      contentId: `
 # Mental Health and Hypertension
 
 ## Connection Between Mental Health and Blood Pressure:
@@ -876,6 +797,85 @@ Based on 2024 Hypertension Guidelines, there's a bidirectional relationship betw
 - Concentration difficulties
 - Sleep disturbances
 - Physical symptoms (palpitations, sweating, tremor)
+      `,
+      contentId: `
+# Kesehatan Mental dan Hipertensi
+
+## Hubungan Kesehatan Mental dengan Tekanan Darah:
+Berdasarkan Pedoman Hipertensi 2024, terdapat hubungan dua arah antara kesehatan mental dan hipertensi:
+
+### Dampak Gangguan Mental terhadap Hipertensi:
+- **Depresi**: Meningkatkan risiko hipertensi 42%
+- **Kecemasan**: Meningkatkan tekanan darah 10-15 mmHg saat episode akut
+- **Stres Kronis**: Menyebabkan peningkatan kortisol dan aktivasi sistem saraf simpatis
+- **Gangguan Tidur**: Kurang tidur (<6 jam) meningkatkan risiko hipertensi 20%
+
+### Dampak Hipertensi terhadap Kesehatan Mental:
+- Risiko depresi meningkat 25% pada penderita hipertensi
+- Kecemasan tentang komplikasi dapat memperburuk kontrol tekanan darah
+- Efek samping obat dapat mempengaruhi mood dan fungsi kognitif
+- Pembatasan aktivitas dapat menyebabkan isolasi sosial
+
+## Mekanisme Biologis:
+
+### 1. Sistem Saraf Otonom:
+- Stres mengaktifkan sistem saraf simpatis
+- Pelepasan adrenalin dan noradrenalin
+- Peningkatan detak jantung dan kontraksi pembuluh darah
+- Aktivasi sistem renin-angiotensin-aldosteron
+
+### 2. Sistem Endokrin:
+- Peningkatan kortisol kronis
+- Gangguan regulasi insulin
+- Perubahan hormon tiroid
+- Ketidakseimbangan neurotransmitter (serotonin, dopamin)
+
+### 3. Peradangan:
+- Stres kronis meningkatkan marker inflamasi (CRP, IL-6)
+- Peradangan merusak endotel pembuluh darah
+- Aterosklerosis dan kekakuan arteri
+- Gangguan fungsi ginjal
+
+## Strategi Pengelolaan Terintegrasi:
+
+### 1. Terapi Psikologis:
+- **Cognitive Behavioral Therapy (CBT)**: Terbukti menurunkan TD 5-10 mmHg
+- **Mindfulness-Based Stress Reduction**: Efektif untuk kecemasan dan TD
+- **Terapi Relaksasi**: Progressive muscle relaxation, guided imagery
+- **Konseling**: Untuk mengatasi masalah adaptasi dan kepatuhan
+
+### 2. Intervensi Gaya Hidup:
+- **Olahraga Teratur**: Meningkatkan endorfin dan menurunkan kortisol
+- **Yoga dan Tai Chi**: Kombinasi aktivitas fisik dan meditasi
+- **Hobi dan Aktivitas Menyenangkan**: Mengurangi stres dan meningkatkan mood
+- **Dukungan Sosial**: Bergabung dengan kelompok dukungan atau komunitas
+
+### 3. Manajemen Tidur:
+- Tidur 7-9 jam per malam
+- Rutinitas tidur yang konsisten
+- Lingkungan tidur yang nyaman (gelap, sejuk, tenang)
+- Hindari kafein dan alkohol sebelum tidur
+- Teknik relaksasi sebelum tidur
+
+## Tanda-tanda yang Memerlukan Bantuan Profesional:
+
+### Gejala Depresi:
+- Perasaan sedih atau putus asa >2 minggu
+- Kehilangan minat pada aktivitas yang biasa disukai
+- Perubahan nafsu makan atau berat badan signifikan
+- Gangguan tidur (insomnia atau hipersomnia)
+- Kelelahan atau kehilangan energi
+- Perasaan tidak berharga atau bersalah berlebihan
+- Kesulitan konsentrasi atau membuat keputusan
+- Pikiran tentang kematian atau bunuh diri
+
+### Gejala Kecemasan:
+- Kekhawatiran berlebihan yang sulit dikontrol
+- Ketegangan otot dan gelisah
+- Mudah lelah atau irritable
+- Kesulitan konsentrasi
+- Gangguan tidur
+- Gejala fisik (jantung berdebar, berkeringat, tremor)
       `,
     },
     {
@@ -1041,72 +1041,6 @@ Positive Thought Facts:
       type: "exercise",
       timerDuration: 1200,
       content: `
-# Latihan Manajemen Kekhawatiran
-
-## Apa itu Manajemen Kekhawatiran?
-Manajemen kekhawatiran adalah melatih pikiran agar tidak langsung merespons setiap kecemasan yang muncul, melainkan secara sadar menyisihkannya untuk dibahas pada "waktu khusus untuk khawatir" yang telah ditentukan.
-
-## Manfaat:
-- Kekhawatiran menjadi tidak terlalu mengganggu aktivitas harian
-- Anda dapat mengelolanya secara lebih efektif
-- Anda kembali memegang kendali atas pikiran Anda
-- Mengurangi kecemasan sepanjang hari
-- Meningkatkan fokus dan produktivitas
-
-## Langkah-langkah Pelaksanaan:
-
-### Langkah 1: Membuat Jadwal Khawatir
-1. Pilih waktu khusus untuk 'waktu khawatir' Anda
-2. Sebaiknya sore hari (jangan larut malam)
-3. Di waktu luang selama 15-30 menit
-4. Contoh: Jam 16.00 - 16.30
-
-**Jadwal Khawatir Saya: _____________**
-
-### Langkah 2: Mengenal Kekhawatiran
-**Menunda Kekhawatiran:**
-- Jika Anda menyadari adanya kekhawatiran, tundalah
-- Katakan: "Akan saya pikirkan nanti pada jam 16.00 - 16.30"
-
-**Mencatat Kekhawatiran:**
-- Tuliskan kekhawatiran secara singkat
-- Gunakan buku catatan, ponsel, atau ingatan
-- Catat semua kekhawatiran yang muncul sepanjang hari
-
-**Contoh Daftar Kekhawatiran:**
-| Waktu | Kekhawatiran |
-|-------|--------------|
-| 08:30 | Bagaimana jika saya terlambat ke kantor? |
-| 11:00 | Apakah presentasi saya cukup baik? |
-| 14:00 | Bagaimana jika saya tidak bisa bayar tagihan? |
-| 15:30 | Apakah keluarga saya baik-baik saja? |
-
-**Ingatkan Diri Anda:**
-- Anda punya waktu khusus untuk memikirkan kekhawatiran
-- Biarkan pikiran itu muncul tetapi jangan terlibat
-- Alihkan fokus ke momen saat ini
-- Lanjutkan kegiatan hari ini
-
-### Langkah 3: Melakukan Jadwal Khawatir
-1. Tenangkan diri di tempat yang telah direncanakan
-2. Luangkan waktu untuk merenungkan kekhawatiran yang telah ditulis
-3. Pikirkan hanya khawatir yang telah Anda tulis
-4. Jika kekhawatiran tidak lagi mengganggu atau tidak relevan, tinggalkan saja
-
-## Setelah Sesi Kekhawatiran:
-- Tutup buku catatan atau aplikasi
-- Lakukan aktivitas yang menenangkan
-- Praktikkan pernapasan dalam
-- Lanjutkan rutinitas normal Anda
-
-## Tips Sukses:
-- Konsisten dengan jadwal yang sama setiap hari
-- Jangan memperpanjang waktu khawatir
-- Jika khawatir di luar jadwal, tuliskan dan tunda
-- Kombinasikan dengan teknik relaksasi
-- Beri waktu minimal 2 minggu untuk melihat hasil
-      `,
-      contentId: `
 # Worry Management Exercise
 
 ## What is Worry Management?
@@ -1171,6 +1105,72 @@ Worry management trains your mind not to immediately respond to every anxiety th
 - If worried outside schedule, write it down and postpone
 - Combine with relaxation techniques
 - Allow at least 2 weeks to see results
+      `,
+      contentId: `
+# Latihan Manajemen Kekhawatiran
+
+## Apa itu Manajemen Kekhawatiran?
+Manajemen kekhawatiran adalah melatih pikiran agar tidak langsung merespons setiap kecemasan yang muncul, melainkan secara sadar menyisihkannya untuk dibahas pada "waktu khusus untuk khawatir" yang telah ditentukan.
+
+## Manfaat:
+- Kekhawatiran menjadi tidak terlalu mengganggu aktivitas harian
+- Anda dapat mengelolanya secara lebih efektif
+- Anda kembali memegang kendali atas pikiran Anda
+- Mengurangi kecemasan sepanjang hari
+- Meningkatkan fokus dan produktivitas
+
+## Langkah-langkah Pelaksanaan:
+
+### Langkah 1: Membuat Jadwal Khawatir
+1. Pilih waktu khusus untuk 'waktu khawatir' Anda
+2. Sebaiknya sore hari (jangan larut malam)
+3. Di waktu luang selama 15-30 menit
+4. Example: Jam 16.00 - 16.30
+
+**Jadwal Khawatir Saya: _____________**
+
+### Langkah 2: Mengenal Kekhawatiran
+**Menunda Kekhawatiran:**
+- Jika Anda menyadari adanya kekhawatiran, tundalah
+- Katakan: "Akan saya pikirkan nanti pada jam 16.00 - 16.30"
+
+**Mencatat Kekhawatiran:**
+- Tuliskan kekhawatiran secara singkat
+- Gunakan buku catatan, ponsel, atau ingatan
+- Catat semua kekhawatiran yang muncul sepanjang hari
+
+**Contoh Daftar Kekhawatiran:**
+| Waktu | Kekhawatiran |
+|-------|--------------|
+| 08:30 | Bagaimana jika saya terlambat ke kantor? |
+| 11:00 | Apakah presentasi saya cukup baik? |
+| 14:00 | Bagaimana jika saya tidak bisa bayar tagihan? |
+| 15:30 | Apakah keluarga saya baik-baik saja? |
+
+**Ingatkan Diri Anda:**
+- Anda punya waktu khusus untuk memikirkan kekhawatiran
+- Biarkan pikiran itu muncul tetapi jangan terlibat
+- Alihkan fokus ke momen saat ini
+- Lanjutkan kegiatan hari ini
+
+### Langkah 3: Melakukan Jadwal Khawatir
+1. Tenangkan diri di tempat yang telah direncanakan
+2. Luangkan waktu untuk merenungkan kekhawatiran yang telah ditulis
+3. Pikirkan hanya khawatir yang telah Anda tulis
+4. Jika kekhawatiran tidak lagi mengganggu atau tidak relevan, tinggalkan saja
+
+## Setelah Sesi Kekhawatiran:
+- Tutup buku catatan atau aplikasi
+- Lakukan aktivitas yang menenangkan
+- Praktikkan pernapasan dalam
+- Lanjutkan rutinitas normal Anda
+
+## Tips Sukses:
+- Konsisten dengan jadwal yang sama setiap hari
+- Jangan memperpanjang waktu khawatir
+- Jika khawatir di luar jadwal, tuliskan dan tunda
+- Kombinasikan dengan teknik relaksasi
+- Beri waktu minimal 2 minggu untuk melihat hasil
       `,
     },
     {
@@ -1453,12 +1453,6 @@ Teknik ini bekerja dengan memodulasi sirkuit trauma pada otak:
 - Jangan memaksa jika merasa tidak nyaman
 - Kombinasikan dengan afirmasi positif
 - Praktikkan di tempat yang tenang dan aman
-
-## Kombinasi dengan Teknik Lain:
-- **Butterfly Hug + Pernapasan Dalam**: Untuk relaksasi maksimal
-- **Butterfly Hug + Afirmasi Positif**: "Saya aman", "Saya tenang"
-- **Butterfly Hug + Grounding**: Setelah grounding, lakukan butterfly hug
-- **Butterfly Hug + Visualisasi**: Bayangkan tempat aman sambil melakukan
 
 ## Catatan Penting:
 - Jika ingatan traumatis muncul dan tidak terkendali, hentikan dan cari bantuan profesional

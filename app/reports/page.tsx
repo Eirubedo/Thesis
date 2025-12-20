@@ -179,7 +179,7 @@ export default function ReportsPage() {
             </TabsTrigger>
             <TabsTrigger value="quick" className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              {t("reports.quickResults")}
+              Monitoring & Evaluasi
             </TabsTrigger>
             <TabsTrigger value="knowledge" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
@@ -440,17 +440,17 @@ export default function ReportsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-blue-500" />
-                  {t("reports.quickResults")}
+                  Hasil Monitoring dan Evaluasi
                 </CardTitle>
-                <CardDescription>Riwayat percakapan asesmen cepat</CardDescription>
+                <CardDescription>Riwayat percakapan monitoring dan evaluasi sistematis</CardDescription>
               </CardHeader>
               <CardContent>
                 {getConversationsByType("quick-assessment").length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Asesmen Cepat</h3>
-                    <p className="text-gray-600 mb-4">Mulai asesmen cepat untuk melihat riwayat di sini</p>
-                    <Button onClick={() => router.push("/assessment")}>Mulai Asesmen Cepat</Button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Monitoring & Evaluasi</h3>
+                    <p className="text-gray-600 mb-4">Mulai monitoring dan evaluasi untuk melihat riwayat di sini</p>
+                    <Button onClick={() => router.push("/assessment")}>Mulai Monitoring & Evaluasi</Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -473,7 +473,7 @@ export default function ReportsPage() {
                                   </h3>
                                 </div>
                                 <p className="text-sm text-gray-600">
-                                  {quickMessages.length} pesan dalam asesmen cepat
+                                  {quickMessages.length} pesan dalam monitoring dan evaluasi
                                 </p>
                               </div>
                               <Dialog>
@@ -486,7 +486,7 @@ export default function ReportsPage() {
                                 <DialogContent className="max-w-4xl max-h-[85vh]">
                                   <DialogHeader>
                                     <DialogTitle>
-                                      Asesmen Cepat -{" "}
+                                      Monitoring & Evaluasi -{" "}
                                       {new Date(day.date).toLocaleDateString("id-ID", {
                                         day: "numeric",
                                         month: "long",
@@ -719,7 +719,7 @@ export default function ReportsPage() {
                 </div>
                 <div>
                   <div className="text-2xl font-bold">{quickResults.length}</div>
-                  <div className="text-sm text-gray-600">Asesmen Cepat</div>
+                  <div className="text-sm text-gray-600">Monitoring & Evaluasi</div>
                 </div>
               </div>
               {quickResults.length > 0 && (

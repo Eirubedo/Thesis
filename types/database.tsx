@@ -82,6 +82,60 @@ export interface ConversationMessage {
   created_at: string
 }
 
+export type ActivityType =
+  | "breathing"
+  | "exercise"
+  | "diet"
+  | "meditation"
+  | "medication"
+  | "bp_measurement"
+  | "stress_management"
+  | "other"
+
+export type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday"
+
+export interface ActivitySchedule {
+  id: string
+  user_id: string
+  activity_type: ActivityType
+  title: string
+  description?: string
+  scheduled_time: string // HH:MM format
+  scheduled_days: DayOfWeek[]
+  duration_minutes: number
+  reminder_enabled: boolean
+  reminder_minutes_before: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ActivityLog {
+  id: string
+  user_id: string
+  schedule_id: string
+  completed_at: string
+  duration_actual_minutes?: number
+  notes?: string
+  mood_before?: number
+  mood_after?: number
+  created_at: string
+}
+
+export interface ActivityReminder {
+  id: string
+  user_id: string
+  schedule_id: string
+  reminder_date: string
+  reminder_time: string
+  was_sent: boolean
+  sent_at?: string
+  was_dismissed: boolean
+  dismissed_at?: string
+  created_at: string
+}
+// </CHANGE>
+
 export interface Database {
   public: {
     Tables: {
@@ -120,6 +174,22 @@ export interface Database {
         Insert: Omit<ConversationMessage, "id" | "created_at">
         Update: Partial<Omit<ConversationMessage, "id" | "created_at">>
       }
+      activity_schedules: {
+        Row: ActivitySchedule
+        Insert: Omit<ActivitySchedule, "id" | "created_at" | "updated_at">
+        Update: Partial<Omit<ActivitySchedule, "id" | "created_at" | "updated_at">>
+      }
+      activity_logs: {
+        Row: ActivityLog
+        Insert: Omit<ActivityLog, "id" | "created_at">
+        Update: Partial<Omit<ActivityLog, "id" | "created_at">>
+      }
+      activity_reminders: {
+        Row: ActivityReminder
+        Insert: Omit<ActivityReminder, "id" | "created_at">
+        Update: Partial<Omit<ActivityReminder, "id" | "created_at">>
+      }
+      // </CHANGE>
     }
   }
 }

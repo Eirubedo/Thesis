@@ -49,15 +49,15 @@ export default function AssessmentPage() {
       id: "quick",
       title: t("assessment.quick"),
       description: t("assessment.quickDesc"),
-      duration: "5-7 min",
+      duration: "10-15 min",
       icon: Clock,
       color: "bg-blue-100 text-blue-700",
       features: [
-        "Screening cepat tekanan darah",
-        "Evaluasi gejala terkini",
-        "Penilaian kepatuhan obat",
-        "Alert kondisi darurat",
-        "Rekomendasi tindakan segera",
+        "Pilihan diagnosis evaluasi (HT, AS, GCT, RBD)",
+        "Asesmen tanda dan gejala",
+        "Evaluasi kemampuan yang diketahui",
+        "Evaluasi kemampuan yang dilakukan",
+        "Ringkasan dan rekomendasi",
       ],
     },
     {
@@ -133,9 +133,10 @@ export default function AssessmentPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-sm text-blue-800 space-y-2">
-                    <div>• Siapkan data tekanan darah terbaru</div>
-                    <div>• Sebutkan gejala yang sedang dialami</div>
-                    <div>• Jawab dengan cepat dan jujur</div>
+                    <div>• Pilih jenis diagnosis yang akan dievaluasi</div>
+                    <div>• Siapkan informasi tanda dan gejala</div>
+                    <div>• Catat kemampuan yang sudah dipelajari</div>
+                    <div>• Sebutkan praktik yang sudah dilakukan</div>
                   </div>
                 </CardContent>
               </Card>
