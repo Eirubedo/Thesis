@@ -9,7 +9,8 @@ import { DifyChatInterface } from "@/components/dify-chat-interface"
 import { useAuth } from "@/components/auth-provider"
 import { useLanguage } from "@/contexts/language-context"
 import { useRouter } from "next/navigation"
-import { Brain, Clock, BookOpen, CheckCircle, ArrowRight, Lightbulb } from "lucide-react"
+import { Brain, Clock, BookOpen, CheckCircle, ArrowRight, Lightbulb, AlertCircle, Mic } from "lucide-react"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 export default function AssessmentPage() {
   const { user } = useAuth()
@@ -17,6 +18,10 @@ export default function AssessmentPage() {
   const router = useRouter()
   const [selectedAssessment, setSelectedAssessment] = useState<string | null>(null)
   const [assessmentMode, setAssessmentMode] = useState<"overview" | "comprehensive" | "quick" | "knowledge">("overview")
+  const [showDisclaimer, setShowDisclaimer] = useState(false)
+  const [pendingAssessmentType, setPendingAssessmentType] = useState<"comprehensive" | "quick" | "knowledge" | null>(
+    null,
+  )
 
   useEffect(() => {
     if (!user) {
@@ -76,6 +81,24 @@ export default function AssessmentPage() {
       ],
     },
   ]
+
+  const handleStartAssessment = (type: "comprehensive" | "quick" | "knowledge") => {
+    setPendingAssessmentType(type)
+    setShowDisclaimer(true)
+  }
+
+  const handleDisclaimerAccept = () => {
+    if (pendingAssessmentType) {
+      setAssessmentMode(pendingAssessmentType)
+    }
+    setShowDisclaimer(false)
+    setPendingAssessmentType(null)
+  }
+
+  const handleDisclaimerCancel = () => {
+    setShowDisclaimer(false)
+    setPendingAssessmentType(null)
+  }
 
   if (assessmentMode === "quick") {
     return (
@@ -339,11 +362,11 @@ export default function AssessmentPage() {
                     onClick={(e) => {
                       e.stopPropagation()
                       if (assessment.id === "comprehensive") {
-                        setAssessmentMode("comprehensive")
+                        handleStartAssessment("comprehensive")
                       } else if (assessment.id === "quick") {
-                        setAssessmentMode("quick")
+                        handleStartAssessment("quick")
                       } else if (assessment.id === "knowledge") {
-                        setAssessmentMode("knowledge")
+                        handleStartAssessment("knowledge")
                       }
                     }}
                   >
@@ -473,6 +496,45 @@ export default function AssessmentPage() {
           </div>
         </div>
       </div>
+
+      {/* Disclaimer Dialog */}
+      <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+              {t("assessment.disclaimerTitle")}
+            </DialogTitle>
+            <div className="text-base text-gray-700 space-y-4 pt-4">
+              <div className="flex items-start gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <Clock className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-yellow-900">{t("assessment.disclaimerDuration")}</p>
+                  <p className="text-sm text-yellow-800">{t("assessment.disclaimerDurationDesc")}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <Mic className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-blue-900">{t("assessment.disclaimerVoice")}</p>
+                  <p className="text-sm text-blue-800">{t("assessment.disclaimerVoiceDesc")}</p>
+                </div>
+              </div>
+
+              <p className="text-gray-600">{t("assessment.disclaimerConfirm")}</p>
+            </div>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button variant="outline" onClick={handleDisclaimerCancel} className="flex-1 bg-transparent">
+              {t("assessment.disclaimerCancel")}
+            </Button>
+            <Button onClick={handleDisclaimerAccept} className="flex-1 bg-red-600 hover:bg-red-700">
+              {t("assessment.disclaimerAccept")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

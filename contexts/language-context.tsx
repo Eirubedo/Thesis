@@ -159,6 +159,17 @@ const translations = {
     "assessment.quickDesc": "Systematic monitoring and evaluation for hypertension management (HT, AS, GCT, RBD)",
     "assessment.knowledge": "Hypertension Knowledge Test",
     "assessment.knowledgeDesc": "Evaluate your understanding of hypertension management",
+    "assessment.disclaimerTitle": "Before You Begin",
+    "assessment.disclaimerDuration": "Time Commitment: 30-60 minutes",
+    "assessment.disclaimerDurationDesc":
+      "This comprehensive assessment requires your full attention. Please ensure you have enough time to complete it without interruption.",
+    "assessment.disclaimerVoice": "Voice Input Available",
+    "assessment.disclaimerVoiceDesc":
+      "You can speak your responses by pressing the microphone icon in the chat interface. This makes the assessment more conversational and easier to complete.",
+    "assessment.disclaimerConfirm":
+      "By proceeding, you acknowledge that you understand the time commitment and are ready to begin the assessment.",
+    "assessment.disclaimerAccept": "I Understand, Let's Begin",
+    "assessment.disclaimerCancel": "Not Now",
 
     // Monitoring
     "monitoring.title": "Health Monitoring",
@@ -668,6 +679,17 @@ const translations = {
     "assessment.quickDesc": "Pemantauan dan evaluasi sistematis untuk manajemen hipertensi (HT, AS, GCT, RBD)",
     "assessment.knowledge": "Tes Pengetahuan",
     "assessment.knowledgeDesc": "Evaluasi pemahaman Anda tentang pengelolaan hipertensi",
+    "assessment.disclaimerTitle": "Sebelum Anda Memulai",
+    "assessment.disclaimerDuration": "Waktu yang Dibutuhkan: 30-60 menit",
+    "assessment.disclaimerDurationDesc":
+      "Asesmen komprehensif ini membutuhkan perhatian penuh Anda. Pastikan Anda memiliki cukup waktu untuk menyelesaikannya tanpa gangguan.",
+    "assessment.disclaimerVoice": "Tersedia Input Suara",
+    "assessment.disclaimerVoiceDesc":
+      "Anda dapat berbicara untuk merespons dengan menekan ikon mikrofon di antarmuka chat. Ini membuat asesmen lebih percakapan dan lebih mudah diselesaikan.",
+    "assessment.disclaimerConfirm":
+      "Dengan melanjutkan, Anda mengakui bahwa Anda memahami komitmen waktu dan siap untuk memulai asesmen.",
+    "assessment.disclaimerAccept": "Saya Mengerti, Mari Mulai",
+    "assessment.disclaimerCancel": "Nanti Saja",
 
     // Monitoring
     "monitoring.title": "Pemantauan Kesehatan",
