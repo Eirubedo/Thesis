@@ -14,11 +14,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/hooks/use-toast"
 import { Eye, EyeOff, Phone, Lock, User, Calendar, MapPin } from "lucide-react"
+import { LanguageSelector } from "@/components/language-selector"
+import { useLanguage } from "@/contexts/language-context"
 
 export default function RegisterPage() {
   const { register, isLoading } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
+  const { t } = useLanguage()
 
   const [formData, setFormData] = useState({
     phone_number: "",
@@ -41,8 +44,8 @@ export default function RegisterPage() {
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match",
+        title: t("register.passwordMismatch") || "Password Mismatch",
+        description: t("register.passwordMismatchDesc") || "Passwords do not match",
         variant: "destructive",
       })
       setIsSubmitting(false)
@@ -52,8 +55,8 @@ export default function RegisterPage() {
     // Validate password strength
     if (formData.password.length < 6) {
       toast({
-        title: "Weak Password",
-        description: "Password must be at least 6 characters long",
+        title: t("register.weakPassword") || "Weak Password",
+        description: t("register.weakPasswordDesc") || "Password must be at least 6 characters long",
         variant: "destructive",
       })
       setIsSubmitting(false)
@@ -66,21 +69,21 @@ export default function RegisterPage() {
 
       if (result.success) {
         toast({
-          title: "Registration Successful",
-          description: "Your account has been created successfully!",
+          title: t("register.successTitle") || "Registration Successful",
+          description: t("register.successDesc") || "Your account has been created successfully!",
         })
         router.push("/")
       } else {
         toast({
-          title: "Registration Failed",
-          description: result.error || "Failed to create account",
+          title: t("register.failedTitle") || "Registration Failed",
+          description: result.error || t("register.failedDesc") || "Failed to create account",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred",
+        title: t("register.errorTitle") || "Error",
+        description: t("register.errorDesc") || "An unexpected error occurred",
         variant: "destructive",
       })
     } finally {
@@ -93,7 +96,7 @@ export default function RegisterPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-gray-600">{t("register.loading") || "Loading..."}</p>
         </div>
       </div>
     )
@@ -102,32 +105,36 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8">
+        <div className="flex justify-end">
+          <LanguageSelector />
+        </div>
+
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Create your account</h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">{t("register.title")}</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Already have an account?{" "}
+            {t("register.alreadyHaveAccount")}{" "}
             <Link href="/login" className="font-medium text-red-600 hover:text-red-500">
-              Sign in here
+              {t("register.signInHere")}
             </Link>
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Register</CardTitle>
-            <CardDescription>Fill in your information to create a new account</CardDescription>
+            <CardTitle>{t("register.registerTitle")}</CardTitle>
+            <CardDescription>{t("register.registerDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Phone Number */}
               <div className="space-y-2">
-                <Label htmlFor="phone_number">Phone Number *</Label>
+                <Label htmlFor="phone_number">{t("register.phoneNumber")} *</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="phone_number"
                     type="tel"
-                    placeholder="Enter your phone number"
+                    placeholder={t("register.phoneNumberPlaceholder")}
                     value={formData.phone_number}
                     onChange={(e) => setFormData((prev) => ({ ...prev, phone_number: e.target.value }))}
                     className="pl-10"
@@ -138,13 +145,13 @@ export default function RegisterPage() {
 
               {/* Full Name */}
               <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name *</Label>
+                <Label htmlFor="full_name">{t("register.fullName")} *</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="full_name"
                     type="text"
-                    placeholder="Enter your full name"
+                    placeholder={t("register.fullNamePlaceholder")}
                     value={formData.full_name}
                     onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
                     className="pl-10"
@@ -156,24 +163,24 @@ export default function RegisterPage() {
               {/* Gender and Birth Date */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
+                  <Label htmlFor="gender">{t("register.gender")}</Label>
                   <Select
                     value={formData.gender}
                     onValueChange={(value) => setFormData((prev) => ({ ...prev, gender: value }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
+                      <SelectValue placeholder={t("register.genderPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="male">{t("register.male")}</SelectItem>
+                      <SelectItem value="female">{t("register.female")}</SelectItem>
+                      <SelectItem value="other">{t("register.other")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="birth_date">Birth Date</Label>
+                  <Label htmlFor="birth_date">{t("register.birthDate")}</Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
@@ -189,12 +196,12 @@ export default function RegisterPage() {
 
               {/* Address */}
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="address">{t("register.address")}</Label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Textarea
                     id="address"
-                    placeholder="Enter your complete address"
+                    placeholder={t("register.addressPlaceholder")}
                     value={formData.address}
                     onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))}
                     className="pl-10"
@@ -205,11 +212,11 @@ export default function RegisterPage() {
 
               {/* Postal Code */}
               <div className="space-y-2">
-                <Label htmlFor="postal_code">Postal Code</Label>
+                <Label htmlFor="postal_code">{t("register.postalCode")}</Label>
                 <Input
                   id="postal_code"
                   type="text"
-                  placeholder="Enter postal code"
+                  placeholder={t("register.postalCodePlaceholder")}
                   value={formData.postal_code}
                   onChange={(e) => setFormData((prev) => ({ ...prev, postal_code: e.target.value }))}
                 />
@@ -217,13 +224,13 @@ export default function RegisterPage() {
 
               {/* Password */}
               <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
+                <Label htmlFor="password">{t("register.password")} *</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder={t("register.passwordPlaceholder")}
                     value={formData.password}
                     onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                     className="pl-10 pr-10"
@@ -241,13 +248,13 @@ export default function RegisterPage() {
 
               {/* Confirm Password */}
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                <Label htmlFor="confirmPassword">{t("register.confirmPassword")} *</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
+                    placeholder={t("register.confirmPasswordPlaceholder")}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
                     className="pl-10 pr-10"
@@ -264,7 +271,7 @@ export default function RegisterPage() {
               </div>
 
               <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isSubmitting}>
-                {isSubmitting ? "Creating account..." : "Create account"}
+                {isSubmitting ? t("register.creatingAccount") : t("register.createAccount")}
               </Button>
             </form>
           </CardContent>

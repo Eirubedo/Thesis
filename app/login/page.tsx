@@ -12,11 +12,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/hooks/use-toast"
 import { Eye, EyeOff, Phone, Lock } from "lucide-react"
+import { LanguageSelector } from "@/components/language-selector"
+import { useLanguage } from "@/contexts/language-context"
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
+  const { t } = useLanguage()
 
   const [formData, setFormData] = useState({
     phone_number: "",
@@ -34,21 +37,21 @@ export default function LoginPage() {
 
       if (result.success) {
         toast({
-          title: "Login Successful",
-          description: "Welcome back!",
+          title: t("login.successTitle") || "Login Successful",
+          description: t("login.successDesc") || "Welcome back!",
         })
         router.push("/")
       } else {
         toast({
-          title: "Login Failed",
-          description: result.error || "Invalid credentials",
+          title: t("login.failedTitle") || "Login Failed",
+          description: result.error || t("login.invalidCreds") || "Invalid credentials",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred",
+        title: t("login.errorTitle") || "Error",
+        description: t("login.errorDesc") || "An unexpected error occurred",
         variant: "destructive",
       })
     } finally {
@@ -61,7 +64,7 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-gray-600">{t("login.loading") || "Loading..."}</p>
         </div>
       </div>
     )
@@ -70,31 +73,35 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        <div className="flex justify-end">
+          <LanguageSelector />
+        </div>
+
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">{t("login.title")}</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Or{" "}
+            {t("login.or")}{" "}
             <Link href="/register" className="font-medium text-red-600 hover:text-red-500">
-              create a new account
+              {t("login.createAccount")}
             </Link>
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>Enter your phone number and password to access your account</CardDescription>
+            <CardTitle>{t("login.signIn")}</CardTitle>
+            <CardDescription>{t("login.enterCredentials")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone_number">Phone Number</Label>
+                <Label htmlFor="phone_number">{t("login.phoneNumber")}</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="phone_number"
                     type="tel"
-                    placeholder="Enter your phone number"
+                    placeholder={t("login.phoneNumberPlaceholder")}
                     value={formData.phone_number}
                     onChange={(e) => setFormData((prev) => ({ ...prev, phone_number: e.target.value }))}
                     className="pl-10"
@@ -104,13 +111,13 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("login.password")}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder={t("login.passwordPlaceholder")}
                     value={formData.password}
                     onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                     className="pl-10 pr-10"
@@ -127,13 +134,13 @@ export default function LoginPage() {
               </div>
 
               <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isSubmitting}>
-                {isSubmitting ? "Signing in..." : "Sign in"}
+                {isSubmitting ? t("login.signingIn") : t("login.signIn")}
               </Button>
             </form>
 
             <div className="mt-4 text-center">
               <Link href="/forgot-password" className="text-sm text-red-600 hover:text-red-500">
-                Forgot your password?
+                {t("login.forgotPassword")}
               </Link>
             </div>
           </CardContent>
