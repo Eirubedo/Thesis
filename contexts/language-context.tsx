@@ -52,6 +52,8 @@ const translations = {
     "home.progressTrackingDescription": "Comprehensive tracking of your hypertension management journey",
     "home.readyToStart": "Ready to take control of your hypertension?",
     "home.joinThousands": "Join thousands of users managing their hypertension with ANSWA's comprehensive platform",
+    "home.featuresTitle": "Key Features",
+    "home.swipeToSee": "Swipe to see more features",
 
     // Login
     "login.title": "ANSWA",
@@ -558,9 +560,9 @@ const translations = {
     // Home Features
     "home.aiChatTitle": "Asisten Kesehatan AI",
     "home.aiChatDescription":
-      "Percakapan cerdas tentang pengelolaan hipertensi, perubahan gaya hidup, dan dukungan kesehatan mental",
-    "home.bpTrackingTitle": "Pemantauan Tekanan Darah",
-    "home.bpTrackingDescription": "Pantau pembacaan tekanan darah dengan analitik cerdas dan analisis tren",
+      "Percakapan cerdas tentang manajemen hipertensi, perubahan gaya hidup, dan dukungan kesehatan mental",
+    "home.bpTrackingTitle": "Pelacakan Tekanan Darah",
+    "home.bpTrackingDescription": "Pantau tekanan darah Anda dengan analitik cerdas dan analisis tren",
     "home.medicationTitle": "Manajemen Obat",
     "home.medicationDescription": "Lacak obat, atur pengingat, dan pantau kepatuhan untuk kontrol hipertensi optimal",
     "home.lifestyleTitle": "Pelatihan Gaya Hidup",
@@ -568,10 +570,12 @@ const translations = {
     "home.mentalHealthTitle": "Dukungan Kesehatan Mental",
     "home.mentalHealthDescription": "Atasi stres, kecemasan, dan faktor emosional yang mempengaruhi tekanan darah",
     "home.progressTrackingTitle": "Pemantauan Kemajuan",
-    "home.progressTrackingDescription": "Pelacakan komprehensif perjalanan pengelolaan hipertensi Anda",
+    "home.progressTrackingDescription": "Pelacakan komprehensif perjalanan manajemen hipertensi Anda",
     "home.readyToStart": "Siap mengendalikan hipertensi Anda?",
     "home.joinThousands":
       "Bergabunglah dengan ribuan pengguna yang mengelola hipertensi mereka dengan platform komprehensif ANSWA",
+    "home.featuresTitle": "Fitur Unggulan",
+    "home.swipeToSee": "Geser untuk melihat fitur lainnya",
 
     // Login
     "login.title": "ANSWA",
@@ -1061,23 +1065,16 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export { LanguageContext }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>("en")
+  const [language, setLanguage] = useState<Language>("id")
 
   useEffect(() => {
-    // Auto-detect browser language on first load
+    // Check for saved language preference
     const savedLanguage = localStorage.getItem("language") as Language
     if (savedLanguage && (savedLanguage === "en" || savedLanguage === "id")) {
       setLanguage(savedLanguage)
     } else {
-      // Auto-detect from browser
-      const browserLanguage = navigator.language.toLowerCase()
-      if (browserLanguage.startsWith("id") || browserLanguage.includes("indonesia")) {
-        setLanguage("id")
-        localStorage.setItem("language", "id")
-      } else {
-        setLanguage("en")
-        localStorage.setItem("language", "en")
-      }
+      setLanguage("id")
+      localStorage.setItem("language", "id")
     }
   }, [])
 
