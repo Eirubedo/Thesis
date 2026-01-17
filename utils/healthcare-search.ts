@@ -127,27 +127,28 @@ export function calculateDistance(lat1: number, lng1: number, lat2: number, lng2
 
 export async function searchOverpassAPI(location: { lat: number; lng: number }): Promise<HealthcareFacility[]> {
   const overpassQuery = `
-    [out:json][timeout:30];
+    [out:json][timeout:15];
     (
-      node["amenity"~"^(hospital|clinic)$"](around:10000,${location.lat},${location.lng});
-      way["amenity"~"^(hospital|clinic)$"](around:10000,${location.lat},${location.lng});
-      node["healthcare"~"^(hospital|clinic|centre)$"](around:10000,${location.lat},${location.lng});
-      way["healthcare"~"^(hospital|clinic|centre)$"](around:10000,${location.lat},${location.lng});
-      node["emergency"="yes"](around:10000,${location.lat},${location.lng});
-      way["emergency"="yes"](around:10000,${location.lat},${location.lng});
+      node["amenity"="hospital"](around:5000,${location.lat},${location.lng});
+      node["amenity"="clinic"](around:5000,${location.lat},${location.lng});
     );
-    out center meta;
+    out body;
   `
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
 
   try {
     const response = await fetch("https://overpass-api.de/api/interpreter", {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain",
-        "User-Agent": "Mental Health App Emergency Support",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: overpassQuery,
+      body: `data=${encodeURIComponent(overpassQuery)}`,
+      signal: controller.signal,
     })
+
+    clearTimeout(timeoutId)
 
     if (!response.ok) {
       throw new Error(`Overpass API error: ${response.status}`)
@@ -206,21 +207,24 @@ export async function searchOverpassAPI(location: { lat: number; lng: number }):
           isOpen,
         }
       })
-      .filter((facility: HealthcareFacility) => facility.lat !== 0 && facility.lng !== 0 && facility.distance <= 15)
+      .filter((facility: HealthcareFacility) => facility.lat !== 0 && facility.lng !== 0 && facility.distance <= 10)
       .sort((a: HealthcareFacility, b: HealthcareFacility) => {
-        // First sort by priority (lower number = higher priority)
         if (a.priority !== b.priority) {
           return a.priority - b.priority
         }
-        // Then sort by distance
         return a.distance - b.distance
       })
-      .slice(0, 8) // Limit to 8 results
+      .slice(0, 8)
 
     return facilities
   } catch (error) {
+    clearTimeout(timeoutId)
+    if (error instanceof Error && error.name === "AbortError") {
+      console.warn("Overpass API timeout, using fallback facilities")
+      return generateFallbackFacilities(location)
+    }
     console.error("Error fetching from Overpass API:", error)
-    throw error
+    return generateFallbackFacilities(location)
   }
 }
 

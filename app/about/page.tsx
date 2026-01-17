@@ -12,11 +12,6 @@ import {
   Heart,
   Shield,
   BookOpen,
-  Users,
-  Github,
-  ExternalLink,
-  Mail,
-  MessageSquare,
   Brain,
   Activity,
   Stethoscope,
@@ -162,6 +157,22 @@ export default function AboutPage() {
               {t("about.badges.evidenceBased")}
             </Badge>
           </div>
+        </div>
+
+        <div className="text-center mb-8 sm:mb-12">
+          <Button
+            onClick={startTutorial}
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all"
+          >
+            <PlayCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+            {isIndonesian ? "Mulai Panduan Interaktif" : "Start Interactive Guide"}
+          </Button>
+          {hasCompletedTutorial && (
+            <p className="text-xs sm:text-sm text-green-600 mt-2">
+              {isIndonesian ? "✓ Anda telah menyelesaikan panduan" : "✓ You have completed the guide"}
+            </p>
+          )}
         </div>
 
         {/* Mission Section - Improved mobile padding */}
@@ -326,80 +337,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Interactive Tutorial Card */}
-        <Card className="mb-8 sm:mb-12 lg:mb-16 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50">
-          <CardHeader className="text-center px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl text-blue-700">{t("about.howItWorks.title")}</CardTitle>
-            <CardDescription className="text-sm sm:text-base text-blue-600 mt-2">
-              {isIndonesian
-                ? "Pelajari cara menggunakan ANSWA dengan panduan interaktif langkah demi langkah"
-                : "Learn how to use ANSWA with our interactive step-by-step guide"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6">
-            {/* Quick overview of steps */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
-              {[
-                {
-                  step: "1",
-                  title: isIndonesian ? "Daftar" : "Register",
-                  description: isIndonesian ? "Buat akun dan lengkapi profil" : "Create account and complete profile",
-                  icon: Users,
-                },
-                {
-                  step: "2",
-                  title: isIndonesian ? "Asesmen" : "Assessment",
-                  description: isIndonesian ? "Ikuti asesmen kesehatan" : "Take health assessment",
-                  icon: Brain,
-                },
-                {
-                  step: "3",
-                  title: isIndonesian ? "Dukungan AI" : "AI Support",
-                  description: isIndonesian ? "Ngobrol dengan asisten AI" : "Chat with AI assistant",
-                  icon: MessageSquare,
-                },
-                {
-                  step: "4",
-                  title: isIndonesian ? "Lacak Kemajuan" : "Track Progress",
-                  description: isIndonesian ? "Pantau perjalanan kesehatan" : "Monitor health journey",
-                  icon: Activity,
-                },
-              ].map((item, index) => {
-                const Icon = item.icon
-                return (
-                  <div key={index} className="text-center">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                      <Icon className="w-6 h-6 sm:w-8 sm:h-8" />
-                    </div>
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-xs sm:text-sm font-bold">
-                      {item.step}
-                    </div>
-                    <h3 className="font-semibold text-sm sm:text-base mb-1">{item.title}</h3>
-                    <p className="text-gray-600 text-xs sm:text-sm">{item.description}</p>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Start Tutorial Button */}
-            <div className="text-center">
-              <Button
-                onClick={startTutorial}
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all"
-              >
-                <PlayCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                {isIndonesian ? "Mulai Panduan Interaktif" : "Start Interactive Guide"}
-              </Button>
-              {hasCompletedTutorial && (
-                <p className="text-xs sm:text-sm text-green-600 mt-2">
-                  {isIndonesian ? "✓ Anda telah menyelesaikan panduan" : "✓ You have completed the guide"}
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Team Section - Single column mobile, 3 cols tablet+ */}
         <div className="mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center text-gray-900 mb-3 sm:mb-4">
@@ -433,61 +370,6 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
-
-        {/* Open Source Section - Stack on mobile */}
-        <Card className="mb-8 sm:mb-12 lg:mb-16 border-purple-100">
-          <CardHeader className="text-center px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl text-purple-700">{t("about.openSource.title")}</CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-              <div className="text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <Github className="w-6 h-6 sm:w-8 sm:h-8" />
-                </div>
-                <h3 className="font-semibold text-base sm:text-lg mb-2">{t("about.openSource.collaboration.title")}</h3>
-                <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">
-                  {t("about.openSource.collaboration.description")}
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <ExternalLink className="w-6 h-6 sm:w-8 sm:h-8" />
-                </div>
-                <h3 className="font-semibold text-base sm:text-lg mb-2">{t("about.openSource.transparency.title")}</h3>
-                <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">
-                  {t("about.openSource.transparency.description")}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Contact Section - Stack buttons on mobile */}
-        <Card className="border-gray-200">
-          <CardHeader className="text-center px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl">{t("about.contact.title")}</CardTitle>
-            <CardDescription className="text-sm sm:text-base">{t("about.contact.description")}</CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6">
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-              <Button
-                variant="outline"
-                className="flex items-center justify-center text-sm sm:text-base bg-transparent"
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                {t("about.contact.email")}
-              </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-center text-sm sm:text-base bg-transparent"
-              >
-                <Github className="w-4 h-4 mr-2" />
-                {t("about.contact.github")}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
