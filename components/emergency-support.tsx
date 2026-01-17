@@ -102,12 +102,13 @@ export function EmergencySupport() {
   }, [isOpen])
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button
             size="lg"
-            className="rounded-full w-12 h-12 sm:w-14 sm:h-14 bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            data-tutorial="emergency-btn"
+            className="rounded-full w-12 h-12 sm:w-14 sm:h-14 bg-yellow-500 hover:bg-yellow-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 relative"
           >
             <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>

@@ -101,8 +101,8 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/login">
-                <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white">
+              <Link href="/register">
+                <Button data-tutorial="register-btn" size="lg" className="bg-red-500 hover:bg-red-600 text-white">
                   {t("home.getStarted")}
                 </Button>
               </Link>
@@ -166,8 +166,8 @@ export default function HomePage() {
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-red-100">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">{t("home.readyToStart")}</h2>
             <p className="text-gray-600 mb-6">{t("home.joinThousands")}</p>
-            <Link href="/login">
-              <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white">
+            <Link href="/register">
+              <Button data-tutorial="register-btn" size="lg" className="bg-red-500 hover:bg-red-600 text-white">
                 {t("home.getStarted")}
               </Button>
             </Link>

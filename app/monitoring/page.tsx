@@ -513,20 +513,20 @@ export default function MonitoringPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Pill className="w-5 h-5" />
-                  Current Medications
+                  {t("meds.currentMedications")}
                 </CardTitle>
-                <p className="text-sm text-muted-foreground">Manage your medication list</p>
+                <p className="text-sm text-muted-foreground">{t("meds.manageMedicationList")}</p>
               </CardHeader>
               <CardContent>
                 {medications && medications.length > 0 ? (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Medication Name</TableHead>
-                        <TableHead>Dosage</TableHead>
-                        <TableHead>Schedule</TableHead>
-                        <TableHead>Notes</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>{t("meds.medicationName")}</TableHead>
+                        <TableHead>{t("meds.dosage")}</TableHead>
+                        <TableHead>{t("monitoring.schedule")}</TableHead>
+                        <TableHead>{t("meds.notes")}</TableHead>
+                        <TableHead className="text-right">{t("monitoring.actions")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

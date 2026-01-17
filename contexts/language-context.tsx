@@ -267,6 +267,7 @@ const translations = {
     "monitoring.scheduleDeleted": "Schedule deleted successfully",
     "monitoring.activityCompleted": "Activity marked as completed",
     "monitoring.activityIncomplete": "Activity marked as incomplete",
+    "monitoring.schedule": "Schedule",
 
     // Reports
     "reports.title": "Health Reports",
@@ -400,6 +401,7 @@ const translations = {
     "meds.save": "Save Medication",
     "meds.cancel": "Cancel",
     "meds.currentMedications": "Current Medications",
+    "meds.manageMedicationList": "Manage your medication list",
     "meds.noMedications": "No medications added",
     "meds.noMedicationsDesc": "Add your medications to track them and set reminders",
     "meds.medicationAdded": "Medication added successfully",
@@ -468,6 +470,15 @@ const translations = {
     "timer.running": "Running...",
     "timer.complete": "Timer Complete!",
     "timer.completedExercise": "You've completed the {title} exercise.",
+    "timer.customizeTimer": "Customize Timer",
+    "timer.presetDurations": "Preset Durations",
+    "timer.customDuration": "Custom Duration",
+    "timer.minutes": "Minutes",
+    "timer.seconds": "Seconds",
+    "timer.applyDuration": "Apply Duration",
+    "timer.customSet": "Custom duration set",
+    "timer.setTimerDescription": "Set timer for {duration} practice session",
+    "timer.adjustTimer": "Adjust",
 
     // About page translations
     "about.title": "About ANSWA",
@@ -811,6 +822,7 @@ const translations = {
     "monitoring.scheduleDeleted": "Jadwal berhasil dihapus",
     "monitoring.activityCompleted": "Aktivitas ditandai sebagai selesai",
     "monitoring.activityIncomplete": "Aktivitas ditandai sebagai belum selesai",
+    "monitoring.schedule": "Jadwal",
 
     // Reports
     "reports.title": "Laporan Kesehatan",
@@ -944,6 +956,7 @@ const translations = {
     "meds.save": "Simpan Obat",
     "meds.cancel": "Batal",
     "meds.currentMedications": "Obat Saat Ini",
+    "meds.manageMedicationList": "Kelola daftar obat Anda",
     "meds.noMedications": "Belum ada obat ditambahkan",
     "meds.noMedicationsDesc": "Tambahkan obat Anda untuk melacak dan mengatur pengingat",
     "meds.medicationAdded": "Obat berhasil ditambahkan",
@@ -1012,6 +1025,15 @@ const translations = {
     "timer.running": "Berlangsung...",
     "timer.complete": "Waktu Habis!",
     "timer.completedExercise": "Anda telah menyelesaikan latihan {title}.",
+    "timer.customizeTimer": "Sesuaikan Timer",
+    "timer.presetDurations": "Durasi Preset",
+    "timer.customDuration": "Durasi Kustom",
+    "timer.minutes": "Menit",
+    "timer.seconds": "Detik",
+    "timer.applyDuration": "Terapkan Durasi",
+    "timer.customSet": "Durasi kustom diatur",
+    "timer.setTimerDescription": "Atur timer untuk sesi latihan {duration}",
+    "timer.adjustTimer": "Sesuaikan",
 
     // About page translations
     "about.title": "Tentang ANSWA",

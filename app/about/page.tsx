@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage } from "@/contexts/language-context"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { useState, useEffect } from "react"
+import { useTutorial } from "@/components/tutorial-provider"
 import {
   Heart,
   Shield,
@@ -21,10 +24,28 @@ import {
   GraduationCap,
   Lightbulb,
   Target,
+  ChevronLeft,
+  ChevronRight,
+  PlayCircle,
 } from "lucide-react"
 
 export default function AboutPage() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const { startTutorial, hasCompletedTutorial } = useTutorial()
+  const [api, setApi] = useState<any>()
+  const [current, setCurrent] = useState(0)
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!api) return
+
+    setCount(api.scrollSnapList().length)
+    setCurrent(api.selectedScrollSnap())
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap())
+    })
+  }, [api])
 
   const features = [
     {
@@ -101,7 +122,7 @@ export default function AboutPage() {
     },
   ]
 
-  const isIndonesian = useLanguage().language === "id"
+  const isIndonesian = language === "id"
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-50">
@@ -236,82 +257,145 @@ export default function AboutPage() {
           </Card>
         </div>
 
-        {/* Features Section - Single column mobile, 2 cols tablet, 3 cols desktop */}
+        {/* Features Carousel Section */}
         <div className="mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center text-gray-900 mb-6 sm:mb-8 lg:mb-12">
             {t("about.features.title")}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon
-              return (
-                <Card key={index} className="border-red-100 hover:shadow-lg transition-shadow">
-                  <CardHeader className="px-4 sm:px-6">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 text-red-600 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </div>
-                    <CardTitle className="text-base sm:text-lg">
-                      {isIndonesian ? feature.titleId : feature.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-4 sm:px-6">
-                    <p className="text-sm sm:text-base text-gray-600">
-                      {isIndonesian ? feature.descriptionId : feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              )
-            })}
+
+          {/* Carousel Container */}
+          <div className="relative px-4 sm:px-12">
+            <Carousel
+              setApi={setApi}
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {features.map((feature, index) => {
+                  const Icon = feature.icon
+                  return (
+                    <CarouselItem key={index} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                      <Card className="border-red-100 hover:shadow-lg transition-shadow h-full">
+                        <CardHeader className="px-4 sm:px-6">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 text-red-600 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                            <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                          </div>
+                          <CardTitle className="text-base sm:text-lg">
+                            {isIndonesian ? feature.titleId : feature.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="px-4 sm:px-6">
+                          <p className="text-sm sm:text-base text-gray-600">
+                            {isIndonesian ? feature.descriptionId : feature.description}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </CarouselItem>
+                  )
+                })}
+              </CarouselContent>
+
+              {/* Navigation arrows - hidden on mobile */}
+              <CarouselPrevious className="hidden sm:flex -left-4 bg-white border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700" />
+              <CarouselNext className="hidden sm:flex -right-4 bg-white border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700" />
+            </Carousel>
+
+            {/* Carousel dots indicator */}
+            <div className="flex justify-center gap-2 mt-4">
+              {Array.from({ length: count }).map((_, index) => (
+                <button
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === current ? "bg-red-600" : "bg-red-200"
+                  }`}
+                  onClick={() => api?.scrollTo(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Mobile swipe hint */}
+            <p className="text-center text-xs text-gray-500 mt-2 sm:hidden flex items-center justify-center gap-1">
+              <ChevronLeft className="w-3 h-3" />
+              {isIndonesian ? "Geser untuk melihat fitur lainnya" : "Swipe to see more features"}
+              <ChevronRight className="w-3 h-3" />
+            </p>
           </div>
         </div>
 
-        {/* How It Works Section - 2x2 grid on mobile/tablet, 4 cols desktop */}
-        <Card className="mb-8 sm:mb-12 lg:mb-16 border-blue-100">
+        {/* Interactive Tutorial Card */}
+        <Card className="mb-8 sm:mb-12 lg:mb-16 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardHeader className="text-center px-4 sm:px-6">
             <CardTitle className="text-xl sm:text-2xl text-blue-700">{t("about.howItWorks.title")}</CardTitle>
+            <CardDescription className="text-sm sm:text-base text-blue-600 mt-2">
+              {isIndonesian
+                ? "Pelajari cara menggunakan ANSWA dengan panduan interaktif langkah demi langkah"
+                : "Learn how to use ANSWA with our interactive step-by-step guide"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+            {/* Quick overview of steps */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
               {[
                 {
                   step: "1",
-                  title: t("about.howItWorks.steps.signUp"),
-                  description: t("about.howItWorks.steps.signUpDescription"),
+                  title: isIndonesian ? "Daftar" : "Register",
+                  description: isIndonesian ? "Buat akun dan lengkapi profil" : "Create account and complete profile",
                   icon: Users,
                 },
                 {
                   step: "2",
-                  title: t("about.howItWorks.steps.assessment"),
-                  description: t("about.howItWorks.steps.assessmentDescription"),
+                  title: isIndonesian ? "Asesmen" : "Assessment",
+                  description: isIndonesian ? "Ikuti asesmen kesehatan" : "Take health assessment",
                   icon: Brain,
                 },
                 {
                   step: "3",
-                  title: t("about.howItWorks.steps.aiSupport"),
-                  description: t("about.howItWorks.steps.aiSupportDescription"),
+                  title: isIndonesian ? "Dukungan AI" : "AI Support",
+                  description: isIndonesian ? "Ngobrol dengan asisten AI" : "Chat with AI assistant",
                   icon: MessageSquare,
                 },
                 {
                   step: "4",
-                  title: t("about.howItWorks.steps.trackProgress"),
-                  description: t("about.howItWorks.steps.trackProgressDescription"),
+                  title: isIndonesian ? "Lacak Kemajuan" : "Track Progress",
+                  description: isIndonesian ? "Pantau perjalanan kesehatan" : "Monitor health journey",
                   icon: Activity,
                 },
               ].map((item, index) => {
                 const Icon = item.icon
                 return (
                   <div key={index} className="text-center">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
                       <Icon className="w-6 h-6 sm:w-8 sm:h-8" />
                     </div>
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-4 text-xs sm:text-sm font-bold">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-xs sm:text-sm font-bold">
                       {item.step}
                     </div>
-                    <h3 className="font-semibold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">{item.title}</h3>
+                    <h3 className="font-semibold text-sm sm:text-base mb-1">{item.title}</h3>
                     <p className="text-gray-600 text-xs sm:text-sm">{item.description}</p>
                   </div>
                 )
               })}
+            </div>
+
+            {/* Start Tutorial Button */}
+            <div className="text-center">
+              <Button
+                onClick={startTutorial}
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                <PlayCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                {isIndonesian ? "Mulai Panduan Interaktif" : "Start Interactive Guide"}
+              </Button>
+              {hasCompletedTutorial && (
+                <p className="text-xs sm:text-sm text-green-600 mt-2">
+                  {isIndonesian ? "✓ Anda telah menyelesaikan panduan" : "✓ You have completed the guide"}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -361,63 +445,45 @@ export default function AboutPage() {
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
                   <Github className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">{t("about.openSource.openSource")}</h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  {t("about.openSource.openSourceDescription")}
+                <h3 className="font-semibold text-base sm:text-lg mb-2">{t("about.openSource.collaboration.title")}</h3>
+                <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">
+                  {t("about.openSource.collaboration.description")}
                 </p>
-                <Button
-                  variant="outline"
-                  className="border-purple-200 text-purple-600 hover:bg-purple-50 bg-transparent text-sm sm:text-base"
-                >
-                  <Github className="w-4 h-4 mr-2" />
-                  {t("about.openSource.viewOnGitHub")}
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
               </div>
-
               <div className="text-center">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
                   <ExternalLink className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
-                  {t("about.openSource.easyDeployment")}
-                </h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  {t("about.openSource.easyDeploymentDescription")}
+                <h3 className="font-semibold text-base sm:text-lg mb-2">{t("about.openSource.transparency.title")}</h3>
+                <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">
+                  {t("about.openSource.transparency.description")}
                 </p>
-                <Button
-                  variant="outline"
-                  className="border-purple-200 text-purple-600 hover:bg-purple-50 bg-transparent text-sm sm:text-base"
-                >
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  {t("about.openSource.deploymentGuide")}
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Contact Section - Stack buttons on mobile */}
-        <Card className="border-red-100">
+        <Card className="border-gray-200">
           <CardHeader className="text-center px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl text-red-700">{t("about.contact.title")}</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">{t("about.contact.title")}</CardTitle>
+            <CardDescription className="text-sm sm:text-base">{t("about.contact.description")}</CardDescription>
           </CardHeader>
-          <CardContent className="text-center px-4 sm:px-6">
-            <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
-              {t("about.contact.description")}
-            </p>
+          <CardContent className="px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-              <Button className="bg-red-600 hover:bg-red-700 text-sm sm:text-base">
+              <Button
+                variant="outline"
+                className="flex items-center justify-center text-sm sm:text-base bg-transparent"
+              >
                 <Mail className="w-4 h-4 mr-2" />
-                {t("about.contact.contactUs")}
+                {t("about.contact.email")}
               </Button>
               <Button
                 variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50 bg-transparent text-sm sm:text-base"
+                className="flex items-center justify-center text-sm sm:text-base bg-transparent"
               >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                {t("about.contact.joinCommunity")}
+                <Github className="w-4 h-4 mr-2" />
+                {t("about.contact.github")}
               </Button>
             </div>
           </CardContent>

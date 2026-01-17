@@ -18,10 +18,10 @@ import { useLanguage } from "@/contexts/language-context"
 import { LanguageSelector } from "./language-selector"
 
 const navigationItems = [
-  { name: "nav.assessment", href: "/assessment" },
-  { name: "nav.monitoring", href: "/monitoring" },
-  { name: "nav.education", href: "/self-help" },
-  { name: "nav.reports", href: "/reports" },
+  { name: "nav.assessment", href: "/assessment", tutorialId: "nav-assessment" },
+  { name: "nav.monitoring", href: "/monitoring", tutorialId: "nav-monitoring" },
+  { name: "nav.education", href: "/self-help", tutorialId: "nav-edukasi" },
+  { name: "nav.reports", href: "/reports", tutorialId: "nav-reports" },
 ]
 
 export function Navigation() {
@@ -65,6 +65,7 @@ export function Navigation() {
                   <Link key={item.name} href={item.href}>
                     <Button
                       variant={isActive ? "default" : "ghost"}
+                      data-tutorial={item.tutorialId}
                       className={`h-10 flex items-center justify-center text-sm font-medium transition-all duration-200 w-24 ${
                         isActive
                           ? "bg-red-100 text-red-700 hover:bg-red-200"
@@ -167,6 +168,7 @@ export function Navigation() {
                         <Link key={item.name} href={item.href} onClick={() => setIsOpen(false)}>
                           <Button
                             variant={isActive ? "default" : "ghost"}
+                            data-tutorial={item.tutorialId}
                             className={`
                               w-full h-12 flex items-center justify-start space-x-3 text-sm font-medium
                               ${

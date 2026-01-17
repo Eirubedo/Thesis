@@ -5,6 +5,8 @@ import "./globals.css"
 import { AuthProvider } from "@/components/auth-provider"
 import { LanguageProvider } from "@/contexts/language-context"
 import { Toaster } from "@/components/ui/toaster"
+import { TutorialProvider } from "@/components/tutorial-provider"
+import { EmergencySupport } from "@/components/emergency-support"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,8 +27,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <LanguageProvider>
           <AuthProvider>
-            {children}
-            <Toaster />
+            <TutorialProvider>
+              {children}
+              <EmergencySupport />
+              <Toaster />
+            </TutorialProvider>
           </AuthProvider>
         </LanguageProvider>
       </body>

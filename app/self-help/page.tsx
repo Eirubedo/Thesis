@@ -1720,7 +1720,10 @@ Teknik ini bekerja dengan memodulasi sirkuit trauma pada otak:
                 <InteractiveTimer
                   title={`${isIndonesian ? selectedResource.titleId : selectedResource.title} Timer`}
                   duration={selectedResource.timerDuration}
-                  description={`Set timer for ${isIndonesian ? selectedResource.durationId : selectedResource.duration} practice session`}
+                  description={t("timer.setTimerDescription").replace(
+                    "{duration}",
+                    isIndonesian ? selectedResource.durationId : selectedResource.duration,
+                  )}
                   resourceId={selectedResource.id}
                   onComplete={() => {
                     markResourceCompleted(selectedResource.id)
