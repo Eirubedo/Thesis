@@ -120,7 +120,25 @@ const translations = {
     "register.errorDesc": "An unexpected error occurred",
 
     // Chat
-    "chat.title": "AI Health Assistant",
+    "chat.title": "AI Health Chat",
+    "chat.subtitle":
+      "Chat with our AI-powered health assistant. Get personalized support, guidance, and resources tailored to your needs.",
+    "chat.support247": "24/7 Support",
+    "chat.support247Desc":
+      "Our AI assistant is available around the clock to provide support and guidance whenever you need it.",
+    "chat.personalizedCare": "Personalized Care",
+    "chat.personalizedCareDesc":
+      "Receive tailored recommendations and support based on your unique health journey and needs.",
+    "chat.privacyFirst": "Privacy First",
+    "chat.privacyFirstDesc":
+      "Your conversations are private and secure. We prioritize your confidentiality and data protection.",
+    "chat.emergencySupport": "Emergency Support",
+    "chat.emergencySupportDesc": "If you're experiencing a health emergency, please contact:",
+    "chat.emergency119": "Emergency: 119",
+    "chat.quickActions": "Quick Actions",
+    "chat.takeAssessment": "Take Assessment",
+    "chat.selfHelpResources": "Self-Help Resources",
+    "chat.viewReports": "View Reports",
     "chat.placeholder": "Ask about blood pressure, medications, lifestyle, or mental health...",
     "chat.initialMessage":
       "Hello! I'm your AI health assistant specializing in hypertension management. I can help with blood pressure questions, lifestyle advice, medication information, and mental health support. How can I assist you today?",
@@ -340,6 +358,10 @@ const translations = {
     "selfHelp.keepGoing": "Keep up the great work!",
     "selfHelp.resourceCompleted": "Resource marked as completed!",
     "selfHelp.alreadyCompleted": "You've already completed this resource.",
+    "selfHelp.yourProgress": "Your Progress",
+    "selfHelp.sessions": "Sessions",
+    "selfHelp.practiceTime": "Practice time",
+    "selfHelp.completionCount": "Completion count",
 
     // Blood Pressure Tracking
     "bp.title": "Blood Pressure Tracking",
@@ -642,7 +664,25 @@ const translations = {
     "register.errorDesc": "Terjadi kesalahan yang tidak terduga",
 
     // Chat
-    "chat.title": "Asisten Kesehatan AI",
+    "chat.title": "Chat Kesehatan AI",
+    "chat.subtitle":
+      "Ngobrol dengan asisten kesehatan berbasis AI kami. Dapatkan dukungan, bimbingan, dan sumber daya yang disesuaikan dengan kebutuhan Anda.",
+    "chat.support247": "Dukungan 24/7",
+    "chat.support247Desc":
+      "Asisten AI kami tersedia sepanjang waktu untuk memberikan dukungan dan bimbingan kapan pun Anda membutuhkannya.",
+    "chat.personalizedCare": "Perawatan Personal",
+    "chat.personalizedCareDesc":
+      "Terima rekomendasi dan dukungan yang disesuaikan berdasarkan perjalanan kesehatan dan kebutuhan unik Anda.",
+    "chat.privacyFirst": "Privasi Utama",
+    "chat.privacyFirstDesc":
+      "Percakapan Anda bersifat pribadi dan aman. Kami mengutamakan kerahasiaan dan perlindungan data Anda.",
+    "chat.emergencySupport": "Dukungan Darurat",
+    "chat.emergencySupportDesc": "Jika Anda mengalami keadaan darurat kesehatan, silakan hubungi:",
+    "chat.emergency119": "Darurat: 119",
+    "chat.quickActions": "Aksi Cepat",
+    "chat.takeAssessment": "Mulai Asesmen",
+    "chat.selfHelpResources": "Sumber Edukasi Mandiri",
+    "chat.viewReports": "Lihat Laporan",
     "chat.placeholder": "Tanyakan tentang tekanan darah, obat, gaya hidup, atau kesehatan mental...",
     "chat.initialMessage":
       "Halo! Saya adalah asisten kesehatan AI yang mengkhususkan diri dalam pengelolaan hipertensi. Saya dapat membantu dengan pertanyaan tekanan darah, saran gaya hidup, informasi obat, dan dukungan kesehatan mental. Bagaimana saya bisa membantu Anda hari ini?",
@@ -862,6 +902,10 @@ const translations = {
     "selfHelp.keepGoing": "Terus pertahankan kerja keras Anda!",
     "selfHelp.resourceCompleted": "Sumber ditandai selesai!",
     "selfHelp.alreadyCompleted": "Anda sudah menyelesaikan sumber ini.",
+    "selfHelp.yourProgress": "Kemajuan Anda",
+    "selfHelp.sessions": "Sesi",
+    "selfHelp.practiceTime": "Waktu praktik",
+    "selfHelp.completionCount": "Jumlah penyelesaian",
 
     // Blood Pressure Tracking
     "bp.title": "Pelacakan Tekanan Darah",

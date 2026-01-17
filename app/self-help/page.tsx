@@ -286,67 +286,6 @@ DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang diranca
         duration: "18:45",
       },
       content: `
-# Olahraga Aman untuk Hipertensi
-
-## Manfaat Olahraga berdasarkan Pedoman 2024:
-- Menurunkan tekanan darah sistolik 4-9 mmHg
-- Menurunkan tekanan darah diastolik 3-5 mmHg
-- Memperkuat jantung dan meningkatkan efisiensi pompa
-- Meningkatkan sirkulasi dan elastisitas pembuluh darah
-- Mengurangi stres dan hormon kortisol
-- Membantu pengelolaan berat badan
-
-## Aktivitas yang Direkomendasikan:
-### Olahraga Aerobik (Prioritas Utama):
-- Jalan cepat: 30-45 menit, 5-7 hari/minggu
-- Berenang: 30-45 menit, 3-5 hari/minggu
-- Bersepeda: 30-60 menit, 3-5 hari/minggu
-- Jogging ringan: 20-30 menit, 3-4 hari/minggu
-
-### Latihan Kekuatan (2-3 hari/minggu):
-- Angkat beban ringan (50-60% 1RM)
-- Latihan resistensi dengan band
-- Latihan berat badan (push-up, squat)
-
-### Olahraga Fleksibilitas:
-- Yoga: 2-3 kali seminggu
-- Tai Chi: sangat baik untuk lansia
-- Stretching: setiap hari
-
-## Panduan Olahraga Berdasarkan Tingkat Hipertensi:
-
-### Hipertensi Tahap 1 (140-159/90-99 mmHg):
-- Semua jenis olahraga aerobik diperbolehkan
-- Latihan kekuatan dengan pengawasan
-- Target: 150 menit aktivitas sedang/minggu
-
-### Hipertensi Tahap 2 (≥160/100 mmHg):
-- Konsultasi dokter sebelum memulai
-- Mulai dengan intensitas rendah
-- Hindari angkat beban berat
-- Fokus pada olahraga aerobik
-
-## Tips Keamanan:
-- Pemanasan 5-10 menit sebelum olahraga
-- Pendinginan 5-10 menit setelah olahraga
-- Hindari menahan napas saat latihan kekuatan
-- Hentikan jika merasa pusing, nyeri dada, atau sesak napas
-- Monitor tekanan darah sebelum dan sesudah olahraga
-- Minum obat sesuai jadwal
-- Tetap terhidrasi
-
-## Target Detak Jantung:
-- Intensitas sedang: 50-70% dari detak jantung maksimal
-- Rumus: (220 - usia) x 0.5-0.7
-- Gunakan skala RPE (Rate of Perceived Exertion) 5-6 dari 10
-
-## Olahraga yang Harus Dihindari:
-- Angkat beban sangat berat (>85% 1RM)
-- Olahraga isometrik berlebihan
-- Aktivitas dengan perubahan posisi mendadak
-- Olahraga kompetitif dengan intensitas tinggi
-      `,
-      contentId: `
 # Safe Exercise for Hypertension
 
 ## Exercise Benefits based on 2024 Guidelines:
@@ -406,6 +345,67 @@ DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang diranca
 - Excessive isometric exercises
 - Activities with sudden position changes
 - High-intensity competitive sports
+      `,
+      contentId: `
+# Olahraga Aman untuk Hipertensi
+
+## Manfaat Olahraga berdasarkan Pedoman 2024:
+- Menurunkan tekanan darah sistolik 4-9 mmHg
+- Menurunkan tekanan darah diastolik 3-5 mmHg
+- Memperkuat jantung dan meningkatkan efisiensi pompa
+- Meningkatkan sirkulasi dan elastisitas pembuluh darah
+- Mengurangi stres dan hormon kortisol
+- Membantu pengelolaan berat badan
+
+## Aktivitas yang Direkomendasikan:
+### Olahraga Aerobik (Prioritas Utama):
+- Jalan cepat: 30-45 menit, 5-7 hari/minggu
+- Berenang: 30-45 menit, 3-5 hari/minggu
+- Bersepeda: 30-60 menit, 3-5 hari/minggu
+- Jogging ringan: 20-30 menit, 3-4 hari/minggu
+
+### Latihan Kekuatan (2-3 hari/minggu):
+- Angkat beban ringan (50-60% 1RM)
+- Latihan resistensi dengan band
+- Latihan berat badan (push-up, squat)
+
+### Olahraga Fleksibilitas:
+- Yoga: 2-3 kali seminggu
+- Tai Chi: sangat baik untuk lansia
+- Stretching: setiap hari
+
+## Panduan Olahraga Berdasarkan Tingkat Hipertensi:
+
+### Hipertensi Tahap 1 (140-159/90-99 mmHg):
+- Semua jenis olahraga aerobik diperbolehkan
+- Latihan kekuatan dengan pengawasan
+- Target: 150 menit aktivitas sedang/minggu
+
+### Hipertensi Tahap 2 (≥160/100 mmHg):
+- Konsultasi dokter sebelum memulai
+- Mulai dengan intensitas rendah
+- Hindari angkat beban berat
+- Fokus pada olahraga aerobik
+
+## Tips Keamanan:
+- Pemanasan 5-10 menit sebelum olahraga
+- Pendinginan 5-10 menit setelah olahraga
+- Hindari menahan napas saat latihan kekuatan
+- Hentikan jika merasa pusing, nyeri dada, atau sesak napas
+- Monitor tekanan darah sebelum dan sesudah olahraga
+- Minum obat sesuai jadwal
+- Tetap terhidrasi
+
+## Target Detak Jantung:
+- Intensitas sedang: 50-70% dari detak jantung maksimal
+- Rumus: (220 - usia) x 0.5-0.7
+- Gunakan skala RPE (Rate of Perceived Exertion) 5-6 dari 10
+
+## Olahraga yang Harus Dihindari:
+- Angkat beban sangat berat (>85% 1RM)
+- Olahraga isometrik berlebihan
+- Aktivitas dengan perubahan posisi mendadak
+- Olahraga kompetitif dengan intensitas tinggi
       `,
     },
     {
@@ -882,8 +882,8 @@ Berdasarkan Pedoman Hipertensi 2024, terdapat hubungan dua arah antara kesehatan
       id: 7,
       title: "Cognitive Reconstruction",
       titleId: "Rekonstruksi Kognitif",
-      description: "Learn to challenge negative thoughts with positive thinking supported by real facts",
-      descriptionId: "Pelajari cara melawan pikiran negatif dengan pikiran positif yang didukung fakta nyata",
+      description: "Learn to challenge and change negative thought patterns that affect your mental health",
+      descriptionId: "Pelajari cara menantang dan mengubah pola pikir negatif yang mempengaruhi kesehatan mental Anda",
       category: "mentalHealth",
       duration: "15 min",
       durationId: "15 mnt",
@@ -892,73 +892,6 @@ Berdasarkan Pedoman Hipertensi 2024, terdapat hubungan dua arah antara kesehatan
       type: "exercise",
       timerDuration: 900,
       content: `
-# Latihan Rekonstruksi Kognitif
-
-## Apa itu Rekonstruksi Kognitif?
-Rekonstruksi kognitif adalah cara mengubah pikiran negatif dengan melawannya dengan pikiran positif disertai fakta-fakta positif yang nyata. Saat mengalami kecemasan dan depresi, individu memiliki pikiran yang negatif seperti "Saya tidak berguna", "Tidak ada yang menyukai saya", "Saya telah gagal".
-
-## Ciri-ciri Pikiran Negatif:
-- Pikiran bersifat otomatis; individu tidak memikirkannya dengan sengaja
-- Pikiran yang muncul tampaknya dapat dipercaya dan nyata
-- Jenis pikiran yang muncul dapat berkaitan dengan siapa pun
-
-## Langkah-langkah Praktik:
-
-### Langkah 1: Identifikasi
-1. Tulis peristiwa/pengalaman yang sulit/tidak menyenangkan
-2. Tulis perasaan terhadap peristiwa yang sulit
-3. Beri skor seberapa buruk perasaan Anda (0-10)
-4. Tulis pikiran negatif yang muncul
-5. Beri skor seberapa besar Anda percaya pada pikiran tersebut (0-10)
-
-**Contoh:**
-- Peristiwa: Diabaikan
-- Perasaan: Sedih (8/10)
-- Pikiran: Tidak berharga (8/10)
-
-### Langkah 2: Kumpulkan Fakta
-1. Tetapkan pikiran positif yang berlawanan dengan pikiran negatif
-2. Tuliskan fakta-fakta pikiran negatif
-3. Tuliskan fakta-fakta pikiran positif
-
-**Contoh:**
-- Pikiran Negatif: "Saya tidak berharga"
-- Pikiran Positif: "Saya berharga"
-
-Fakta Pikiran Negatif:
-- Saya dicuekin
-- Saya di-gossipin
-
-Fakta Pikiran Positif:
-- Saya masih bekerja
-- Suami saya menghargai saya
-- Anak saya selalu memuji masakan saya
-- Adik saya sayang pada saya
-
-### Langkah 3: Evaluasi Ulang
-1. Nilai kembali seberapa besar Anda percaya pada pikiran negatif (0-10)
-2. Nilai kembali seberapa buruk perasaan Anda (0-10)
-3. Bandingkan perubahan sebelum dan sesudah
-
-**Contoh:**
-- Pikiran "Tidak berharga": 8/10 → 4/10
-- Perasaan Sedih: 8/10 → 4/10
-
-## Manfaat:
-- Mengurangi intensitas pikiran negatif
-- Meningkatkan kesadaran diri
-- Memperbaiki mood dan perasaan
-- Meningkatkan kepercayaan diri
-- Membantu mengelola kecemasan dan depresi
-
-## Tips Praktik:
-- Lakukan saat pikiran negatif muncul
-- Gunakan jurnal untuk mencatat
-- Praktikkan secara teratur
-- Bersabar dengan prosesnya
-- Diskusikan dengan konselor jika perlu
-      `,
-      contentId: `
 # Cognitive Reconstruction Exercise
 
 ## What is Cognitive Reconstruction?
@@ -1024,6 +957,73 @@ Positive Thought Facts:
 - Practice regularly
 - Be patient with the process
 - Discuss with counselor if needed
+      `,
+      contentId: `
+# Latihan Rekonstruksi Kognitif
+
+## Apa itu Rekonstruksi Kognitif?
+Rekonstruksi kognitif adalah cara mengubah pikiran negatif dengan melawannya dengan pikiran positif yang didukung oleh fakta positif nyata. Saat mengalami kecemasan dan depresi, individu memiliki pikiran negatif seperti "Saya tidak berharga", "Tidak ada yang menyukai saya", "Saya telah gagal".
+
+## Ciri-ciri Pikiran Negatif:
+- Pikiran bersifat otomatis; individu tidak memikirkannya dengan sengaja
+- Pikiran yang muncul tampaknya dapat dipercaya dan nyata
+- Jenis pikiran yang muncul dapat berkaitan dengan siapa pun
+
+## Langkah-langkah Praktik:
+
+### Langkah 1: Identifikasi
+1. Tulis peristiwa/pengalaman yang sulit/tidak menyenangkan
+2. Tulis perasaan terhadap peristiwa yang sulit
+3. Beri skor seberapa buruk perasaan Anda (0-10)
+4. Tulis pikiran negatif yang muncul
+5. Beri skor seberapa besar Anda percaya pada pikiran tersebut (0-10)
+
+**Contoh:**
+- Peristiwa: Diabaikan
+- Perasaan: Sedih (8/10)
+- Pikiran: Tidak berharga (8/10)
+
+### Langkah 2: Kumpulkan Fakta
+1. Tetapkan pikiran positif yang berlawanan dengan pikiran negatif
+2. Tuliskan fakta-fakta pikiran negatif
+3. Tuliskan fakta-fakta pikiran positif
+
+**Contoh:**
+- Pikiran Negatif: "Saya tidak berharga"
+- Pikiran Positif: "Saya berharga"
+
+Fakta Pikiran Negatif:
+- Saya dicuekin
+- Saya di-gossipin
+
+Fakta Pikiran Positif:
+- Saya masih bekerja
+- Suami saya menghargai saya
+- Anak saya selalu memuji masakan saya
+- Adik saya sayang pada saya
+
+### Langkah 3: Evaluasi Ulang
+1. Nilai kembali seberapa besar Anda percaya pada pikiran negatif (0-10)
+2. Nilai kembali seberapa buruk perasaan Anda (0-10)
+3. Bandingkan perubahan sebelum dan sesudah
+
+**Contoh:**
+- Pikiran "Tidak berharga": 8/10 → 4/10
+- Perasaan Sedih: 8/10 → 4/10
+
+## Manfaat:
+- Mengurangi intensitas pikiran negatif
+- Meningkatkan kesadaran diri
+- Memperbaiki mood dan perasaan
+- Meningkatkan kepercayaan diri
+- Membantu mengelola kecemasan dan depresi
+
+## Tips Praktik:
+- Lakukan saat pikiran negatif muncul
+- Gunakan jurnal untuk mencatat
+- Praktikkan secara teratur
+- Bersabar dengan prosesnya
+- Diskusikan dengan konselor jika perlu
       `,
     },
     {
@@ -1187,96 +1187,6 @@ Manajemen kekhawatiran adalah melatih pikiran agar tidak langsung merespons seti
       type: "exercise",
       timerDuration: 600,
       content: `
-# Latihan Grounding (5-4-3-2-1)
-
-## Apa itu Grounding?
-Grounding adalah metode yang dirancang untuk "membumikan" atau menghubungkan kembali kesadaran pada saat ini (here and now), terutama ketika pikiran sedang diliputi kecemasan.
-
-## Manfaat Berdasarkan Penelitian:
-- Meningkatkan suasana hati secara bermakna (Chevalier, 2015)
-- Mengurangi kecemasan dan stres
-- Dapat dilakukan kapan saja dan di mana saja
-- Tanpa diketahui orang lain
-- Efektif untuk serangan panik
-
-## Langkah-langkah Grounding 5-4-3-2-1:
-
-### 1. LIHAT - 5 Benda
-**Fokus, tunjuk, dan sebutkan 5 benda yang ada di sekitar Anda:**
-- Contoh: foto keluarga di dinding
-- Pensil atau cangkir kopi
-- Tanaman atau bunga yang bergerak tertiup angin
-- Awan atau burung di langit
-- Hewan peliharaan
-
-**Tips:** Perhatikan warna, tekstur, dan pola setiap benda
-
-### 2. RABA - 4 Benda
-**Rasakan dengan tangan 4 benda yang ada di dekat Anda:**
-- Letakkan tangan di bawah air mengalir (hangat/dingin)
-- Rasakan pakaian menyentuh tubuh Anda
-- Sentuh furnitur dan fokus pada teksturnya
-- Sentuh bagian tubuh dengan menekan selama 30 detik
-
-**Tips:** Fokus pada sensasi sentuhan, tekstur, suhu
-
-### 3. DENGAR - 3 Suara
-**Dengan telinga, sebutkan 3 suara yang ada di sekitar Anda:**
-- Gonggongan anjing
-- Perut keroncongan
-- Jam berdetak
-- Lalu lintas di luar
-- Mesin mobil atau kereta
-- Musik
-- Percakapan
-- Kicauan burung
-- Angin yang bertiup
-
-**Tips:** Tutup mata sejenak untuk fokus pada pendengaran
-
-### 4. CIUM - 2 Aroma
-**Hirup udara dan sebutkan 2 aroma/bau yang dirasakan hidung Anda:**
-- Aroma sabun atau sampo
-- Lilin aromaterapi
-- Minyak wangi
-- Aroma sederhana (bantal, pensil)
-- Rumput segar atau bunga
-- Kopi atau teh
-- Makanan
-
-**Tips:** Tarik napas dalam-dalam melalui hidung
-
-### 5. KECAP - 1 Rasa
-**Sebutkan 1 rasa di lidah, mulut, dan bibir Anda:**
-- Sepotong permen karet
-- Permen mint
-- Kopi atau teh
-- Gula atau garam
-- Sepotong makanan
-- Minum air
-
-**Tips:** Fokus pada rasa di lidah dan sensasi di mulut
-
-## Cara Pelaksanaan:
-1. Cari tempat yang tenang
-2. Lakukan relaksasi dan fokus pada lingkungan sekitar
-3. Ikuti langkah 5-4-3-2-1 secara berurutan
-4. Lakukan dengan perlahan dan sadar
-5. Bernapas dalam di antara setiap langkah
-
-## Kapan Menggunakan Grounding:
-- Saat merasa cemas atau panik
-- Ketika pikiran tidak bisa berhenti berputar
-- Sebelum situasi yang menimbulkan stres
-- Saat merasa terlepas dari realitas
-- Sebagai bagian dari rutinitas harian
-
-## Variasi Grounding:
-- **Walking Grounding**: Lakukan sambil berjalan perlahan
-- **Quick Grounding**: Lakukan versi singkat (3-2-1)
-- **Emergency Grounding**: Fokus hanya pada pernapasan dan 1 indra
-      `,
-      contentId: `
 # Grounding Exercise (5-4-3-2-1)
 
 ## What is Grounding?
@@ -1366,6 +1276,96 @@ Grounding is a method designed to "ground" or reconnect consciousness to the pre
 - **Quick Grounding**: Do short version (3-2-1)
 - **Emergency Grounding**: Focus only on breathing and 1 sense
       `,
+      contentId: `
+# Latihan Grounding (5-4-3-2-1)
+
+## Apa itu Grounding?
+Grounding adalah metode yang dirancang untuk "membumikan" atau menghubungkan kembali kesadaran pada saat ini (here and now), terutama ketika pikiran sedang diliputi kecemasan.
+
+## Manfaat Berdasarkan Penelitian:
+- Meningkatkan suasana hati secara bermakna (Chevalier, 2015)
+- Mengurangi kecemasan dan stres
+- Dapat dilakukan kapan saja dan di mana saja
+- Tanpa diketahui orang lain
+- Efektif untuk serangan panik
+
+## Langkah-langkah Grounding 5-4-3-2-1:
+
+### 1. LIHAT - 5 Benda
+**Fokus, tunjuk, dan sebutkan 5 benda yang ada di sekitar Anda:**
+- Contoh: foto keluarga di dinding
+- Pensil atau cangkir kopi
+- Tanaman atau bunga yang bergerak tertiup angin
+- Awan atau burung di langit
+- Hewan peliharaan
+
+**Tips:** Perhatikan warna, tekstur, dan pola setiap benda
+
+### 2. RABA - 4 Benda
+**Rasakan dengan tangan 4 benda yang ada di dekat Anda:**
+- Letakkan tangan di bawah air mengalir (hangat/dingin)
+- Rasakan pakaian menyentuh tubuh Anda
+- Sentuh furnitur dan fokus pada teksturnya
+- Sentuh bagian tubuh dengan menekan selama 30 detik
+
+**Tips:** Fokus pada sensasi sentuhan, tekstur, suhu
+
+### 3. DENGAR - 3 Suara
+**Dengan telinga, sebutkan 3 suara yang ada di sekitar Anda:**
+- Gonggongan anjing
+- Perut keroncongan
+- Jam berdetak
+- Lalu lintas di luar
+- Mesin mobil atau kereta
+- Musik
+- Percakapan
+- Kicauan burung
+- Angin yang bertiup
+
+**Tips:** Tutup mata sejenak untuk fokus pada pendengaran
+
+### 4. CIUM - 2 Aroma
+**Hirup udara dan sebutkan 2 aroma/bau yang dirasakan hidung Anda:**
+- Aroma sabun atau sampo
+- Lilin aromaterapi
+- Minyak wangi
+- Aroma sederhana (bantal, pensil)
+- Rumput segar atau bunga
+- Kopi atau teh
+- Makanan
+
+**Tips:** Tarik napas dalam-dalam melalui hidung
+
+### 5. KECAP - 1 Rasa
+**Sebutkan 1 rasa di lidah, mulut, dan bibir Anda:**
+- Sepotong permen karet
+- Permen mint
+- Kopi atau teh
+- Gula atau garam
+- Sepotong makanan
+- Minum air
+
+**Tips:** Fokus pada rasa di lidah dan sensasi di mulut
+
+## Cara Pelaksanaan:
+1. Cari tempat yang tenang
+2. Lakukan relaksasi dan fokus pada lingkungan sekitar
+3. Ikuti langkah 5-4-3-2-1 secara berurutan
+4. Lakukan dengan perlahan dan sadar
+5. Bernapas dalam di antara setiap langkah
+
+## Kapan Menggunakan Grounding:
+- Saat merasa cemas atau panik
+- Ketika pikiran tidak bisa berhenti berputar
+- Sebelum situasi yang menimbulkan stres
+- Saat merasa terlepas dari realitas
+- Sebagai bagian dari rutinitas harian
+
+## Variasi Grounding:
+- **Walking Grounding**: Lakukan sambil berjalan perlahan
+- **Quick Grounding**: Lakukan versi singkat (3-2-1)
+- **Emergency Grounding**: Fokus hanya pada pernapasan dan 1 indra
+      `,
     },
     {
       id: 10,
@@ -1381,6 +1381,86 @@ Grounding is a method designed to "ground" or reconnect consciousness to the pre
       type: "exercise",
       timerDuration: 720,
       content: `
+# Butterfly Hug Exercise
+
+## What is Butterfly Hug?
+Butterfly Hug is a psychological intervention that uses bilateral stimulation (BLS) principles to support emotional regulation and trauma processing.
+
+## Neurobiological Basis:
+This technique works by modulating trauma circuits in the brain:
+- Reduces hyperactivity in amygdala and hippocampus when stress memories arise
+- Increases activity in medial prefrontal cortex
+- Strengthens top-down emotional control
+- Helps integrate traumatic experiences
+
+## Benefits:
+- Reduces anxiety and acute stress
+- Helps trauma processing
+- Increases sense of safety and calm
+- Easy to apply and do independently
+- No special tools required
+- Can be done anytime and anywhere
+
+## Butterfly Hug Steps:
+
+### 1. Position Preparation
+- Cross both hands in front of chest
+- Place fingertips of each hand below collarbone or upper arm
+- Position hands as comfortably as possible
+- Like hugging yourself
+
+### 2. Focus and Relaxation
+- Close both eyes
+- Regulate breathing with Deep Breathing Technique (TND)
+- Inhale deeply through nose (4 seconds)
+- Hold breath (4 seconds)
+- Exhale slowly through mouth (6 seconds)
+- Focus thoughts during butterfly hug
+
+### 3. Bilateral Stimulation
+- Perform tapping motion on shoulders
+- Do it slowly and alternately
+- Right hand taps left shoulder, then left hand taps right shoulder
+- Repeat this movement at a comfortable rhythm
+- Do 6-12 rounds (1 round = right-left)
+
+### 4. Speed Variation
+**For Anxiety:**
+- Do faster tapping (2-3 taps per second)
+- Helps reduce high arousal
+
+**For Sadness:**
+- Do slower tapping (1 tap per 2-3 seconds)
+- Helps calm and comfort
+
+### 5. Duration
+- Start with 1-2 minutes
+- Gradually increase to 5-10 minutes
+- Do 2-3 times daily or when needed
+
+## When to Use Butterfly Hug:
+- When feeling anxious or panicked
+- After recalling traumatic memories
+- Before or after stressful situations
+- When feeling emotionally overwhelmed
+- As part of daily relaxation routine
+- Before sleep to calm the mind
+
+## Practice Tips:
+- Find the most comfortable rhythm for you
+- Focus on the tapping sensation on shoulders
+- Notice changes in your feelings
+- Don't force if feeling uncomfortable
+- Combine with positive affirmations
+- Practice in a quiet and safe place
+
+## Important Notes:
+- If traumatic memories arise uncontrollably, stop and seek professional help
+- Butterfly hug is not a replacement for professional therapy for severe trauma
+- Use as a support tool in the healing process
+- Consult with psychologist or counselor if needed
+      `,
+      contentId: `
 # Latihan Butterfly Hug (Pelukan Kupu-kupu)
 
 ## Apa itu Butterfly Hug?
@@ -1459,92 +1539,6 @@ Teknik ini bekerja dengan memodulasi sirkuit trauma pada otak:
 - Butterfly hug bukan pengganti terapi profesional untuk trauma berat
 - Gunakan sebagai alat pendukung dalam proses penyembuhan
 - Konsultasikan dengan psikolog atau konselor jika diperlukan
-      `,
-      contentId: `
-# Butterfly Hug Exercise
-
-## What is Butterfly Hug?
-Butterfly Hug is a psychological intervention that uses bilateral stimulation (BLS) principles to support emotional regulation and trauma processing.
-
-## Neurobiological Basis:
-This technique works by modulating trauma circuits in the brain:
-- Reduces hyperactivity in amygdala and hippocampus when stress memories arise
-- Increases activity in medial prefrontal cortex
-- Strengthens top-down emotional control
-- Helps integrate traumatic experiences
-
-## Benefits:
-- Reduces anxiety and acute stress
-- Helps trauma processing
-- Increases sense of safety and calm
-- Easy to apply and do independently
-- No special tools required
-- Can be done anytime and anywhere
-
-## Butterfly Hug Steps:
-
-### 1. Position Preparation
-- Cross both hands in front of chest
-- Place fingertips of each hand below collarbone or upper arm
-- Position hands as comfortably as possible
-- Like hugging yourself
-
-### 2. Focus and Relaxation
-- Close both eyes
-- Regulate breathing with Deep Breathing Technique (TND)
-- Inhale deeply through nose (4 seconds)
-- Hold breath (4 seconds)
-- Exhale slowly through mouth (6 seconds)
-- Focus thoughts during butterfly hug
-
-### 3. Bilateral Stimulation
-- Tap hands on shoulders
-- Do slowly and alternately
-- Right hand taps left shoulder, then left hand taps right shoulder
-- Repeat this movement with comfortable rhythm
-- Do 6-12 rounds (1 round = right-left)
-
-### 4. Speed Variation
-**For Anxiety:**
-- Do faster taps (2-3 taps per second)
-- Helps reduce high arousal
-
-**For Sadness:**
-- Do slower taps (1 tap per 2-3 seconds)
-- Helps calm and comfort
-
-### 5. Duration
-- Start with 1-2 minutes
-- Gradually increase to 5-10 minutes
-- Do 2-3 times daily or as needed
-
-## When to Use Butterfly Hug:
-- When feeling anxious or panicked
-- After recalling traumatic memories
-- Before or after stress-inducing situations
-- When feeling emotionally overwhelmed
-- As part of daily relaxation routine
-- Before sleep to calm thoughts
-
-## Practice Tips:
-- Find the most comfortable rhythm for you
-- Focus on tap sensation on shoulders
-- Notice changes in your feelings
-- Don't force if feeling uncomfortable
-- Combine with positive affirmations
-- Practice in quiet and safe place
-
-## Combination with Other Techniques:
-- **Butterfly Hug + Deep Breathing**: For maximum relaxation
-- **Butterfly Hug + Positive Affirmations**: "I am safe", "I am calm"
-- **Butterfly Hug + Grounding**: After grounding, do butterfly hug
-- **Butterfly Hug + Visualization**: Imagine safe place while doing
-
-## Important Notes:
-- If traumatic memories arise uncontrollably, stop and seek professional help
-- Butterfly hug is not a replacement for professional therapy for severe trauma
-- Use as supporting tool in healing process
-- Consult with psychologist or counselor if needed
       `,
     },
   ]
@@ -1740,29 +1734,29 @@ This technique works by modulating trauma circuits in the brain:
                   <CardHeader>
                     <CardTitle className="text-lg text-green-900 flex items-center">
                       <TrendingUp className="w-5 h-5 mr-2" />
-                      Your Progress
+                      {t("selfHelp.yourProgress")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-green-700">Sessions completed</span>
+                        <span className="text-sm text-green-700">{t("selfHelp.sessionsCompleted")}</span>
                         <span className="text-sm font-medium text-green-900">{resourceProgress.sessions.length}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-green-700">Total practice time</span>
+                        <span className="text-sm text-green-700">{t("selfHelp.totalPracticeTime")}</span>
                         <span className="text-sm font-medium text-green-900">
                           {formatDuration(resourceProgress.totalPracticeTime)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-green-700">Last practiced</span>
+                        <span className="text-sm text-green-700">{t("selfHelp.lastPracticed")}</span>
                         <span className="text-sm font-medium text-green-900">
                           {getLastPracticedText(selectedResource.id, t)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-green-700">Completion count</span>
+                        <span className="text-sm text-green-700">{t("selfHelp.completionCount")}</span>
                         <span className="text-sm font-medium text-green-900">{resourceProgress.completionCount}</span>
                       </div>
                     </div>
@@ -1943,15 +1937,15 @@ This technique works by modulating trauma circuits in the brain:
                       {resourceProgress && (
                         <div className="space-y-2 mb-4 p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Sessions:</span>
+                            <span className="text-gray-600">{t("selfHelp.sessions")}:</span>
                             <span className="font-medium">{resourceProgress.sessions.length}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Practice time:</span>
+                            <span className="text-gray-600">{t("selfHelp.practiceTime")}:</span>
                             <span className="font-medium">{formatDuration(resourceProgress.totalPracticeTime)}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Last practiced:</span>
+                            <span className="text-gray-600">{t("selfHelp.lastPracticed")}:</span>
                             <span className="font-medium">{getLastPracticedText(resource.id, t)}</span>
                           </div>
                         </div>

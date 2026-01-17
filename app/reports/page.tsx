@@ -23,6 +23,7 @@ import {
   MessageCircle,
   Bot,
   User,
+  RefreshCw,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -34,16 +35,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-interface AssessmentResult {
-  id: string
-  userId: string
-  type: "comprehensive" | "quick" | "knowledge"
-  score: number
-  maxScore: number
-  completedAt: string
-  data: any
-}
 
 interface DailyConversation {
   date: string
@@ -58,63 +49,99 @@ interface DailyConversation {
   }>
 }
 
+interface ConversationStats {
+  totalDays: number
+  assessmentDays: number
+  quickAssessmentDays: number
+  knowledgeTestDays: number
+  totalMessages: number
+  assessmentMessages: number
+  quickAssessmentMessages: number
+  knowledgeTestMessages: number
+}
+
 export default function ReportsPage() {
   const { user } = useAuth()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const router = useRouter()
   const { toast } = useToast()
-  const [results, setResults] = useState<AssessmentResult[]>([])
   const [dailyConversations, setDailyConversations] = useState<DailyConversation[]>([])
   const [selectedDay, setSelectedDay] = useState<DailyConversation | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [stats, setStats] = useState<ConversationStats>({
+    totalDays: 0,
+    assessmentDays: 0,
+    quickAssessmentDays: 0,
+    knowledgeTestDays: 0,
+    totalMessages: 0,
+    assessmentMessages: 0,
+    quickAssessmentMessages: 0,
+    knowledgeTestMessages: 0,
+  })
 
   useEffect(() => {
     if (!user) {
       router.push("/login")
       return
     }
-
-    const storedResults = JSON.parse(localStorage.getItem("assessmentResults") || "[]")
-    const userResults = storedResults.filter((result: AssessmentResult) => result.userId === user.id)
-    setResults(
-      userResults.sort(
-        (a: AssessmentResult, b: AssessmentResult) =>
-          new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
-      ),
-    )
-
     fetchDailyConversations()
   }, [user, router])
 
   const fetchDailyConversations = async () => {
     if (!user?.id) return
 
+    setIsLoading(true)
     try {
       const response = await fetch(`/api/conversations/daily?user_id=${user.id}`)
       const data = await response.json()
       setDailyConversations(data)
+
+      const newStats: ConversationStats = {
+        totalDays: data.length,
+        assessmentDays: 0,
+        quickAssessmentDays: 0,
+        knowledgeTestDays: 0,
+        totalMessages: 0,
+        assessmentMessages: 0,
+        quickAssessmentMessages: 0,
+        knowledgeTestMessages: 0,
+      }
+
+      data.forEach((day: DailyConversation) => {
+        newStats.totalMessages += day.messageCount
+
+        const hasAssessment = day.messages.some((m) => m.conversation_type === "assessment")
+        const hasQuickAssessment = day.messages.some((m) => m.conversation_type === "quick-assessment")
+        const hasKnowledgeTest = day.messages.some((m) => m.conversation_type === "knowledge-test")
+
+        if (hasAssessment) newStats.assessmentDays++
+        if (hasQuickAssessment) newStats.quickAssessmentDays++
+        if (hasKnowledgeTest) newStats.knowledgeTestDays++
+
+        day.messages.forEach((m) => {
+          if (m.conversation_type === "assessment") newStats.assessmentMessages++
+          if (m.conversation_type === "quick-assessment") newStats.quickAssessmentMessages++
+          if (m.conversation_type === "knowledge-test") newStats.knowledgeTestMessages++
+        })
+      })
+
+      setStats(newStats)
     } catch (error) {
       console.error("Failed to fetch daily conversations:", error)
+      toast({
+        title: language === "id" ? "Gagal memuat data" : "Failed to load data",
+        description: language === "id" ? "Silakan coba lagi" : "Please try again",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
-  }
-
-  const getScoreColor = (score: number, maxScore: number) => {
-    const percentage = (score / maxScore) * 100
-    if (percentage >= 80) return "text-green-600"
-    if (percentage >= 60) return "text-yellow-600"
-    return "text-red-600"
-  }
-
-  const getScoreBg = (score: number, maxScore: number) => {
-    const percentage = (score / maxScore) * 100
-    if (percentage >= 80) return "bg-green-100"
-    if (percentage >= 60) return "bg-yellow-100"
-    return "bg-red-100"
   }
 
   const exportToPDF = () => {
     toast({
       title: t("reports.exportPDF"),
-      description: "PDF export functionality would be implemented here using libraries like jsPDF or Puppeteer.",
+      description: language === "id" ? "Fitur ekspor PDF akan segera tersedia" : "PDF export feature coming soon",
     })
   }
 
@@ -125,11 +152,21 @@ export default function ReportsPage() {
   const getConversationType = (type: string) => {
     switch (type) {
       case "chat":
-        return { label: "Chat AI", color: "bg-blue-100 text-blue-700" }
+        return { label: language === "id" ? "Chat AI" : "AI Chat", color: "bg-blue-100 text-blue-700" }
       case "assessment":
-        return { label: "Asesmen", color: "bg-red-100 text-red-700" }
+        return {
+          label: language === "id" ? "Asesmen Lengkap" : "Full Assessment",
+          color: "bg-purple-100 text-purple-700",
+        }
+      case "quick-assessment":
+        return {
+          label: language === "id" ? "Monitoring & Evaluasi" : "Monitoring & Evaluation",
+          color: "bg-cyan-100 text-cyan-700",
+        }
+      case "knowledge-test":
+        return { label: language === "id" ? "Tes Pengetahuan" : "Knowledge Test", color: "bg-green-100 text-green-700" }
       case "education":
-        return { label: "Edukasi", color: "bg-green-100 text-green-700" }
+        return { label: language === "id" ? "Edukasi" : "Education", color: "bg-amber-100 text-amber-700" }
       default:
         return { label: type, color: "bg-gray-100 text-gray-700" }
     }
@@ -143,10 +180,6 @@ export default function ReportsPage() {
     return null
   }
 
-  const comprehensiveResults = results.filter((r) => r.type === "comprehensive")
-  const quickResults = results.filter((r) => r.type === "quick")
-  const knowledgeResults = results.filter((r) => r.type === "knowledge")
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 pt-20 pb-12">
       <Navigation />
@@ -156,6 +189,15 @@ export default function ReportsPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{t("reports.title")}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t("reports.subtitle")}</p>
           <div className="flex justify-center gap-4 mt-6">
+            <Button
+              onClick={fetchDailyConversations}
+              variant="outline"
+              className="flex items-center gap-2 bg-transparent"
+              disabled={isLoading}
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+              {language === "id" ? "Refresh" : "Refresh"}
+            </Button>
             <Button onClick={exportToPDF} variant="outline" className="flex items-center gap-2 bg-transparent">
               <Download className="w-4 h-4" />
               {t("reports.exportPDF")}
@@ -167,42 +209,156 @@ export default function ReportsPage() {
           </div>
         </div>
 
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{stats.totalDays}</div>
+                  <div className="text-sm text-gray-600">{language === "id" ? "Riwayat Harian" : "Daily History"}</div>
+                </div>
+              </div>
+              {stats.totalMessages > 0 && (
+                <div className="mt-4 flex items-center gap-2 text-sm">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-green-600">
+                    {stats.totalMessages} {language === "id" ? "pesan" : "messages"}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
+                  <Brain className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{stats.assessmentDays}</div>
+                  <div className="text-sm text-gray-600">
+                    {language === "id" ? "Asesmen Lengkap" : "Full Assessment"}
+                  </div>
+                </div>
+              </div>
+              {stats.assessmentMessages > 0 && (
+                <div className="mt-4 flex items-center gap-2 text-sm">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  <span className="text-green-600">
+                    {stats.assessmentMessages} {language === "id" ? "pesan" : "messages"}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{stats.quickAssessmentDays}</div>
+                  <div className="text-sm text-gray-600">
+                    {language === "id" ? "Monitoring & Evaluasi" : "Monitoring & Evaluation"}
+                  </div>
+                </div>
+              </div>
+              {stats.quickAssessmentMessages > 0 && (
+                <div className="mt-4 flex items-center gap-2 text-sm">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-green-600">
+                    {stats.quickAssessmentMessages} {language === "id" ? "pesan" : "messages"}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{stats.knowledgeTestDays}</div>
+                  <div className="text-sm text-gray-600">
+                    {language === "id" ? "Tes Pengetahuan" : "Knowledge Test"}
+                  </div>
+                </div>
+              </div>
+              {stats.knowledgeTestMessages > 0 && (
+                <div className="mt-4 flex items-center gap-2 text-sm">
+                  <Award className="w-4 h-4 text-green-500" />
+                  <span className="text-green-600">
+                    {stats.knowledgeTestMessages} {language === "id" ? "pesan" : "messages"}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
         <Tabs defaultValue="conversations" className="space-y-8">
           <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
             <TabsTrigger value="conversations" className="flex items-center gap-2">
               <MessageCircle className="w-4 h-4" />
-              Riwayat Chat
+              <span className="hidden sm:inline">{language === "id" ? "Riwayat Harian" : "Daily History"}</span>
             </TabsTrigger>
             <TabsTrigger value="comprehensive" className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
-              {t("reports.comprehensiveResults")}
+              <span className="hidden sm:inline">{language === "id" ? "Asesmen Lengkap" : "Full Assessment"}</span>
             </TabsTrigger>
             <TabsTrigger value="quick" className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              Monitoring & Evaluasi
+              <span className="hidden sm:inline">{language === "id" ? "Monitoring" : "Monitoring"}</span>
             </TabsTrigger>
             <TabsTrigger value="knowledge" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
-              {t("reports.knowledgeLevel")}
+              <span className="hidden sm:inline">{language === "id" ? "Pengetahuan" : "Knowledge"}</span>
             </TabsTrigger>
           </TabsList>
 
+          {/* Tab: Riwayat Harian - All conversations */}
           <TabsContent value="conversations" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="w-5 h-5 text-blue-500" />
-                  Riwayat Percakapan Harian
+                  {language === "id" ? "Riwayat Percakapan Harian" : "Daily Conversation History"}
                 </CardTitle>
-                <CardDescription>Semua percakapan Anda dengan AI dikelompokkan per hari</CardDescription>
+                <CardDescription>
+                  {language === "id"
+                    ? "Semua percakapan Anda dengan AI dikelompokkan per hari"
+                    : "All your AI conversations grouped by day"}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {dailyConversations.length === 0 ? (
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
+                    <p className="text-gray-600">{language === "id" ? "Memuat data..." : "Loading data..."}</p>
+                  </div>
+                ) : dailyConversations.length === 0 ? (
                   <div className="text-center py-8">
                     <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Percakapan</h3>
-                    <p className="text-gray-600 mb-4">Mulai chat dengan AI untuk melihat riwayat di sini</p>
-                    <Button onClick={() => router.push("/chat")}>Mulai Chat</Button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {language === "id" ? "Belum Ada Percakapan" : "No Conversations Yet"}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {language === "id"
+                        ? "Mulai chat dengan AI untuk melihat riwayat di sini"
+                        : "Start chatting with AI to see history here"}
+                    </p>
+                    <Button onClick={() => router.push("/chat")}>
+                      {language === "id" ? "Mulai Chat" : "Start Chat"}
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -214,7 +370,7 @@ export default function ReportsPage() {
                               <div className="flex items-center gap-2 mb-2">
                                 <Calendar className="w-5 h-5 text-gray-500" />
                                 <h3 className="text-lg font-semibold">
-                                  {new Date(day.date).toLocaleDateString("id-ID", {
+                                  {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                     weekday: "long",
                                     day: "numeric",
                                     month: "long",
@@ -223,27 +379,43 @@ export default function ReportsPage() {
                                 </h3>
                               </div>
                               <p className="text-sm text-gray-600">
-                                {day.messageCount} pesan dalam percakapan hari ini
+                                {day.messageCount}{" "}
+                                {language === "id" ? "pesan dalam percakapan hari ini" : "messages today"}
                               </p>
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {Array.from(new Set(day.messages.map((m) => m.conversation_type))).map((type) => {
+                                  const typeInfo = getConversationType(type)
+                                  return (
+                                    <Badge key={type} className={typeInfo.color}>
+                                      {typeInfo.label}
+                                    </Badge>
+                                  )
+                                })}
+                              </div>
                             </div>
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button size="sm" variant="outline" onClick={() => setSelectedDay(day)}>
                                   <FileText className="w-4 h-4 mr-2" />
-                                  Lihat Percakapan
+                                  {language === "id" ? "Lihat" : "View"}
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="max-w-4xl max-h-[85vh]">
                                 <DialogHeader>
                                   <DialogTitle>
-                                    Percakapan -{" "}
-                                    {new Date(day.date).toLocaleDateString("id-ID", {
+                                    {language === "id" ? "Percakapan" : "Conversations"} -{" "}
+                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                       day: "numeric",
                                       month: "long",
                                       year: "numeric",
                                     })}
                                   </DialogTitle>
-                                  <DialogDescription>{day.messageCount} pesan dari semua percakapan</DialogDescription>
+                                  <DialogDescription>
+                                    {day.messageCount}{" "}
+                                    {language === "id"
+                                      ? "pesan dari semua percakapan"
+                                      : "messages from all conversations"}
+                                  </DialogDescription>
                                 </DialogHeader>
                                 <ScrollArea className="h-[65vh] pr-4">
                                   {selectedDay?.date === day.date && (
@@ -268,14 +440,10 @@ export default function ReportsPage() {
                                               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                             >
                                               <div
-                                                className={`flex items-start space-x-3 max-w-[80%] ${
-                                                  message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-                                                }`}
+                                                className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
                                               >
                                                 <div
-                                                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                                    message.role === "user" ? "bg-sky-500" : "bg-yellow-500"
-                                                  }`}
+                                                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-sky-500" : "bg-yellow-500"}`}
                                                 >
                                                   {message.role === "user" ? (
                                                     <User className="w-4 h-4 text-white" />
@@ -284,18 +452,17 @@ export default function ReportsPage() {
                                                   )}
                                                 </div>
                                                 <div
-                                                  className={`p-3 rounded-lg ${
-                                                    message.role === "user"
-                                                      ? "bg-sky-500 text-white"
-                                                      : "bg-gray-100 text-gray-900"
-                                                  }`}
+                                                  className={`p-3 rounded-lg ${message.role === "user" ? "bg-sky-500 text-white" : "bg-gray-100 text-gray-900"}`}
                                                 >
                                                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                                                   <p className="text-xs opacity-70 mt-1">
-                                                    {new Date(message.created_at).toLocaleTimeString("id-ID", {
-                                                      hour: "2-digit",
-                                                      minute: "2-digit",
-                                                    })}
+                                                    {new Date(message.created_at).toLocaleTimeString(
+                                                      language === "id" ? "id-ID" : "en-US",
+                                                      {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                      },
+                                                    )}
                                                   </p>
                                                 </div>
                                               </div>
@@ -318,22 +485,40 @@ export default function ReportsPage() {
             </Card>
           </TabsContent>
 
+          {/* Tab: Asesmen Lengkap */}
           <TabsContent value="comprehensive" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Brain className="w-5 h-5 text-purple-500" />
-                  {t("reports.comprehensiveResults")}
+                  {language === "id" ? "Hasil Asesmen AI Lengkap" : "Full AI Assessment Results"}
                 </CardTitle>
-                <CardDescription>Riwayat percakapan asesmen AI lengkap</CardDescription>
+                <CardDescription>
+                  {language === "id"
+                    ? "Riwayat percakapan asesmen AI lengkap"
+                    : "Full AI assessment conversation history"}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {getConversationsByType("assessment").length === 0 ? (
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
+                    <p className="text-gray-600">{language === "id" ? "Memuat data..." : "Loading data..."}</p>
+                  </div>
+                ) : getConversationsByType("assessment").length === 0 ? (
                   <div className="text-center py-8">
                     <Brain className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Asesmen Lengkap</h3>
-                    <p className="text-gray-600 mb-4">Mulai asesmen lengkap untuk melihat riwayat di sini</p>
-                    <Button onClick={() => router.push("/assessment")}>Mulai Asesmen</Button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {language === "id" ? "Belum Ada Asesmen Lengkap" : "No Full Assessments Yet"}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {language === "id"
+                        ? "Mulai asesmen lengkap untuk melihat riwayat di sini"
+                        : "Start a full assessment to see history here"}
+                    </p>
+                    <Button onClick={() => router.push("/assessment")}>
+                      {language === "id" ? "Mulai Asesmen" : "Start Assessment"}
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -347,7 +532,7 @@ export default function ReportsPage() {
                                 <div className="flex items-center gap-2 mb-2">
                                   <Calendar className="w-5 h-5 text-gray-500" />
                                   <h3 className="text-lg font-semibold">
-                                    {new Date(day.date).toLocaleDateString("id-ID", {
+                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                       weekday: "long",
                                       day: "numeric",
                                       month: "long",
@@ -356,27 +541,34 @@ export default function ReportsPage() {
                                   </h3>
                                 </div>
                                 <p className="text-sm text-gray-600">
-                                  {assessmentMessages.length} pesan dalam asesmen lengkap
+                                  {assessmentMessages.length}{" "}
+                                  {language === "id" ? "pesan dalam asesmen lengkap" : "messages in full assessment"}
                                 </p>
                               </div>
                               <Dialog>
                                 <DialogTrigger asChild>
-                                  <Button size="sm" variant="outline">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setSelectedDay({ ...day, messages: assessmentMessages })}
+                                  >
                                     <FileText className="w-4 h-4 mr-2" />
-                                    Lihat Percakapan
+                                    {language === "id" ? "Lihat Percakapan" : "View Conversation"}
                                   </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-4xl max-h-[85vh]">
                                   <DialogHeader>
                                     <DialogTitle>
-                                      Asesmen Lengkap -{" "}
-                                      {new Date(day.date).toLocaleDateString("id-ID", {
+                                      {language === "id" ? "Asesmen Lengkap" : "Full Assessment"} -{" "}
+                                      {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                         day: "numeric",
                                         month: "long",
                                         year: "numeric",
                                       })}
                                     </DialogTitle>
-                                    <DialogDescription>{assessmentMessages.length} pesan</DialogDescription>
+                                    <DialogDescription>
+                                      {assessmentMessages.length} {language === "id" ? "pesan" : "messages"}
+                                    </DialogDescription>
                                   </DialogHeader>
                                   <ScrollArea className="h-[65vh] pr-4">
                                     <div className="space-y-4">
@@ -386,14 +578,10 @@ export default function ReportsPage() {
                                             className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                           >
                                             <div
-                                              className={`flex items-start space-x-3 max-w-[80%] ${
-                                                message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-                                              }`}
+                                              className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
                                             >
                                               <div
-                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                                  message.role === "user" ? "bg-purple-500" : "bg-purple-100"
-                                                }`}
+                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-purple-500" : "bg-purple-100"}`}
                                               >
                                                 {message.role === "user" ? (
                                                   <User className="w-4 h-4 text-white" />
@@ -402,18 +590,17 @@ export default function ReportsPage() {
                                                 )}
                                               </div>
                                               <div
-                                                className={`p-3 rounded-lg ${
-                                                  message.role === "user"
-                                                    ? "bg-purple-500 text-white"
-                                                    : "bg-purple-50 text-gray-900"
-                                                }`}
+                                                className={`p-3 rounded-lg ${message.role === "user" ? "bg-purple-500 text-white" : "bg-purple-50 text-gray-900"}`}
                                               >
                                                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                                                 <p className="text-xs opacity-70 mt-1">
-                                                  {new Date(message.created_at).toLocaleTimeString("id-ID", {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                  })}
+                                                  {new Date(message.created_at).toLocaleTimeString(
+                                                    language === "id" ? "id-ID" : "en-US",
+                                                    {
+                                                      hour: "2-digit",
+                                                      minute: "2-digit",
+                                                    },
+                                                  )}
                                                 </p>
                                               </div>
                                             </div>
@@ -435,36 +622,54 @@ export default function ReportsPage() {
             </Card>
           </TabsContent>
 
+          {/* Tab: Monitoring & Evaluasi */}
           <TabsContent value="quick" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-blue-500" />
-                  Hasil Monitoring dan Evaluasi
+                  <Clock className="w-5 h-5 text-cyan-500" />
+                  {language === "id" ? "Hasil Monitoring dan Evaluasi" : "Monitoring and Evaluation Results"}
                 </CardTitle>
-                <CardDescription>Riwayat percakapan monitoring dan evaluasi sistematis</CardDescription>
+                <CardDescription>
+                  {language === "id"
+                    ? "Riwayat percakapan monitoring dan evaluasi sistematis"
+                    : "Systematic monitoring and evaluation conversation history"}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {getConversationsByType("quick-assessment").length === 0 ? (
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
+                    <p className="text-gray-600">{language === "id" ? "Memuat data..." : "Loading data..."}</p>
+                  </div>
+                ) : getConversationsByType("quick-assessment").length === 0 ? (
                   <div className="text-center py-8">
                     <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Monitoring & Evaluasi</h3>
-                    <p className="text-gray-600 mb-4">Mulai monitoring dan evaluasi untuk melihat riwayat di sini</p>
-                    <Button onClick={() => router.push("/assessment")}>Mulai Monitoring & Evaluasi</Button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {language === "id" ? "Belum Ada Monitoring & Evaluasi" : "No Monitoring & Evaluation Yet"}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {language === "id"
+                        ? "Mulai monitoring dan evaluasi untuk melihat riwayat di sini"
+                        : "Start monitoring and evaluation to see history here"}
+                    </p>
+                    <Button onClick={() => router.push("/assessment")}>
+                      {language === "id" ? "Mulai Monitoring & Evaluasi" : "Start Monitoring & Evaluation"}
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {getConversationsByType("quick-assessment").map((day) => {
                       const quickMessages = day.messages.filter((msg) => msg.conversation_type === "quick-assessment")
                       return (
-                        <Card key={day.date} className="border-l-4 border-l-blue-500">
+                        <Card key={day.date} className="border-l-4 border-l-cyan-500">
                           <CardContent className="pt-4">
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                   <Calendar className="w-5 h-5 text-gray-500" />
                                   <h3 className="text-lg font-semibold">
-                                    {new Date(day.date).toLocaleDateString("id-ID", {
+                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                       weekday: "long",
                                       day: "numeric",
                                       month: "long",
@@ -473,27 +678,36 @@ export default function ReportsPage() {
                                   </h3>
                                 </div>
                                 <p className="text-sm text-gray-600">
-                                  {quickMessages.length} pesan dalam monitoring dan evaluasi
+                                  {quickMessages.length}{" "}
+                                  {language === "id"
+                                    ? "pesan dalam monitoring dan evaluasi"
+                                    : "messages in monitoring and evaluation"}
                                 </p>
                               </div>
                               <Dialog>
                                 <DialogTrigger asChild>
-                                  <Button size="sm" variant="outline">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setSelectedDay({ ...day, messages: quickMessages })}
+                                  >
                                     <FileText className="w-4 h-4 mr-2" />
-                                    Lihat Percakapan
+                                    {language === "id" ? "Lihat Percakapan" : "View Conversation"}
                                   </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-4xl max-h-[85vh]">
                                   <DialogHeader>
                                     <DialogTitle>
-                                      Monitoring & Evaluasi -{" "}
-                                      {new Date(day.date).toLocaleDateString("id-ID", {
+                                      {language === "id" ? "Monitoring & Evaluasi" : "Monitoring & Evaluation"} -{" "}
+                                      {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                         day: "numeric",
                                         month: "long",
                                         year: "numeric",
                                       })}
                                     </DialogTitle>
-                                    <DialogDescription>{quickMessages.length} pesan</DialogDescription>
+                                    <DialogDescription>
+                                      {quickMessages.length} {language === "id" ? "pesan" : "messages"}
+                                    </DialogDescription>
                                   </DialogHeader>
                                   <ScrollArea className="h-[65vh] pr-4">
                                     <div className="space-y-4">
@@ -503,34 +717,29 @@ export default function ReportsPage() {
                                             className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                           >
                                             <div
-                                              className={`flex items-start space-x-3 max-w-[80%] ${
-                                                message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-                                              }`}
+                                              className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
                                             >
                                               <div
-                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                                  message.role === "user" ? "bg-blue-500" : "bg-blue-100"
-                                                }`}
+                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-cyan-500" : "bg-cyan-100"}`}
                                               >
                                                 {message.role === "user" ? (
                                                   <User className="w-4 h-4 text-white" />
                                                 ) : (
-                                                  <Bot className="w-4 h-4 text-blue-600" />
+                                                  <Bot className="w-4 h-4 text-cyan-600" />
                                                 )}
                                               </div>
                                               <div
-                                                className={`p-3 rounded-lg ${
-                                                  message.role === "user"
-                                                    ? "bg-blue-500 text-white"
-                                                    : "bg-blue-50 text-gray-900"
-                                                }`}
+                                                className={`p-3 rounded-lg ${message.role === "user" ? "bg-cyan-500 text-white" : "bg-cyan-50 text-gray-900"}`}
                                               >
                                                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                                                 <p className="text-xs opacity-70 mt-1">
-                                                  {new Date(message.created_at).toLocaleTimeString("id-ID", {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                  })}
+                                                  {new Date(message.created_at).toLocaleTimeString(
+                                                    language === "id" ? "id-ID" : "en-US",
+                                                    {
+                                                      hour: "2-digit",
+                                                      minute: "2-digit",
+                                                    },
+                                                  )}
                                                 </p>
                                               </div>
                                             </div>
@@ -552,22 +761,38 @@ export default function ReportsPage() {
             </Card>
           </TabsContent>
 
+          {/* Tab: Level Pengetahuan */}
           <TabsContent value="knowledge" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-green-500" />
-                  {t("reports.knowledgeLevel")}
+                  {language === "id" ? "Hasil Tes Pengetahuan" : "Knowledge Test Results"}
                 </CardTitle>
-                <CardDescription>Riwayat percakapan tes pengetahuan</CardDescription>
+                <CardDescription>
+                  {language === "id" ? "Riwayat percakapan tes pengetahuan" : "Knowledge test conversation history"}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {getConversationsByType("knowledge-test").length === 0 ? (
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
+                    <p className="text-gray-600">{language === "id" ? "Memuat data..." : "Loading data..."}</p>
+                  </div>
+                ) : getConversationsByType("knowledge-test").length === 0 ? (
                   <div className="text-center py-8">
                     <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum Ada Tes Pengetahuan</h3>
-                    <p className="text-gray-600 mb-4">Mulai tes pengetahuan untuk melihat riwayat di sini</p>
-                    <Button onClick={() => router.push("/assessment")}>Mulai Tes Pengetahuan</Button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {language === "id" ? "Belum Ada Tes Pengetahuan" : "No Knowledge Tests Yet"}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {language === "id"
+                        ? "Mulai tes pengetahuan untuk melihat riwayat di sini"
+                        : "Start a knowledge test to see history here"}
+                    </p>
+                    <Button onClick={() => router.push("/assessment")}>
+                      {language === "id" ? "Mulai Tes Pengetahuan" : "Start Knowledge Test"}
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -581,7 +806,7 @@ export default function ReportsPage() {
                                 <div className="flex items-center gap-2 mb-2">
                                   <Calendar className="w-5 h-5 text-gray-500" />
                                   <h3 className="text-lg font-semibold">
-                                    {new Date(day.date).toLocaleDateString("id-ID", {
+                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                       weekday: "long",
                                       day: "numeric",
                                       month: "long",
@@ -590,27 +815,34 @@ export default function ReportsPage() {
                                   </h3>
                                 </div>
                                 <p className="text-sm text-gray-600">
-                                  {knowledgeMessages.length} pesan dalam tes pengetahuan
+                                  {knowledgeMessages.length}{" "}
+                                  {language === "id" ? "pesan dalam tes pengetahuan" : "messages in knowledge test"}
                                 </p>
                               </div>
                               <Dialog>
                                 <DialogTrigger asChild>
-                                  <Button size="sm" variant="outline">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setSelectedDay({ ...day, messages: knowledgeMessages })}
+                                  >
                                     <FileText className="w-4 h-4 mr-2" />
-                                    Lihat Percakapan
+                                    {language === "id" ? "Lihat Percakapan" : "View Conversation"}
                                   </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-4xl max-h-[85vh]">
                                   <DialogHeader>
                                     <DialogTitle>
-                                      Tes Pengetahuan -{" "}
-                                      {new Date(day.date).toLocaleDateString("id-ID", {
+                                      {language === "id" ? "Tes Pengetahuan" : "Knowledge Test"} -{" "}
+                                      {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
                                         day: "numeric",
                                         month: "long",
                                         year: "numeric",
                                       })}
                                     </DialogTitle>
-                                    <DialogDescription>{knowledgeMessages.length} pesan</DialogDescription>
+                                    <DialogDescription>
+                                      {knowledgeMessages.length} {language === "id" ? "pesan" : "messages"}
+                                    </DialogDescription>
                                   </DialogHeader>
                                   <ScrollArea className="h-[65vh] pr-4">
                                     <div className="space-y-4">
@@ -620,14 +852,10 @@ export default function ReportsPage() {
                                             className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                           >
                                             <div
-                                              className={`flex items-start space-x-3 max-w-[80%] ${
-                                                message.role === "user" ? "flex-row-reverse space-x-reverse" : ""
-                                              }`}
+                                              className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
                                             >
                                               <div
-                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                                  message.role === "user" ? "bg-green-500" : "bg-green-100"
-                                                }`}
+                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-green-500" : "bg-green-100"}`}
                                               >
                                                 {message.role === "user" ? (
                                                   <User className="w-4 h-4 text-white" />
@@ -636,18 +864,17 @@ export default function ReportsPage() {
                                                 )}
                                               </div>
                                               <div
-                                                className={`p-3 rounded-lg ${
-                                                  message.role === "user"
-                                                    ? "bg-green-500 text-white"
-                                                    : "bg-green-50 text-gray-900"
-                                                }`}
+                                                className={`p-3 rounded-lg ${message.role === "user" ? "bg-green-500 text-white" : "bg-green-50 text-gray-900"}`}
                                               >
                                                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                                                 <p className="text-xs opacity-70 mt-1">
-                                                  {new Date(message.created_at).toLocaleTimeString("id-ID", {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                  })}
+                                                  {new Date(message.created_at).toLocaleTimeString(
+                                                    language === "id" ? "id-ID" : "en-US",
+                                                    {
+                                                      hour: "2-digit",
+                                                      minute: "2-digit",
+                                                    },
+                                                  )}
                                                 </p>
                                               </div>
                                             </div>
@@ -670,98 +897,7 @@ export default function ReportsPage() {
           </TabsContent>
         </Tabs>
 
-        <div className="grid md:grid-cols-4 gap-6 mt-12">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{dailyConversations.length}</div>
-                  <div className="text-sm text-gray-600">Riwayat Harian</div>
-                </div>
-              </div>
-              {dailyConversations.length > 0 && (
-                <div className="mt-4 flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-green-600">Aktif berkomunikasi</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
-                  <Brain className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{comprehensiveResults.length}</div>
-                  <div className="text-sm text-gray-600">Asesmen Lengkap</div>
-                </div>
-              </div>
-              {comprehensiveResults.length > 1 && (
-                <div className="mt-4 flex items-center gap-2 text-sm">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span className="text-green-600">Skor meningkat</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{quickResults.length}</div>
-                  <div className="text-sm text-gray-600">Monitoring & Evaluasi</div>
-                </div>
-              </div>
-              {quickResults.length > 0 && (
-                <div className="mt-4 flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-green-600">Monitoring aktif</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">
-                    {knowledgeResults.length > 0
-                      ? `${Math.round((knowledgeResults[0].score / knowledgeResults[0].maxScore) * 100)}%`
-                      : "--"}
-                  </div>
-                  <div className="text-sm text-gray-600">Level Pengetahuan</div>
-                </div>
-              </div>
-              {knowledgeResults.length > 0 && (
-                <div className="mt-4 flex items-center gap-2 text-sm">
-                  <Award className="w-4 h-4 text-green-500" />
-                  <span className="text-green-600">
-                    {Math.round((knowledgeResults[0].score / knowledgeResults[0].maxScore) * 100) >= 80
-                      ? "Advanced"
-                      : Math.round((knowledgeResults[0].score / knowledgeResults[0].maxScore) * 100) >= 60
-                        ? "Intermediate"
-                        : "Beginner"}
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
+        {/* Recommendations Card */}
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>{t("reports.recommendations")}</CardTitle>
@@ -772,18 +908,16 @@ export default function ReportsPage() {
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">{t("reports.continueAI")}</p>
               </div>
-
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm text-green-800">{t("reports.exploreSelfHelp")}</p>
               </div>
             </div>
-
             <div className="flex space-x-2 mt-4">
-              <Button onClick={() => router.push("/chat")} size="sm">
-                {t("reports.chatWithAI")}
+              <Button onClick={() => router.push("/chat")}>
+                {language === "id" ? "Lanjut Chat" : "Continue Chat"}
               </Button>
-              <Button onClick={() => router.push("/self-help")} variant="outline" size="sm">
-                {t("reports.educationResources")}
+              <Button variant="outline" onClick={() => router.push("/self-help")} className="bg-transparent">
+                {language === "id" ? "Buka Edukasi" : "Open Self-Help"}
               </Button>
             </div>
           </CardContent>
