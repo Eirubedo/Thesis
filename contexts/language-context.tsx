@@ -1066,25 +1066,45 @@ export { LanguageContext }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>("id")
+  const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    // Check for saved language preference
-    const savedLanguage = localStorage.getItem("language") as Language
-    if (savedLanguage && (savedLanguage === "en" || savedLanguage === "id")) {
-      setLanguage(savedLanguage)
-    } else {
+    setIsHydrated(true)
+    try {
+      const savedLanguage = localStorage.getItem("language") as Language
+      if (savedLanguage && (savedLanguage === "en" || savedLanguage === "id")) {
+        setLanguage(savedLanguage)
+      } else {
+        setLanguage("id")
+        localStorage.setItem("language", "id")
+      }
+    } catch (error) {
+      // localStorage might not be available in some environments
+      console.error("Error accessing localStorage:", error)
       setLanguage("id")
-      localStorage.setItem("language", "id")
     }
   }, [])
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang)
-    localStorage.setItem("language", lang)
+    try {
+      localStorage.setItem("language", lang)
+    } catch (error) {
+      console.error("Error saving language to localStorage:", error)
+    }
   }
 
   const t = (key: string): string => {
     return translations[language][key as keyof (typeof translations)[typeof language]] || key
+  }
+
+  // This ensures the language is set correctly from localStorage before rendering
+  if (!isHydrated) {
+    return (
+      <LanguageContext.Provider value={{ language: "id", setLanguage: handleSetLanguage, t }}>
+        {children}
+      </LanguageContext.Provider>
+    )
   }
 
   return (

@@ -14,7 +14,11 @@ export function LanguageSelector() {
   ]
 
   const handleLanguageChange = (langCode: "en" | "id") => {
+    console.log("[v0] Language selector clicked:", langCode)
     setLanguage(langCode)
+    setTimeout(() => {
+      console.log("[v0] Language after change:", langCode)
+    }, 100)
   }
 
   return (

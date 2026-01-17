@@ -21,6 +21,32 @@ interface Message {
   timestamp: Date
 }
 
+interface UserContext {
+  profile: {
+    name: string | null
+    gender: string | null
+    age: number | null
+    location: string | null
+  }
+  hypertension: {
+    familyHistory: boolean
+    riskFactors: string[]
+    medicalHistory: string | null
+    smokingStatus: string | null
+    alcoholConsumption: string | null
+    exerciseFrequency: string | null
+    stressLevel: number | null
+  }
+  bloodPressure: {
+    recentReadings: any[]
+    average: { systolic: number; diastolic: number; heartRate: number | null } | null
+    latestReading: any | null
+    latestCategory: string | null
+  }
+  medications: any[]
+  activities: any[]
+}
+
 interface DifyChatInterfaceProps {
   title?: string
   showHeader?: boolean
@@ -28,7 +54,7 @@ interface DifyChatInterfaceProps {
   minHeight?: string
   placeholder?: string
   apiPath?: string
-  conversationType?: "chat" | "assessment" | "education"
+  conversationType?: "chat" | "assessment" | "education" | "quick-assessment" | "knowledge-test"
 }
 
 export function DifyChatInterface({
@@ -61,9 +87,34 @@ export function DifyChatInterface({
   const [isListening, setIsListening] = useState(false)
   const [conversationId, setConversationId] = useState<string>("")
   const [dbConversationId, setDbConversationId] = useState<string>("")
+  const [userContext, setUserContext] = useState<UserContext | null>(null)
+  const [contextLoaded, setContextLoaded] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+
+  useEffect(() => {
+    const fetchUserContext = async () => {
+      if (!user?.id) {
+        setContextLoaded(true)
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/user-context?user_id=${user.id}`)
+        if (response.ok) {
+          const context = await response.json()
+          setUserContext(context)
+        }
+      } catch (error) {
+        console.error("Failed to fetch user context:", error)
+      } finally {
+        setContextLoaded(true)
+      }
+    }
+
+    fetchUserContext()
+  }, [user?.id])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -125,7 +176,7 @@ export function DifyChatInterface({
         setDbConversationId(data.conversation_id)
       }
     } catch (error) {
-      console.error("[v0] Failed to save conversation:", error)
+      console.error("Failed to save conversation:", error)
     }
   }
 
@@ -156,6 +207,7 @@ export function DifyChatInterface({
           message: userMessage.content,
           conversation_id: conversationId,
           user_id: user?.id || "anonymous",
+          userContext: userContext,
         }),
       })
 
@@ -227,6 +279,15 @@ export function DifyChatInterface({
 
   const chatContent = (
     <div className={`flex flex-col h-full ${className}`} style={{ minHeight }}>
+      {userContext && (userContext.profile?.name || userContext.bloodPressure?.latestReading) && (
+        <div className="px-4 py-2 bg-green-50 border-b border-green-200 text-xs text-green-700 flex items-center gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          {language === "id"
+            ? "Konteks personal aktif - AI mengenali data kesehatan Anda"
+            : "Personal context active - AI recognizes your health data"}
+        </div>
+      )}
+
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
