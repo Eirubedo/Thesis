@@ -85,6 +85,15 @@ interface InsightsData {
   generatedAt: string
 }
 
+interface DailySummary {
+  id: string
+  summary_date: string
+  summary_text: string
+  conversation_types: string[]
+  message_count: number
+  key_topics: string[]
+}
+
 export default function ReportsPage() {
   const { user } = useAuth()
   const { t, language } = useLanguage()
@@ -106,6 +115,8 @@ export default function ReportsPage() {
 
   const [insights, setInsights] = useState<InsightsData | null>(null)
   const [isLoadingInsights, setIsLoadingInsights] = useState(false)
+  const [dailySummaries, setDailySummaries] = useState<Record<string, DailySummary>>({})
+  const [generatingSummary, setGeneratingSummary] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) {
@@ -114,7 +125,55 @@ export default function ReportsPage() {
     }
     fetchDailyConversations()
     fetchInsights()
+    fetchDailySummaries()
   }, [user, router])
+
+  const fetchDailySummaries = async () => {
+    if (!user?.id) return
+    try {
+      const response = await fetch(`/api/daily-summary?user_id=${user.id}&limit=30`)
+      if (response.ok) {
+        const data = await response.json()
+        const summaryMap: Record<string, DailySummary> = {}
+        data.forEach((s: DailySummary) => {
+          summaryMap[s.summary_date] = s
+        })
+        setDailySummaries(summaryMap)
+      }
+    } catch (error) {
+      console.error("Failed to fetch daily summaries:", error)
+    }
+  }
+
+  const generateSummary = async (date: string) => {
+    if (!user?.id) return
+    setGeneratingSummary(date)
+    try {
+      const response = await fetch("/api/daily-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id, date, lang: language }),
+      })
+      if (response.ok) {
+        const summary = await response.json()
+        setDailySummaries((prev) => ({ ...prev, [date]: summary }))
+        toast({
+          title: language === "id" ? "Ringkasan dibuat" : "Summary generated",
+          description: language === "id" ? "Ringkasan harian berhasil dibuat" : "Daily summary has been generated",
+        })
+      } else {
+        throw new Error("Failed to generate summary")
+      }
+    } catch (error) {
+      console.error("Failed to generate summary:", error)
+      toast({
+        title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
+        variant: "destructive",
+      })
+    } finally {
+      setGeneratingSummary(null)
+    }
+  }
 
   const fetchDailyConversations = async () => {
     if (!user?.id) return
@@ -575,10 +634,42 @@ export default function ReportsPage() {
                                   })}
                                 </h3>
                               </div>
-                              <p className="text-sm text-gray-600">
-                                {day.messageCount}{" "}
-                                {language === "id" ? "pesan dalam percakapan hari ini" : "messages today"}
-                              </p>
+                              {dailySummaries[day.date] ? (
+                                <div className="mt-2">
+                                  <p className="text-sm text-gray-700 line-clamp-3">
+                                    {dailySummaries[day.date].summary_text}
+                                  </p>
+                                  {dailySummaries[day.date].key_topics.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                      {dailySummaries[day.date].key_topics.map((topic) => (
+                                        <Badge key={topic} variant="outline" className="text-xs">
+                                          {topic}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-gray-500 italic mt-1">
+                                  {day.messageCount} {language === "id" ? "pesan" : "messages"} -{" "}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      generateSummary(day.date)
+                                    }}
+                                    disabled={generatingSummary === day.date}
+                                    className="text-blue-600 hover:underline disabled:opacity-50"
+                                  >
+                                    {generatingSummary === day.date
+                                      ? language === "id"
+                                        ? "Membuat ringkasan..."
+                                        : "Generating..."
+                                      : language === "id"
+                                        ? "Buat ringkasan"
+                                        : "Generate summary"}
+                                  </button>
+                                </p>
+                              )}
                               <div className="flex flex-wrap gap-2 mt-2">
                                 {Array.from(new Set(day.messages.map((m) => m.conversation_type))).map((type) => {
                                   const typeInfo = getConversationType(type)

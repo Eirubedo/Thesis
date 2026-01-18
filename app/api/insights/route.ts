@@ -9,6 +9,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -22,7 +25,7 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Fetch all user data for comprehensive insights
-    const [userResult, hpResult, bpResult, medsResult, logsResult, conversationsResult, schedulesResult] =
+    const [userResult, hpResult, bpResult, medsResult, logsResult, conversationsResult, schedulesResult, messagesResult] =
       await Promise.all([
         supabase.from("users").select("full_name, gender, birth_date, address, postal_code").eq("id", userId).single(),
         supabase.from("hypertension_profiles").select("*").eq("user_id", userId).single(),
@@ -41,7 +44,7 @@ export async function GET(request: NextRequest) {
           .limit(60),
         supabase
           .from("conversations")
-          .select("conversation_type, title, message_count, started_at, summary")
+          .select("id, conversation_type, title, message_count, started_at, summary")
           .eq("user_id", userId)
           .order("started_at", { ascending: false })
           .limit(20),
@@ -50,6 +53,13 @@ export async function GET(request: NextRequest) {
           .select("title, activity_type, scheduled_time, is_active")
           .eq("user_id", userId)
           .eq("is_active", true),
+        // Fetch daily summaries for context (latest 30 days)
+        supabase
+          .from("daily_summaries")
+          .select("summary_date, summary_text, conversation_types, key_topics, message_count")
+          .eq("user_id", userId)
+          .order("summary_date", { ascending: false })
+          .limit(30),
       ])
 
     const user = userResult.data
@@ -59,6 +69,16 @@ export async function GET(request: NextRequest) {
     const medicationLogs = logsResult.data || []
     const conversations = conversationsResult.data || []
     const schedules = schedulesResult.data || []
+    const dailySummaries = messagesResult.data || []
+
+    // Format daily summaries for AI context
+    const summariesForContext = dailySummaries.map((s: any) => ({
+      date: s.summary_date,
+      summary: s.summary_text,
+      types: s.conversation_types,
+      topics: s.key_topics,
+      messageCount: s.message_count,
+    }))
 
     // Calculate age
     let age = null
@@ -116,6 +136,15 @@ export async function GET(request: NextRequest) {
       education: conversations.filter((c) => c.conversation_type === "education").length,
     }
 
+    // Fetch recent chat history for context
+    const messagesByType = conversations.reduce((acc, c) => {
+      if (!acc[c.conversation_type]) {
+        acc[c.conversation_type] = []
+      }
+      acc[c.conversation_type].push(c.summary)
+      return acc
+    }, {} as Record<string, string[]>)
+
     // Build context for AI
     const contextData = {
       user: {
@@ -141,6 +170,7 @@ export async function GET(request: NextRequest) {
       },
       activities: schedules.map((s) => ({ title: s.title, type: s.activity_type })),
       conversations: conversationSummary,
+      dailySummaries: summariesForContext,
     }
 
     // Generate insights using OpenAI
@@ -149,31 +179,35 @@ export async function GET(request: NextRequest) {
         ? `Anda adalah asisten kesehatan jiwa yang memberikan wawasan dan rekomendasi berdasarkan data kesehatan pengguna. Berikan respons dalam Bahasa Indonesia yang mudah dipahami.
 
 Tugas Anda:
-1. Analisis data kesehatan pengguna secara menyeluruh
+1. Analisis RINGKASAN HARIAN (dailySummaries) untuk memahami perjalanan kesehatan pengguna dari waktu ke waktu
 2. Identifikasi pola dan tren dari data tekanan darah, kepatuhan obat, dan aktivitas
-3. Berikan wawasan tentang kondisi kesehatan mental dan fisik
-4. Rekomendasikan fitur-fitur aplikasi ANSWA yang relevan:
-   - Asesmen AI Lengkap untuk evaluasi mendalam
-   - Monitoring & Evaluasi untuk pemantauan rutin
-   - Edukasi untuk belajar teknik relaksasi
-   - Penjadwalan Aktivitas untuk rutinitas sehat
-5. Berikan saran konkret dan actionable
+3. Berdasarkan ringkasan percakapan, evaluasi:
+   - Pemahaman pengguna tentang hipertensi (dari tes pengetahuan)
+   - Kondisi mental dan emosional (dari asesmen dan monitoring)
+   - Topik-topik kesehatan yang sering dibahas
+4. Berikan gambaran trajektori kondisi kesehatan: apakah membaik, stabil, atau perlu perhatian
+5. Rekomendasikan fitur ANSWA yang relevan berdasarkan kebutuhan spesifik
+6. Berikan saran konkret dan actionable
 
-Format respons dalam paragraf yang mengalir natural, bukan poin-poin. Maksimal 4 paragraf.`
+PENTING: Gunakan ringkasan harian untuk melihat perkembangan kondisi pengguna dari hari ke hari. Identifikasi perubahan positif dan area yang perlu ditingkatkan.
+
+Format respons dalam paragraf yang mengalir natural. Maksimal 4 paragraf.`
         : `You are a mental health assistant providing insights and recommendations based on user health data. Respond in clear, easy-to-understand English.
 
 Your tasks:
-1. Analyze user health data comprehensively
-2. Identify patterns and trends from blood pressure, medication adherence, and activity data
-3. Provide insights about mental and physical health condition
-4. Recommend relevant ANSWA app features:
-   - Full AI Assessment for in-depth evaluation
-   - Monitoring & Evaluation for routine check-ups
-   - Education for learning relaxation techniques
-   - Activity Scheduling for healthy routines
-5. Give concrete, actionable advice
+1. Analyze DAILY SUMMARIES (dailySummaries) to understand user's health journey over time
+2. Identify patterns and trends from blood pressure, medication adherence, and activities
+3. Based on conversation summaries, evaluate:
+   - User's understanding of hypertension (from knowledge tests)
+   - Mental and emotional condition (from assessments and monitoring)
+   - Frequently discussed health topics
+4. Provide trajectory overview: improving, stable, or needs attention
+5. Recommend relevant ANSWA features based on specific needs
+6. Give concrete, actionable advice
 
-Format response in naturally flowing paragraphs, not bullet points. Maximum 4 paragraphs.`
+IMPORTANT: Use daily summaries to see user's condition progress day by day. Identify positive changes and areas for improvement.
+
+Format response in naturally flowing paragraphs. Maximum 4 paragraphs.`
 
     const userPrompt =
       lang === "id"
