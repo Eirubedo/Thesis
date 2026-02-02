@@ -71,17 +71,7 @@ export function DifyChatInterface({
   const { toast } = useToast()
   const { speak, manualSpeak, stopSpeech, isPlaying, isLoading: ttsLoading, currentProvider } = useTTS()
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      content:
-        language === "id"
-          ? "Halo! Saya asisten kesehatan AI Anda. Saya di sini untuk mendengarkan, mendukung, dan memberikan bimbingan. Bagaimana perasaan Anda hari ini?"
-          : "Hello! I'm your AI health assistant. I'm here to listen, support, and provide guidance. How are you feeling today?",
-      role: "assistant",
-      timestamp: new Date(),
-    },
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
@@ -233,8 +223,8 @@ export function DifyChatInterface({
 
       await saveConversation(assistantMessage, "assistant")
 
-      // Use TTS hook for speech synthesis
-      await speak(assistantMessage.content, language === "id" ? "id-ID" : "en-US")
+      // TTS is now on-demand only - user must click play button to hear audio
+      // Removed auto-play: await speak(assistantMessage.content, language === "id" ? "id-ID" : "en-US")
     } catch (error) {
       console.error("Chat error:", error)
       toast({
@@ -397,6 +387,29 @@ export function DifyChatInterface({
       </div>
     </div>
   )
+
+  const getWelcomeMessage = (context: UserContext | null) => {
+    const userName = context?.profile?.name || ""
+    const greeting = userName ? (language === "id" ? `Halo ${userName}!` : `Hello ${userName}!`) : (language === "id" ? "Halo!" : "Hello!")
+    
+    if (language === "id") {
+      return `${greeting} Saya ANSWA (AI Nursing Support for Wellness Assistance), asisten kesehatan AI Anda yang siap membantu 24/7. Saya di sini untuk mendengarkan, mendukung, dan memberikan bimbingan terkait kesehatan hipertensi dan kesejahteraan mental Anda. Anda juga bisa berbicara dengan menekan ikon mikrofon untuk mengobrol dengan suara. Bagaimana perasaan Anda hari ini?`
+    }
+    return `${greeting} I'm ANSWA (AI Nursing Support for Wellness Assistance), your AI health assistant available 24/7. I'm here to listen, support, and provide guidance for your hypertension health and mental wellbeing. You can also speak by pressing the microphone icon to chat with voice. How are you feeling today?`
+  }
+
+  useEffect(() => {
+    if (contextLoaded && messages.length === 0) {
+      setMessages([
+        {
+          id: "welcome",
+          content: getWelcomeMessage(userContext),
+          role: "assistant",
+          timestamp: new Date(),
+        },
+      ])
+    }
+  }, [contextLoaded, userContext, language])
 
   if (!showHeader) {
     return <div className="w-full">{chatContent}</div>

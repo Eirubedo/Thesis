@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 
 export default function AssessmentPage() {
   const { user } = useAuth()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const router = useRouter()
   const [selectedAssessment, setSelectedAssessment] = useState<string | null>(null)
   const [assessmentMode, setAssessmentMode] = useState<"overview" | "comprehensive" | "quick" | "knowledge">("overview")
@@ -49,6 +49,12 @@ export default function AssessmentPage() {
         "Rekomendasi pengobatan personal",
         "Laporan detail untuk dokter",
       ],
+      whyImportant: language === "id"
+        ? "Asesmen komprehensif membantu mengidentifikasi faktor risiko tersembunyi dan memberikan gambaran lengkap kondisi kesehatan Anda. Hasil asesmen dapat digunakan sebagai referensi saat berkonsultasi dengan dokter."
+        : "Comprehensive assessment helps identify hidden risk factors and provides a complete picture of your health condition. Results can be used as reference when consulting with your doctor.",
+      howItHelps: language === "id"
+        ? "AI akan menganalisis riwayat kesehatan, gaya hidup, dan kondisi mental Anda untuk memberikan rekomendasi personal yang dapat membantu mengendalikan hipertensi secara holistik."
+        : "AI will analyze your health history, lifestyle, and mental condition to provide personalized recommendations that can help control hypertension holistically.",
     },
     {
       id: "quick",
@@ -64,6 +70,12 @@ export default function AssessmentPage() {
         "Evaluasi kemampuan yang dilakukan",
         "Ringkasan dan rekomendasi",
       ],
+      whyImportant: language === "id"
+        ? "Monitoring rutin penting untuk mendeteksi perubahan kondisi secara dini. Dengan evaluasi berkala, Anda dapat memantau efektivitas pengobatan dan gaya hidup yang dijalani."
+        : "Routine monitoring is important for early detection of condition changes. With periodic evaluation, you can monitor the effectiveness of treatment and lifestyle.",
+      howItHelps: language === "id"
+        ? "AI akan mengevaluasi tanda, gejala, dan kemampuan pengelolaan diri Anda saat ini, kemudian memberikan umpan balik tentang area yang perlu ditingkatkan."
+        : "AI will evaluate your current signs, symptoms, and self-management abilities, then provide feedback on areas that need improvement.",
     },
     {
       id: "knowledge",
@@ -79,6 +91,12 @@ export default function AssessmentPage() {
         "Mitos vs fakta",
         "Sertifikat pengetahuan",
       ],
+      whyImportant: language === "id"
+        ? "Pengetahuan yang baik tentang hipertensi terbukti meningkatkan kepatuhan pengobatan dan hasil kesehatan. Tes ini membantu mengidentifikasi kesenjangan pengetahuan Anda."
+        : "Good knowledge about hypertension is proven to improve medication adherence and health outcomes. This test helps identify your knowledge gaps.",
+      howItHelps: language === "id"
+        ? "AI akan menguji pemahaman Anda tentang hipertensi dan memberikan edukasi interaktif untuk memperbaiki miskonsepsi serta memperkuat pengetahuan yang sudah benar."
+        : "AI will test your understanding of hypertension and provide interactive education to correct misconceptions and reinforce correct knowledge.",
     },
   ]
 
@@ -375,7 +393,7 @@ export default function AssessmentPage() {
                   </Button>
                 </CardHeader>
                 <CardContent className="flex flex-col h-full">
-                  <ul className="space-y-2 flex-grow">
+                  <ul className="space-y-2 flex-grow mb-4">
                     {assessment.features.map((feature, index) => (
                       <li key={index} className="flex items-start gap-2 text-sm">
                         <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -383,6 +401,31 @@ export default function AssessmentPage() {
                       </li>
                     ))}
                   </ul>
+                  
+                  {/* Detailed Information Section */}
+                  <div className="border-t pt-4 mt-auto">
+                    <details className="group">
+                      <summary className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+                        <AlertCircle className="w-4 h-4" />
+                        {language === "id" ? "Informasi Detail" : "Detailed Information"}
+                        <ArrowRight className="w-3 h-3 ml-auto transition-transform group-open:rotate-90" />
+                      </summary>
+                      <div className="mt-3 space-y-3 text-sm">
+                        <div className="bg-blue-50 p-3 rounded-lg">
+                          <p className="font-medium text-blue-900 mb-1">
+                            {language === "id" ? "Mengapa Penting?" : "Why is it Important?"}
+                          </p>
+                          <p className="text-blue-700 text-xs">{assessment.whyImportant}</p>
+                        </div>
+                        <div className="bg-green-50 p-3 rounded-lg">
+                          <p className="font-medium text-green-900 mb-1">
+                            {language === "id" ? "Bagaimana Ini Membantu?" : "How Does It Help?"}
+                          </p>
+                          <p className="text-green-700 text-xs">{assessment.howItHelps}</p>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
                 </CardContent>
               </Card>
             )
