@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useAuth } from "@/components/auth-provider"
 import { useLanguage } from "@/contexts/language-context"
 import { useTTS } from "@/hooks/use-tts"
@@ -96,6 +97,9 @@ export function DifyChatInterface({
   const [contextLoaded, setContextLoaded] = useState(false)
   const [assessmentProgress, setAssessmentProgress] = useState<AssessmentProgress | null>(null)
   const [profilePicture, setProfilePicture] = useState<string | null>(null)
+  const [showSessionDialog, setShowSessionDialog] = useState(false)
+  const [lastConversation, setLastConversation] = useState<any>(null)
+  const [loadingLastConversation, setLoadingLastConversation] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
@@ -141,6 +145,34 @@ export function DifyChatInterface({
 
     fetchProfilePicture()
   }, [user?.id])
+
+  // Check for last conversation and show dialog
+  useEffect(() => {
+    const checkLastConversation = async () => {
+      if (!user?.id || conversationType !== "chat") {
+        setLoadingLastConversation(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/conversations/list?user_id=${user.id}&type=${conversationType}`)
+        if (response.ok) {
+          const conversations = await response.json()
+          if (conversations && conversations.length > 0) {
+            const lastConv = conversations[0] // Most recent
+            setLastConversation(lastConv)
+            setShowSessionDialog(true)
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check last conversation:", error)
+      } finally {
+        setLoadingLastConversation(false)
+      }
+    }
+
+    checkLastConversation()
+  }, [user?.id, conversationType])
 
   // Fetch and update assessment progress
   useEffect(() => {
@@ -247,6 +279,50 @@ export function DifyChatInterface({
       recognitionRef.current = recognition
     }
   }, [toast, language])
+
+  const loadConversation = async (conversationId: string) => {
+    try {
+      const response = await fetch(`/api/conversations/detail?conversation_id=${conversationId}`)
+      if (response.ok) {
+        const data = await response.json()
+        const { conversation, messages: dbMessages } = data
+
+        // Load conversation
+        setDbConversationId(conversation.id)
+        setConversationId(conversation.dify_conversation_id || "")
+
+        // Load messages
+        const loadedMessages: Message[] = dbMessages.map((msg: any) => ({
+          id: msg.message_id,
+          content: msg.content,
+          role: msg.role,
+          timestamp: new Date(msg.created_at),
+        }))
+        setMessages(loadedMessages)
+      }
+    } catch (error) {
+      console.error("Failed to load conversation:", error)
+      toast({
+        title: "Error",
+        description: "Failed to load conversation",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleContinueSession = async () => {
+    if (lastConversation) {
+      await loadConversation(lastConversation.id)
+    }
+    setShowSessionDialog(false)
+  }
+
+  const handleNewSession = () => {
+    setMessages([])
+    setConversationId("")
+    setDbConversationId("")
+    setShowSessionDialog(false)
+  }
 
   const saveConversation = async (message: Message, role: "user" | "assistant") => {
     if (!user?.id) return
@@ -655,7 +731,7 @@ export function DifyChatInterface({
   }
 
   useEffect(() => {
-    if (contextLoaded && messages.length === 0) {
+    if (contextLoaded && messages.length === 0 && !loadingLastConversation && !showSessionDialog) {
       setMessages([
         {
           id: "welcome",
@@ -665,7 +741,7 @@ export function DifyChatInterface({
         },
       ])
     }
-  }, [contextLoaded, userContext, language])
+  }, [contextLoaded, userContext, language, loadingLastConversation, showSessionDialog])
 
   if (!showHeader) {
     return <div className="w-full">{chatContent}</div>
@@ -705,27 +781,71 @@ export function DifyChatInterface({
   }
 
   return (
-    <div className="space-y-4">
-      <Card className="w-full border-sky-100">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center">
-                <MessageCircle className="w-6 h-6 mr-2 text-sky-600" />
-                {title || t("chat.title")}
+    <>
+      <div className="space-y-4">
+        <Card className="w-full border-sky-100">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center">
+                  <MessageCircle className="w-6 h-6 mr-2 text-sky-600" />
+                  {title || t("chat.title")}
+                </div>
+                {getProgressBadge()}
               </div>
-              {getProgressBadge()}
-            </div>
-            {showHeader && (
-              <div className="flex items-center space-x-2">
-                <span className="text-xs text-gray-500">Voice: {currentProvider}</span>
-                {isPlaying && <Volume2 className="w-4 h-4 text-yellow-500 animate-pulse" />}
-              </div>
+              {showHeader && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-500">Voice: {currentProvider}</span>
+                  {isPlaying && <Volume2 className="w-4 h-4 text-yellow-500 animate-pulse" />}
+                </div>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">{chatContent}</CardContent>
+        </Card>
+      </div>
+
+      {/* Session Choice Dialog */}
+      <Dialog open={showSessionDialog} onOpenChange={setShowSessionDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">{t("chat.continueOrNew")}</DialogTitle>
+            <DialogDescription className="text-center">{t("chat.continueOrNewDesc")}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 mt-4">
+            {lastConversation && (
+              <Button
+                onClick={handleContinueSession}
+                className="w-full h-auto py-4 flex flex-col items-start gap-1 bg-sky-500 hover:bg-sky-600 text-white"
+              >
+                <div className="flex items-center gap-2 font-semibold">
+                  <MessageCircle className="w-5 h-5" />
+                  {t("chat.continueLastSession")}
+                </div>
+                <span className="text-xs text-sky-100">{t("chat.continueLastSessionDesc")}</span>
+                {lastConversation.started_at && (
+                  <span className="text-xs text-sky-200">
+                    {t("chat.lastConversationFrom")} {new Date(lastConversation.started_at).toLocaleDateString()}
+                  </span>
+                )}
+              </Button>
             )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">{chatContent}</CardContent>
-      </Card>
-    </div>
+
+            <Button
+              onClick={handleNewSession}
+              variant="outline"
+              className="w-full h-auto py-4 flex flex-col items-start gap-1 border-sky-200 hover:bg-sky-50 bg-transparent"
+            >
+              <div className="flex items-center gap-2 font-semibold text-sky-700">
+                <Bot className="w-5 h-5" />
+                {t("chat.startNewSession")}
+              </div>
+              <span className="text-xs text-gray-500">{t("chat.startNewSessionDesc")}</span>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
