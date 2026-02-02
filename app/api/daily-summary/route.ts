@@ -56,37 +56,51 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { user_id, date, lang = "id" } = body
 
+    console.log("[v0] Daily summary POST request:", { user_id, date, lang })
+
     if (!user_id || !date) {
       return NextResponse.json({ error: "User ID and date required" }, { status: 400 })
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Fetch all messages for that date
+    // Fetch all messages for that date using a simpler query approach
     const startOfDay = `${date}T00:00:00.000Z`
     const endOfDay = `${date}T23:59:59.999Z`
 
+    // First, get all conversations for this user
+    const { data: conversations, error: convError } = await supabase
+      .from("conversations")
+      .select("id, conversation_type, title")
+      .eq("user_id", user_id)
+
+    if (convError) {
+      console.error("[v0] Error fetching conversations:", convError)
+      return NextResponse.json({ error: `Failed to fetch conversations: ${convError.message}` }, { status: 500 })
+    }
+
+    if (!conversations || conversations.length === 0) {
+      return NextResponse.json({ error: "No conversations found for this user" }, { status: 404 })
+    }
+
+    const conversationIds = conversations.map(c => c.id)
+    const conversationMap = new Map(conversations.map(c => [c.id, c]))
+
+    // Then, get messages for these conversations within the date range
     const { data: messages, error: messagesError } = await supabase
       .from("conversation_messages")
-      .select(`
-        content,
-        role,
-        created_at,
-        conversations!inner (
-          conversation_type,
-          title,
-          user_id
-        )
-      `)
-      .eq("conversations.user_id", user_id)
+      .select("content, role, created_at, conversation_id")
+      .in("conversation_id", conversationIds)
       .gte("created_at", startOfDay)
       .lte("created_at", endOfDay)
       .order("created_at", { ascending: true })
 
     if (messagesError) {
-      console.error("Fetch messages error:", messagesError)
-      throw messagesError
+      console.error("[v0] Error fetching messages:", messagesError)
+      return NextResponse.json({ error: `Failed to fetch messages: ${messagesError.message}` }, { status: 500 })
     }
+
+    console.log("[v0] Found messages:", messages?.length || 0)
 
     if (!messages || messages.length === 0) {
       return NextResponse.json({ error: "No messages found for this date" }, { status: 404 })
@@ -97,7 +111,8 @@ export async function POST(request: NextRequest) {
     const conversationTypes: Set<string> = new Set()
 
     messages.forEach((msg: any) => {
-      const type = msg.conversations?.conversation_type || "chat"
+      const conv = conversationMap.get(msg.conversation_id)
+      const type = conv?.conversation_type || "chat"
       conversationTypes.add(type)
       if (!messagesByType[type]) {
         messagesByType[type] = []
@@ -132,57 +147,84 @@ Tulis dalam bahasa Indonesia yang mudah dipahami. Jangan gunakan poin-poin, tuli
 
 Write in clear, flowing paragraphs without bullet points.`
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Ringkaskan percakapan berikut:\n${transcript}` }
-      ],
-      temperature: 0.7,
-      max_tokens: 500,
-    })
-
-    const summaryText = completion.choices[0]?.message?.content || ""
+    console.log("[v0] Generating summary with OpenAI...")
+    
+    let summaryText = ""
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Ringkaskan percakapan berikut:\n${transcript}` }
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      })
+      summaryText = completion.choices[0]?.message?.content || ""
+      console.log("[v0] OpenAI summary generated successfully")
+    } catch (openaiError: any) {
+      console.error("[v0] OpenAI error:", openaiError?.message || openaiError)
+      return NextResponse.json({ error: `OpenAI error: ${openaiError?.message || "Unknown error"}` }, { status: 500 })
+    }
 
     // Extract key topics (simple extraction from summary)
     const keyTopics = extractKeyTopics(summaryText, lang)
 
-    // Upsert the summary
-    const { data: summary, error: upsertError } = await supabase
+    // Check if summary already exists
+    const { data: existingSummary } = await supabase
       .from("daily_summaries")
-      .upsert({
-        user_id,
-        summary_date: date,
-        summary_text: summaryText,
-        conversation_types: Array.from(conversationTypes),
-        message_count: messages.length,
-        key_topics: keyTopics,
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: "user_id,summary_date",
-      })
-      .select()
+      .select("id")
+      .eq("user_id", user_id)
+      .eq("summary_date", date)
       .single()
 
-    if (upsertError) {
-      console.error("Upsert summary error:", upsertError)
-      // If table doesn't exist, just return the generated summary
-      if (upsertError.code === "42P01") {
-        return NextResponse.json({
-          summary_date: date,
-          summary_text: summaryText,
-          conversation_types: Array.from(conversationTypes),
-          message_count: messages.length,
-          key_topics: keyTopics,
-        })
-      }
-      throw upsertError
+    const summaryData = {
+      user_id,
+      summary_date: date,
+      summary_text: summaryText,
+      conversation_types: Array.from(conversationTypes),
+      message_count: messages.length,
+      key_topics: keyTopics,
+      updated_at: new Date().toISOString(),
     }
 
+    let summary
+    if (existingSummary) {
+      // Update existing
+      const { data, error } = await supabase
+        .from("daily_summaries")
+        .update(summaryData)
+        .eq("id", existingSummary.id)
+        .select()
+        .single()
+      
+      if (error) {
+        console.error("[v0] Update summary error:", error)
+        // Return generated data anyway
+        return NextResponse.json({ ...summaryData, id: existingSummary.id })
+      }
+      summary = data
+    } else {
+      // Insert new
+      const { data, error } = await supabase
+        .from("daily_summaries")
+        .insert(summaryData)
+        .select()
+        .single()
+      
+      if (error) {
+        console.error("[v0] Insert summary error:", error)
+        // Return generated data anyway
+        return NextResponse.json(summaryData)
+      }
+      summary = data
+    }
+
+    console.log("[v0] Summary saved successfully")
     return NextResponse.json(summary)
-  } catch (error) {
-    console.error("Daily summary POST error:", error)
-    return NextResponse.json({ error: "Failed to generate summary" }, { status: 500 })
+  } catch (error: any) {
+    console.error("[v0] Daily summary POST error:", error?.message || error)
+    return NextResponse.json({ error: `Failed to generate summary: ${error?.message || "Unknown error"}` }, { status: 500 })
   }
 }
 
