@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Check if there's an existing in-progress assessment
-    const { data: existing } = await supabase
+    const { data: existingArray } = await supabase
       .from("assessment_progress")
       .select("*")
       .eq("user_id", user_id)
@@ -75,7 +75,8 @@ export async function POST(request: NextRequest) {
       .neq("status", "completed")
       .order("created_at", { ascending: false })
       .limit(1)
-      .single()
+
+    const existing = existingArray?.[0] || null
 
     if (existing && status === "started") {
       // Return existing progress if starting and one already exists
