@@ -87,22 +87,22 @@ All variables are stored in the `full_assessments` table with the following stru
 ## API Endpoints
 
 ### Save or Update Full Assessment
-```
+\`\`\`
 POST /api/full-assessment
 Body: {
   user_id: string (required),
   // ... all other assessment fields
 }
-```
+\`\`\`
 
 ### Get Full Assessment
-```
+\`\`\`
 GET /api/full-assessment?user_id={userId}
 Response: { assessment: { ...assessmentData } }
-```
+\`\`\`
 
 ### Get User Context (includes full assessment)
-```
+\`\`\`
 GET /api/user-context?user_id={userId}
 Response: {
   profile: {...},
@@ -112,7 +112,7 @@ Response: {
   activities: [...],
   fullAssessment: {...}  // Full assessment data included here
 }
-```
+\`\`\`
 
 ## Integration with Dify
 
