@@ -1,7 +1,31 @@
 "use client"
 
+import { ChartLegendContent } from "@/components/ui/chart"
+
+import { ChartLegend } from "@/components/ui/chart"
+
+import { ChartTooltipContent } from "@/components/ui/chart"
+
+import { ChartTooltip } from "@/components/ui/chart"
+
+import { ChartContainer } from "@/components/ui/chart"
+
+import React from "react"
+
 import { useState } from "react"
 import { Navigation } from "@/components/navigation"
+import { useAuth } from "@/hooks/use-auth"
+import { supabase } from "@/lib/supabase"
+import {
+  ResponsiveContainer,
+  LineChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  Legend,
+  Line,
+} from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -56,6 +80,7 @@ import { useLanguage } from "@/contexts/language-context"
 import type { ActivityType } from "@/types/database"
 
 export default function MonitoringPage() {
+  const { user } = useAuth()
   const { language, t } = useLanguage()
   const { readings, addReading, deleteReading, getStats, getAverageReading, getCategoryColor, getCategoryLabel } =
     useBPTracking()
@@ -79,6 +104,10 @@ export default function MonitoringPage() {
     getUpcomingSchedule,
     getActivityStatistics,
   } = useActivityScheduling()
+
+  // Chat Activity State
+  const [chatActivityData, setChatActivityData] = useState<any[]>([])
+  const [isLoadingChartData, setIsLoadingChartData] = useState(true)
 
   // BP Form State
   const [systolic, setSystolic] = useState("")
@@ -192,6 +221,55 @@ export default function MonitoringPage() {
   // Calculate today's medication progress
   const totalScheduledToday = todaysMeds.reduce((total, med) => total + (med.times?.length || 0), 0)
   const takenToday = todaysMeds.reduce((total, med) => total + (med.logs?.filter((log) => log.taken).length || 0), 0)
+
+  // Fetch chat activity data
+  React.useEffect(() => {
+    const fetchChatActivity = async () => {
+      if (!user?.id) return
+
+      try {
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("started_at, message_count")
+          .eq("user_id", user.id)
+          .gte("started_at", thirtyDaysAgo.toISOString())
+          .order("started_at", { ascending: true })
+
+        if (error) throw error
+
+        // Group by day
+        const groupedByDay: { [key: string]: { count: number; messages: number } } = {}
+        data?.forEach((conv: any) => {
+          const date = new Date(conv.started_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          })
+          if (!groupedByDay[date]) {
+            groupedByDay[date] = { count: 0, messages: 0 }
+          }
+          groupedByDay[date].count += 1
+          groupedByDay[date].messages += conv.message_count || 0
+        })
+
+        const chartData = Object.entries(groupedByDay).map(([date, data]) => ({
+          date,
+          sessions: data.count,
+          messages: data.messages,
+        }))
+
+        setChatActivityData(chartData)
+      } catch (error) {
+        console.error("Error fetching chat activity:", error)
+      } finally {
+        setIsLoadingChartData(false)
+      }
+    }
+
+    fetchChatActivity()
+  }, [user?.id])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 pt-20 pb-12">

@@ -29,7 +29,7 @@ export default function BPTrackingPage() {
     heartRate: "",
     notes: "",
     date: new Date().toISOString().split("T")[0],
-    time: new Date().toTimeString().slice(0, 5),
+    time: new Date().toISOString().split("T")[1].slice(0, 5),
   })
 
   if (!user) {
@@ -57,7 +57,7 @@ export default function BPTrackingPage() {
         heartRate: "",
         notes: "",
         date: new Date().toISOString().split("T")[0],
-        time: new Date().toTimeString().slice(0, 5),
+        time: new Date().toISOString().split("T")[1].slice(0, 5),
       })
       setShowAddForm(false)
     }
