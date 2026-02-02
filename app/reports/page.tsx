@@ -153,6 +153,22 @@ export default function ReportsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id, date, lang: language }),
       })
+      
+      // Check content type before parsing
+      const contentType = response.headers.get("content-type")
+      
+      if (!contentType?.includes("application/json")) {
+        // Server returned non-JSON (likely plain text error)
+        const textError = await response.text()
+        console.error("[v0] Non-JSON response:", textError)
+        toast({
+          title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
+          description: language === "id" ? "Terjadi kesalahan server" : "Server error occurred",
+          variant: "destructive",
+        })
+        return
+      }
+      
       const data = await response.json()
       
       if (response.ok) {
@@ -164,7 +180,6 @@ export default function ReportsPage() {
       } else {
         // Show specific error from API
         const errorMessage = data?.error || "Unknown error"
-        console.log("[v0] API error response:", data)
         toast({
           title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
           description: errorMessage,

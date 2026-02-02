@@ -2,15 +2,27 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase environment variables")
+  }
+  
+  return createClient(supabaseUrl, supabaseServiceKey)
+}
+
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    throw new Error("Missing OPENAI_API_KEY environment variable")
+  }
+  return new OpenAI({ apiKey })
+}
 
 // GET: Fetch daily summaries for a user
 export async function GET(request: NextRequest) {
@@ -24,7 +36,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = getSupabaseClient()
 
     // Fetch existing summaries
     const { data: summaries, error } = await supabase
@@ -62,7 +74,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User ID and date required" }, { status: 400 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = getSupabaseClient()
+    const openai = getOpenAIClient()
 
     // Fetch all messages for that date using a simpler query approach
     const startOfDay = `${date}T00:00:00.000Z`
