@@ -1,5 +1,15 @@
 "use client"
 
+import { ChartLegendContent } from "@/components/ui/chart"
+
+import { ChartLegend } from "@/components/ui/chart"
+
+import { ChartTooltipContent } from "@/components/ui/chart"
+
+import { ChartTooltip } from "@/components/ui/chart"
+
+import { ChartContainer } from "@/components/ui/chart"
+
 import React from "react"
 
 import { useState } from "react"
@@ -51,8 +61,7 @@ import {
   HelpCircle,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
+import { CartesianGrid, Line, LineChart, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts"
 import { useBPTracking } from "@/hooks/use-bp-tracking"
 import { useMedicationTracking } from "@/hooks/use-medication-tracking"
 import { useActivityScheduling } from "@/hooks/use-activity-scheduling"
@@ -275,19 +284,7 @@ export default function MonitoringPage() {
             </CardHeader>
             <CardContent>
               {readings.length > 0 ? (
-                <ChartContainer
-                  config={{
-                    systolic: {
-                      label: language === "id" ? "Sistolik" : "Systolic",
-                      color: "hsl(0, 84%, 60%)",
-                    },
-                    diastolic: {
-                      label: language === "id" ? "Diastolik" : "Diastolic",
-                      color: "hsl(221, 83%, 53%)",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
+                <ResponsiveContainer width="100%" height={300}>
                   <LineChart
                     data={readings
                       .slice(0, 30)
@@ -297,19 +294,38 @@ export default function MonitoringPage() {
                           month: "short",
                           day: "numeric",
                         }),
-                        systolic: r.systolic,
-                        diastolic: r.diastolic,
+                        [language === "id" ? "Sistolik" : "Systolic"]: r.systolic,
+                        [language === "id" ? "Diastolik" : "Diastolic"]: r.diastolic,
                       }))}
+                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis domain={[40, 200]} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Line type="monotone" dataKey="systolic" stroke="var(--color-systolic)" strokeWidth={2} />
-                    <Line type="monotone" dataKey="diastolic" stroke="var(--color-diastolic)" strokeWidth={2} />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" />
+                    <YAxis domain={[40, 200]} className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Sistolik" : "Systolic"}
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={{ fill: "#ef4444" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Diastolik" : "Diastolic"}
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={{ fill: "#3b82f6" }}
+                    />
                   </LineChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                   {t("bp.noReadings")}
@@ -328,19 +344,7 @@ export default function MonitoringPage() {
             </CardHeader>
             <CardContent>
               {medications.length > 0 ? (
-                <ChartContainer
-                  config={{
-                    taken: {
-                      label: language === "id" ? "Diminum" : "Taken",
-                      color: "hsl(142, 76%, 36%)",
-                    },
-                    missed: {
-                      label: language === "id" ? "Terlewat" : "Missed",
-                      color: "hsl(0, 84%, 60%)",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
+                <ResponsiveContainer width="100%" height={300}>
                   <LineChart
                     data={(() => {
                       const last7Days = []
@@ -351,26 +355,47 @@ export default function MonitoringPage() {
                         const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 
                         const dayMeds = medications.flatMap((med) => med.logs || [])
-                        const dayLogs = dayMeds.filter(
-                          (log) => log.taken_at && log.taken_at.startsWith(dateStr),
-                        )
+                        const dayLogs = dayMeds.filter((log) => log.taken_at && log.taken_at.startsWith(dateStr))
                         const taken = dayLogs.filter((log) => log.was_taken).length
                         const missed = dayLogs.filter((log) => !log.was_taken).length
 
-                        last7Days.push({ date: dayLabel, taken, missed })
+                        last7Days.push({
+                          date: dayLabel,
+                          [language === "id" ? "Diminum" : "Taken"]: taken,
+                          [language === "id" ? "Terlewat" : "Missed"]: missed,
+                        })
                       }
                       return last7Days
                     })()}
+                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Line type="monotone" dataKey="taken" stroke="var(--color-taken)" strokeWidth={2} />
-                    <Line type="monotone" dataKey="missed" stroke="var(--color-missed)" strokeWidth={2} />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Diminum" : "Taken"}
+                      stroke="#22c55e"
+                      strokeWidth={2}
+                      dot={{ fill: "#22c55e" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Terlewat" : "Missed"}
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={{ fill: "#ef4444" }}
+                    />
                   </LineChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                   {language === "id" ? "Belum ada data obat" : "No medication data"}
@@ -389,15 +414,7 @@ export default function MonitoringPage() {
             </CardHeader>
             <CardContent>
               {schedules.length > 0 ? (
-                <ChartContainer
-                  config={{
-                    completed: {
-                      label: language === "id" ? "Selesai" : "Completed",
-                      color: "hsl(142, 76%, 36%)",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
+                <ResponsiveContainer width="100%" height={300}>
                   <LineChart
                     data={(() => {
                       const last30Days = []
@@ -412,19 +429,35 @@ export default function MonitoringPage() {
                           (log) => log.completed_at && log.completed_at.startsWith(dateStr),
                         ).length
 
-                        last30Days.push({ date: dayLabel, completed })
+                        last30Days.push({
+                          date: dayLabel,
+                          [language === "id" ? "Selesai" : "Completed"]: completed,
+                        })
                       }
                       return last30Days
                     })()}
+                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Line type="monotone" dataKey="completed" stroke="var(--color-completed)" strokeWidth={2} />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Selesai" : "Completed"}
+                      stroke="#22c55e"
+                      strokeWidth={2}
+                      dot={{ fill: "#22c55e" }}
+                    />
                   </LineChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                   {language === "id" ? "Belum ada data aktivitas" : "No activity data"}
@@ -447,29 +480,42 @@ export default function MonitoringPage() {
                   {language === "id" ? "Memuat..." : "Loading..."}
                 </div>
               ) : chatActivityData.length > 0 ? (
-                <ChartContainer
-                  config={{
-                    sessions: {
-                      label: language === "id" ? "Sesi" : "Sessions",
-                      color: "hsl(262, 83%, 58%)",
-                    },
-                    messages: {
-                      label: language === "id" ? "Pesan" : "Messages",
-                      color: "hsl(221, 83%, 53%)",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
-                  <LineChart data={chatActivityData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Line type="monotone" dataKey="sessions" stroke="var(--color-sessions)" strokeWidth={2} />
-                    <Line type="monotone" dataKey="messages" stroke="var(--color-messages)" strokeWidth={2} />
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={chatActivityData.map((d) => ({
+                      date: d.date,
+                      [language === "id" ? "Sesi" : "Sessions"]: d.sessions,
+                      [language === "id" ? "Pesan" : "Messages"]: d.messages,
+                    }))}
+                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Sesi" : "Sessions"}
+                      stroke="#a855f7"
+                      strokeWidth={2}
+                      dot={{ fill: "#a855f7" }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Pesan" : "Messages"}
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={{ fill: "#3b82f6" }}
+                    />
                   </LineChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                   {language === "id" ? "Belum ada aktivitas chat" : "No chat activity"}
