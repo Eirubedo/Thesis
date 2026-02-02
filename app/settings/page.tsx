@@ -31,8 +31,8 @@ export default function SettingsPage() {
   const handleLanguageChange = (newLanguage: "en" | "id") => {
     setLanguage(newLanguage)
     toast({
-      title: "Language Updated",
-      description: `Language changed to ${newLanguage === "en" ? "English" : "Bahasa Indonesia"}`,
+      title: t("settings.languageUpdated"),
+      description: t("settings.languageChangedTo").replace("{language}", newLanguage === "en" ? "English" : "Bahasa Indonesia"),
     })
   }
 
@@ -43,7 +43,7 @@ export default function SettingsPage() {
       <div className="pt-16 max-w-4xl mx-auto p-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("settings.title")}</h1>
-          <p className="text-gray-600">Customize your ANSWA experience</p>
+          <p className="text-gray-600">{t("settings.subtitle")}</p>
         </div>
 
         <div className="space-y-6">
@@ -76,21 +76,21 @@ export default function SettingsPage() {
                 <Bell className="w-5 h-5 mr-2 text-yellow-500" />
                 {t("settings.notifications")}
               </CardTitle>
-              <CardDescription>Manage your notification preferences</CardDescription>
+              <CardDescription>{t("settings.notificationsDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="push-notifications">Push Notifications</Label>
-                  <p className="text-sm text-gray-500">Receive notifications about your mental health journey</p>
+                  <Label htmlFor="push-notifications">{t("settings.pushNotifications")}</Label>
+                  <p className="text-sm text-gray-500">{t("settings.pushNotificationsDesc")}</p>
                 </div>
                 <Switch id="push-notifications" checked={notifications} onCheckedChange={setNotifications} />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="sound-notifications">Sound Notifications</Label>
-                  <p className="text-sm text-gray-500">Play sounds for notifications and alerts</p>
+                  <Label htmlFor="sound-notifications">{t("settings.soundNotifications")}</Label>
+                  <p className="text-sm text-gray-500">{t("settings.soundNotificationsDesc")}</p>
                 </div>
                 <Switch id="sound-notifications" checked={soundEnabled} onCheckedChange={setSoundEnabled} />
               </div>
@@ -102,15 +102,15 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Palette className="w-5 h-5 mr-2 text-sky-600" />
-                Appearance
+                {t("settings.appearance")}
               </CardTitle>
-              <CardDescription>Customize the look and feel of the application</CardDescription>
+              <CardDescription>{t("settings.appearanceDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="dark-mode">Dark Mode</Label>
-                  <p className="text-sm text-gray-500">Switch to dark theme for better viewing in low light</p>
+                  <Label htmlFor="dark-mode">{t("settings.darkMode")}</Label>
+                  <p className="text-sm text-gray-500">{t("settings.darkModeDesc")}</p>
                 </div>
                 <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
               </div>
@@ -124,7 +124,7 @@ export default function SettingsPage() {
                 <Shield className="w-5 h-5 mr-2 text-yellow-500" />
                 {t("settings.privacy")}
               </CardTitle>
-              <CardDescription>Control your data and privacy settings</CardDescription>
+              <CardDescription>{t("settings.privacyDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                   className="w-full justify-start bg-transparent border-sky-200 hover:bg-sky-50"
                 >
                   <Shield className="w-4 h-4 mr-2" />
-                  Data Export
+                  {t("settings.dataExport")}
                 </Button>
                 <Button
                   variant="outline"
@@ -141,14 +141,14 @@ export default function SettingsPage() {
                   onClick={() => router.push("/privacy")}
                 >
                   <FileText className="w-4 h-4 mr-2" />
-                  Privacy Policy
+                  {t("settings.privacyPolicy")}
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full justify-start bg-transparent border-sky-200 hover:bg-sky-50"
                 >
                   <Shield className="w-4 h-4 mr-2" />
-                  Terms of Service
+                  {t("settings.termsOfService")}
                 </Button>
               </div>
             </CardContent>
@@ -159,22 +159,22 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center text-yellow-900">
                 <Info className="w-5 h-5 mr-2" />
-                Informasi Penelitian
+                {t("settings.researchInfo")}
               </CardTitle>
               <CardDescription className="text-yellow-700">
-                Aplikasi ini dikembangkan untuk tujuan penelitian
+                {t("settings.researchInfoDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-sm space-y-2 text-yellow-800">
                 <p>
-                  <strong>Peneliti:</strong> Eka Putri Yulianti
+                  <strong>{t("settings.researcher")}:</strong> Eka Putri Yulianti
                 </p>
                 <p>
-                  <strong>Institusi:</strong> Universitas Indonesia
+                  <strong>{t("settings.institution")}:</strong> Universitas Indonesia
                 </p>
                 <p>
-                  <strong>Program:</strong> Magister Ilmu Keperawatan
+                  <strong>{t("settings.program")}:</strong> Magister Ilmu Keperawatan
                 </p>
               </div>
               <Button
@@ -183,7 +183,7 @@ export default function SettingsPage() {
                 onClick={() => router.push("/privacy")}
               >
                 <FileText className="w-4 h-4 mr-2" />
-                Baca Kebijakan Privasi Lengkap
+                {t("settings.readFullPrivacy")}
               </Button>
             </CardContent>
           </Card>
@@ -195,24 +195,24 @@ export default function SettingsPage() {
                 <Info className="w-5 h-5 mr-2 text-sky-600" />
                 {t("settings.about")}
               </CardTitle>
-              <CardDescription>Information about the application</CardDescription>
+              <CardDescription>{t("settings.aboutDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-sm space-y-1">
                 <p>
-                  <strong>Version:</strong> 1.0.0
+                  <strong>{t("settings.version")}:</strong> 1.0.0
                 </p>
                 <p>
-                  <strong>Build:</strong> 2024.01.15
+                  <strong>{t("settings.build")}:</strong> 2024.01.15
                 </p>
                 <p>
-                  <strong>AI Model:</strong> Dify.ai RAG + OpenAI GPT
+                  <strong>{t("settings.aiModel")}:</strong> Dify.ai RAG + OpenAI GPT
                 </p>
                 <p>
-                  <strong>Application Name:</strong> ANSWA (Asisten Keperawatan Jiwa)
+                  <strong>{t("settings.appName")}:</strong> ANSWA (Asisten Keperawatan Jiwa)
                 </p>
                 <p>
-                  <strong>Voice:</strong> Browser Speech Synthesis
+                  <strong>{t("settings.voice")}:</strong> Browser Speech Synthesis
                 </p>
               </div>
               <Button
@@ -221,7 +221,7 @@ export default function SettingsPage() {
                 onClick={() => router.push("/about")}
               >
                 <Info className="w-4 h-4 mr-2" />
-                Learn More About ANSWA
+                {t("settings.learnMore")}
               </Button>
             </CardContent>
           </Card>
