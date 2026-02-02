@@ -95,6 +95,7 @@ export function DifyChatInterface({
   const [userContext, setUserContext] = useState<UserContext | null>(null)
   const [contextLoaded, setContextLoaded] = useState(false)
   const [assessmentProgress, setAssessmentProgress] = useState<AssessmentProgress | null>(null)
+  const [profilePicture, setProfilePicture] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
@@ -120,6 +121,25 @@ export function DifyChatInterface({
     }
 
     fetchUserContext()
+  }, [user?.id])
+
+  // Fetch profile picture
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (!user?.id) return
+
+      try {
+        const response = await fetch(`/api/profile-picture?user_id=${user.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          setProfilePicture(data.profile_picture)
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile picture:", error)
+      }
+    }
+
+    fetchProfilePicture()
   }, [user?.id])
 
   // Fetch and update assessment progress
@@ -402,12 +422,16 @@ export function DifyChatInterface({
                 }`}
               >
                 <div
-                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ${
                     message.role === "user" ? "bg-sky-500" : "bg-yellow-500"
                   }`}
                 >
                   {message.role === "user" ? (
-                    <User className="w-4 h-4 text-white" />
+                    profilePicture ? (
+                      <img src={profilePicture || "/placeholder.svg"} alt="User" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-4 h-4 text-white" />
+                    )
                   ) : (
                     <Bot className="w-4 h-4 text-white" />
                   )}
@@ -451,6 +475,31 @@ export function DifyChatInterface({
               </div>
             </div>
           )}
+          
+          {/* TTS Audio Visualization */}
+          {(isPlaying || ttsLoading) && (
+            <div className="flex justify-start mb-2">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                <Volume2 className="w-3 h-3 text-yellow-600 animate-pulse" />
+                <div className="flex items-center gap-0.5 h-4">
+                  {[...Array(8)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-0.5 bg-yellow-500 rounded-full animate-pulse"
+                      style={{
+                        height: `${30 + Math.sin(i * 0.5) * 30}%`,
+                        animationDelay: `${i * 0.1}s`,
+                        animationDuration: `${0.6 + (i % 3) * 0.2}s`
+                      }}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-yellow-700">
+                  {ttsLoading ? (language === "id" ? "Menyiapkan..." : "Preparing...") : (language === "id" ? "Memutar" : "Playing")}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
         <div ref={messagesEndRef} />
       </ScrollArea>
@@ -470,20 +519,37 @@ export function DifyChatInterface({
         )}
 
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={placeholder || t("chat.placeholder")}
-            disabled={isLoading}
-            className="flex-1"
-          />
+          <div className="relative flex-1">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={placeholder || t("chat.placeholder")}
+              disabled={isLoading}
+              className="flex-1 pr-24"
+            />
+            {isListening && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 h-4">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-0.5 bg-red-500 rounded-full animate-pulse"
+                    style={{
+                      height: `${30 + Math.sin(i * 0.5) * 30}%`,
+                      animationDelay: `${i * 0.1}s`,
+                      animationDuration: `${0.6 + (i % 3) * 0.2}s`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={isListening ? stopListening : startListening}
             disabled={isLoading}
-            className={isListening ? "bg-yellow-100 text-yellow-600 border-yellow-300" : ""}
+            className={isListening ? "bg-red-100 text-red-600 border-red-300" : ""}
             aria-pressed={isListening}
             aria-label={isListening ? "Stop voice input" : "Start voice input"}
           >
