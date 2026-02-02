@@ -30,7 +30,7 @@ Records symptoms experienced by users for each diagnosis.
 - `assessed_at`: TIMESTAMP
 
 **Symptom Object Structure:**
-```json
+\`\`\`json
 {
   "name": "Sakit kepala",
   "severity": "sedang",
@@ -38,7 +38,7 @@ Records symptoms experienced by users for each diagnosis.
   "duration": "2 minggu",
   "notes": "Biasanya pagi hari"
 }
-```
+\`\`\`
 
 **Usage:** Store symptoms collected during Monev chat.
 
@@ -55,7 +55,7 @@ Records abilities that users know (cognitive) vs. actually do (psychomotor).
 - `assessed_at`: TIMESTAMP
 
 **Example:**
-```json
+\`\`\`json
 {
   "abilities_known": [
     "Mengukur tekanan darah",
@@ -67,7 +67,7 @@ Records abilities that users know (cognitive) vs. actually do (psychomotor).
     "Diet rendah garam"
   ]
 }
-```
+\`\`\`
 
 **Gap Analysis:** `abilities_known` - `abilities_practiced` = abilities that need practice support
 
@@ -130,17 +130,17 @@ Action plans and recommendations generated from assessments.
 1. **User starts chat** → Status: "started"
    
 2. **User selects diagnosis** → Save to `user_diagnoses`
-   ```javascript
+   \`\`\`javascript
    POST /api/monev/diagnoses
    {
      user_id: "...",
      diagnosis_type: "HT",
      diagnosed_date: "2024-01-15"
    }
-   ```
+   \`\`\`
 
 3. **Chat collects symptoms** → Save to `symptom_assessments`
-   ```javascript
+   \`\`\`javascript
    POST /api/monev/symptoms
    {
      user_id: "...",
@@ -149,10 +149,10 @@ Action plans and recommendations generated from assessments.
        { name: "Sakit kepala", severity: "sedang", frequency: "kadang-kadang" }
      ]
    }
-   ```
+   \`\`\`
 
 4. **Chat collects abilities** → Save to `ability_assessments` + `ability_practice_details`
-   ```javascript
+   \`\`\`javascript
    POST /api/monev/abilities
    {
      user_id: "...",
@@ -168,17 +168,17 @@ Action plans and recommendations generated from assessments.
        }
      ]
    }
-   ```
+   \`\`\`
 
 5. **Check if assessed** → Status: "assessed"
-   ```javascript
+   \`\`\`javascript
    POST /api/monev/check-assessed
    {
      user_id: "...",
      assessment_type: "quick-assessment"
    }
    // Returns: { assessed: true, hasSymptoms: true, hasAbilities: true }
-   ```
+   \`\`\`
 
 6. **Chat provides summary & recommendations** → Status: "completed"
 
