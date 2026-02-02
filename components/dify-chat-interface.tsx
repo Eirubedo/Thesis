@@ -312,33 +312,89 @@ export function DifyChatInterface({
         throw new Error("Failed to get response")
       }
 
-      const data = await response.json()
+      // Handle streaming response
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
 
-      if (data.error) {
-        throw new Error(data.error)
+      if (!reader) {
+        throw new Error("No response body")
       }
 
+      let assistantMessageId = (Date.now() + 1).toString()
+      let fullContent = ""
+      let streamConversationId = conversationId
+
+      // Create initial empty assistant message
       const assistantMessage: Message = {
-        id: data.message_id || (Date.now() + 1).toString(),
-        content: data.message,
+        id: assistantMessageId,
+        content: "",
         role: "assistant",
         timestamp: new Date(),
       }
-
       setMessages((prev) => [...prev, assistantMessage])
-      setConversationId(data.conversation_id)
 
-      await saveConversation(assistantMessage, "assistant")
+      // Read the stream
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split("\n")
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const jsonStr = line.slice(6).trim()
+              if (!jsonStr || jsonStr === "[DONE]") continue
+
+              const data = JSON.parse(jsonStr)
+
+              if (data.event === "message" || data.event === "agent_message") {
+                fullContent += data.answer || ""
+                streamConversationId = data.conversation_id || streamConversationId
+                assistantMessageId = data.message_id || assistantMessageId
+
+                // Update the message in real-time
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMessage.id
+                      ? { ...msg, id: assistantMessageId, content: fullContent }
+                      : msg
+                  )
+                )
+              } else if (data.event === "message_end") {
+                streamConversationId = data.conversation_id || streamConversationId
+              } else if (data.event === "error") {
+                throw new Error(data.message || "Stream error")
+              }
+            } catch (parseError) {
+              console.error("Error parsing stream chunk:", parseError)
+            }
+          }
+        }
+      }
+
+      setConversationId(streamConversationId)
+
+      // Save the complete assistant message
+      const finalMessage: Message = {
+        id: assistantMessageId,
+        content: fullContent || (language === "id" 
+          ? "Maaf, saya tidak bisa memberikan respons. Silakan coba lagi."
+          : "Sorry, I couldn't provide a response. Please try again."),
+        role: "assistant",
+        timestamp: new Date(),
+      }
+      await saveConversation(finalMessage, "assistant")
 
       // Check for assessment progress triggers in assistant response
       if (showProgressStatus && assessmentProgress?.status === "started") {
-        // Keywords that indicate data has been gathered (assessed)
         const assessedKeywords = [
           "berdasarkan informasi", "dari data yang", "hasil evaluasi", "ringkasan",
           "rekomendasi untuk anda", "based on", "from your data", "summary",
           "kemampuan yang diketahui", "kemampuan yang dilakukan", "tanda dan gejala"
         ]
-        const lowerContent = data.message.toLowerCase()
+        const lowerContent = fullContent.toLowerCase()
         if (assessedKeywords.some(keyword => lowerContent.includes(keyword))) {
           await updateAssessmentProgress("assessed")
         }
@@ -351,14 +407,13 @@ export function DifyChatInterface({
           "selamat anda telah", "hasil akhir", "final result", "semoga bermanfaat",
           "jangan ragu untuk kembali", "sampai jumpa"
         ]
-        const lowerContent = data.message.toLowerCase()
+        const lowerContent = fullContent.toLowerCase()
         if (completionKeywords.some(keyword => lowerContent.includes(keyword))) {
           await updateAssessmentProgress("completed")
         }
       }
 
       // TTS is now on-demand only - user must click play button to hear audio
-      // Removed auto-play: await speak(assistantMessage.content, language === "id" ? "id-ID" : "en-US")
     } catch (error) {
       console.error("Chat error:", error)
       toast({

@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         inputs: {},
         query: enhancedMessage,
-        response_mode: "blocking",
+        response_mode: "streaming",
         conversation_id: conversation_id || "",
         user: user_id || "anonymous",
       }),
@@ -110,12 +110,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to get response from AI assistant" }, { status: difyResponse.status })
     }
 
-    const data = await difyResponse.json()
-
-    return NextResponse.json({
-      message: data.answer || "Saya disini untuk membantu Anda. Apakah bisa diulangi lagi pertanyaannya?",
-      conversation_id: data.conversation_id,
-      message_id: data.id,
+    // Return the streaming response directly
+    return new Response(difyResponse.body, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
     })
   } catch (error) {
     console.error("Chat API error:", error)
