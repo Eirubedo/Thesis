@@ -12,6 +12,7 @@ interface AuthUser {
   birth_date?: string
   address?: string
   postal_code?: string
+  profile_picture?: string
 }
 
 export function useAuth() {
@@ -65,6 +66,7 @@ export function useAuth() {
         birth_date: userData.birth_date,
         address: userData.address,
         postal_code: userData.postal_code,
+        profile_picture: userData.profile_picture,
       }
 
       setUser(authUser)
@@ -143,6 +145,7 @@ export function useAuth() {
         birth_date: newUser.birth_date,
         address: newUser.address,
         postal_code: newUser.postal_code,
+        profile_picture: newUser.profile_picture,
       }
 
       setUser(authUser)
