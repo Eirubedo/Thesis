@@ -5,7 +5,6 @@ import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/components/auth-provider"
 import { useLanguage } from "@/contexts/language-context"
 import { useRouter } from "next/navigation"
@@ -154,20 +153,44 @@ export default function ReportsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id, date, lang: language }),
       })
+      
+      // Check content type before parsing
+      const contentType = response.headers.get("content-type")
+      
+      if (!contentType?.includes("application/json")) {
+        // Server returned non-JSON (likely plain text error)
+        const textError = await response.text()
+        console.error("[v0] Non-JSON response:", textError)
+        toast({
+          title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
+          description: language === "id" ? "Terjadi kesalahan server" : "Server error occurred",
+          variant: "destructive",
+        })
+        return
+      }
+      
+      const data = await response.json()
+      
       if (response.ok) {
-        const summary = await response.json()
-        setDailySummaries((prev) => ({ ...prev, [date]: summary }))
+        setDailySummaries((prev) => ({ ...prev, [date]: data }))
         toast({
           title: language === "id" ? "Ringkasan dibuat" : "Summary generated",
           description: language === "id" ? "Ringkasan harian berhasil dibuat" : "Daily summary has been generated",
         })
       } else {
-        throw new Error("Failed to generate summary")
+        // Show specific error from API
+        const errorMessage = data?.error || "Unknown error"
+        toast({
+          title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
+          description: errorMessage,
+          variant: "destructive",
+        })
       }
-    } catch (error) {
-      console.error("Failed to generate summary:", error)
+    } catch (error: any) {
+      console.error("[v0] Failed to generate summary:", error)
       toast({
         title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
+        description: error?.message || "Network error",
         variant: "destructive",
       })
     } finally {
@@ -300,10 +323,6 @@ export default function ReportsPage() {
     }
   }
 
-  const getConversationsByType = (type: string) => {
-    return dailyConversations.filter((day) => day.messages.some((msg) => msg.conversation_type === type))
-  }
-
   if (!user) {
     return null
   }
@@ -340,6 +359,7 @@ export default function ReportsPage() {
           </div>
         </div>
 
+        {/* Insights and Recommendation Card */}
         <Card className="mb-8 border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-800">
@@ -465,6 +485,7 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
 
+        {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="pt-6">
@@ -561,602 +582,204 @@ export default function ReportsPage() {
           </Card>
         </div>
 
-        <Tabs defaultValue="conversations" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
-            <TabsTrigger value="conversations" className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">{language === "id" ? "Riwayat Harian" : "Daily History"}</span>
-            </TabsTrigger>
-            <TabsTrigger value="comprehensive" className="flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              <span className="hidden sm:inline">{language === "id" ? "Asesmen Lengkap" : "Full Assessment"}</span>
-            </TabsTrigger>
-            <TabsTrigger value="quick" className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span className="hidden sm:inline">{language === "id" ? "Monitoring" : "Monitoring"}</span>
-            </TabsTrigger>
-            <TabsTrigger value="knowledge" className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">{language === "id" ? "Pengetahuan" : "Knowledge"}</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Tab: Riwayat Harian - All conversations */}
-          <TabsContent value="conversations" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-blue-500" />
-                  {language === "id" ? "Riwayat Percakapan Harian" : "Daily Conversation History"}
-                </CardTitle>
-                <CardDescription>
+        {/* Daily History - All conversations consolidated */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-blue-500" />
+              {language === "id" ? "Riwayat Percakapan Harian" : "Daily Conversation History"}
+            </CardTitle>
+            <CardDescription>
+              {language === "id"
+                ? "Semua percakapan Anda dengan AI dikelompokkan per hari (Asesmen, Monitoring, Tes Pengetahuan)"
+                : "All your AI conversations grouped by day (Assessment, Monitoring, Knowledge Test)"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
+                <p className="text-gray-600">{language === "id" ? "Memuat data..." : "Loading data..."}</p>
+              </div>
+            ) : dailyConversations.length === 0 ? (
+              <div className="text-center py-8">
+                <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {language === "id" ? "Belum Ada Percakapan" : "No Conversations Yet"}
+                </h3>
+                <p className="text-gray-600 mb-4">
                   {language === "id"
-                    ? "Semua percakapan Anda dengan AI dikelompokkan per hari"
-                    : "All your AI conversations grouped by day"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
-                    <p className="text-gray-600">{language === "id" ? "Memuat data..." : "Loading data..."}</p>
-                  </div>
-                ) : dailyConversations.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "id" ? "Belum Ada Percakapan" : "No Conversations Yet"}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {language === "id"
-                        ? "Mulai chat dengan AI untuk melihat riwayat di sini"
-                        : "Start chatting with AI to see history here"}
-                    </p>
-                    <Button onClick={() => router.push("/chat")}>
-                      {language === "id" ? "Mulai Chat" : "Start Chat"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {dailyConversations.map((day) => (
-                      <Card key={day.date} className="border-l-4 border-l-blue-500">
-                        <CardContent className="pt-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="w-5 h-5 text-gray-500" />
-                                <h3 className="text-lg font-semibold">
-                                  {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                    weekday: "long",
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                  })}
-                                </h3>
-                              </div>
-                              {dailySummaries[day.date] ? (
-                                <div className="mt-2">
-                                  <p className="text-sm text-gray-700 line-clamp-3">
-                                    {dailySummaries[day.date].summary_text}
-                                  </p>
-                                  {dailySummaries[day.date].key_topics.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 mt-2">
-                                      {dailySummaries[day.date].key_topics.map((topic) => (
-                                        <Badge key={topic} variant="outline" className="text-xs">
-                                          {topic}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <p className="text-sm text-gray-500 italic mt-1">
-                                  {day.messageCount} {language === "id" ? "pesan" : "messages"} -{" "}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      generateSummary(day.date)
-                                    }}
-                                    disabled={generatingSummary === day.date}
-                                    className="text-blue-600 hover:underline disabled:opacity-50"
-                                  >
-                                    {generatingSummary === day.date
-                                      ? language === "id"
-                                        ? "Membuat ringkasan..."
-                                        : "Generating..."
-                                      : language === "id"
-                                        ? "Buat ringkasan"
-                                        : "Generate summary"}
-                                  </button>
-                                </p>
-                              )}
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {Array.from(new Set(day.messages.map((m) => m.conversation_type))).map((type) => {
-                                  const typeInfo = getConversationType(type)
-                                  return (
-                                    <Badge key={type} className={typeInfo.color}>
-                                      {typeInfo.label}
+                    ? "Mulai chat dengan AI untuk melihat riwayat di sini"
+                    : "Start chatting with AI to see history here"}
+                </p>
+                <Button onClick={() => router.push("/assessment")}>
+                  {language === "id" ? "Mulai Asesmen" : "Start Assessment"}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {dailyConversations.map((day) => (
+                  <Card key={day.date} className="border-l-4 border-l-blue-500">
+                    <CardContent className="pt-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-5 h-5 text-gray-500" />
+                            <h3 className="text-lg font-semibold">
+                              {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
+                                weekday: "long",
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                            </h3>
+                          </div>
+                          {dailySummaries[day.date] ? (
+                            <div className="mt-2">
+                              <p className="text-sm text-gray-700 line-clamp-3">
+                                {dailySummaries[day.date].summary_text}
+                              </p>
+                              {dailySummaries[day.date].key_topics.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {dailySummaries[day.date].key_topics.map((topic) => (
+                                    <Badge key={topic} variant="outline" className="text-xs">
+                                      {topic}
                                     </Badge>
-                                  )
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic mt-1">
+                              {day.messageCount} {language === "id" ? "pesan" : "messages"} -{" "}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  generateSummary(day.date)
+                                }}
+                                disabled={generatingSummary === day.date}
+                                className="text-blue-600 hover:underline disabled:opacity-50"
+                              >
+                                {generatingSummary === day.date
+                                  ? language === "id"
+                                    ? "Membuat ringkasan..."
+                                    : "Generating..."
+                                  : language === "id"
+                                    ? "Buat ringkasan"
+                                    : "Generate summary"}
+                              </button>
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {Array.from(new Set(day.messages.map((m) => m.conversation_type))).map((type) => {
+                              const typeInfo = getConversationType(type)
+                              return (
+                                <Badge key={type} className={typeInfo.color}>
+                                  {typeInfo.label}
+                                </Badge>
+                              )
+                            })}
+                          </div>
+                        </div>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button size="sm" variant="outline" onClick={() => setSelectedDay(day)} className="bg-transparent">
+                              <FileText className="w-4 h-4 mr-2" />
+                              {language === "id" ? "Lihat" : "View"}
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl max-h-[85vh]">
+                            <DialogHeader>
+                              <DialogTitle>
+                                {language === "id" ? "Percakapan" : "Conversations"} -{" "}
+                                {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
                                 })}
-                              </div>
-                            </div>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button size="sm" variant="outline" onClick={() => setSelectedDay(day)}>
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  {language === "id" ? "Lihat" : "View"}
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl max-h-[85vh]">
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    {language === "id" ? "Percakapan" : "Conversations"} -{" "}
-                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                      day: "numeric",
-                                      month: "long",
-                                      year: "numeric",
-                                    })}
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    {day.messageCount}{" "}
-                                    {language === "id"
-                                      ? "pesan dari semua percakapan"
-                                      : "messages from all conversations"}
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <ScrollArea className="h-[65vh] pr-4">
-                                  {selectedDay?.date === day.date && (
-                                    <div className="space-y-4">
-                                      {selectedDay.messages.map((message, index) => {
-                                        const typeInfo = getConversationType(message.conversation_type)
-                                        const showTypeLabel =
-                                          index === 0 ||
-                                          message.conversation_type !==
-                                            selectedDay.messages[index - 1]?.conversation_type
+                              </DialogTitle>
+                              <DialogDescription>
+                                {day.messageCount}{" "}
+                                {language === "id"
+                                  ? "pesan dari semua percakapan"
+                                  : "messages from all conversations"}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <ScrollArea className="h-[65vh] pr-4">
+                              {selectedDay?.date === day.date && (
+                                <div className="space-y-4">
+                                  {selectedDay.messages.map((message, index) => {
+                                    const typeInfo = getConversationType(message.conversation_type)
+                                    const showTypeLabel =
+                                      index === 0 ||
+                                      message.conversation_type !==
+                                        selectedDay.messages[index - 1]?.conversation_type
 
-                                        return (
-                                          <div key={message.id}>
-                                            {showTypeLabel && (
-                                              <div className="flex items-center gap-2 my-4">
-                                                <div className="h-px flex-1 bg-gray-200" />
-                                                <Badge className={typeInfo.color}>{typeInfo.label}</Badge>
-                                                <div className="h-px flex-1 bg-gray-200" />
-                                              </div>
-                                            )}
-                                            <div
-                                              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                                            >
-                                              <div
-                                                className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
-                                              >
-                                                <div
-                                                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-sky-500" : "bg-yellow-500"}`}
-                                                >
-                                                  {message.role === "user" ? (
-                                                    <User className="w-4 h-4 text-white" />
-                                                  ) : (
-                                                    <Bot className="w-4 h-4 text-white" />
-                                                  )}
-                                                </div>
-                                                <div
-                                                  className={`rounded-2xl px-4 py-3 ${
-                                                    message.role === "user"
-                                                      ? "bg-sky-500 text-white"
-                                                      : "bg-gray-100 text-gray-900"
-                                                  }`}
-                                                >
-                                                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                                  <p
-                                                    className={`text-xs mt-1 ${message.role === "user" ? "text-sky-100" : "text-gray-500"}`}
-                                                  >
-                                                    {new Date(message.created_at).toLocaleTimeString(
-                                                      language === "id" ? "id-ID" : "en-US",
-                                                      {
-                                                        hour: "2-digit",
-                                                        minute: "2-digit",
-                                                      },
-                                                    )}
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            </div>
+                                    return (
+                                      <div key={message.id}>
+                                        {showTypeLabel && (
+                                          <div className="flex items-center gap-2 my-4">
+                                            <div className="h-px flex-1 bg-gray-200" />
+                                            <Badge className={typeInfo.color}>{typeInfo.label}</Badge>
+                                            <div className="h-px flex-1 bg-gray-200" />
                                           </div>
-                                        )
-                                      })}
-                                    </div>
-                                  )}
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Tab: Asesmen Lengkap */}
-          <TabsContent value="comprehensive" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-purple-500" />
-                  {language === "id" ? "Hasil Asesmen AI Lengkap" : "Comprehensive AI Assessment Results"}
-                </CardTitle>
-                <CardDescription>
-                  {language === "id"
-                    ? "Riwayat percakapan asesmen lengkap dengan AI"
-                    : "Comprehensive assessment conversation history with AI"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {getConversationsByType("assessment").length === 0 ? (
-                  <div className="text-center py-8">
-                    <Brain className="w-16 h-16 text-purple-200 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "id" ? "Belum Ada Asesmen Lengkap" : "No Full Assessment Yet"}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {language === "id"
-                        ? "Lakukan asesmen lengkap untuk melihat hasilnya di sini"
-                        : "Complete a full assessment to see results here"}
-                    </p>
-                    <Button onClick={() => router.push("/assessment")} className="bg-purple-600 hover:bg-purple-700">
-                      {language === "id" ? "Mulai Asesmen" : "Start Assessment"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {getConversationsByType("assessment").map((day) => (
-                      <Card key={day.date} className="border-l-4 border-l-purple-500">
-                        <CardContent className="pt-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="w-5 h-5 text-gray-500" />
-                                <h3 className="text-lg font-semibold">
-                                  {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                    weekday: "long",
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                  })}
-                                </h3>
-                              </div>
-                              <p className="text-sm text-gray-600">
-                                {day.messages.filter((m) => m.conversation_type === "assessment").length}{" "}
-                                {language === "id" ? "pesan asesmen" : "assessment messages"}
-                              </p>
-                            </div>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-purple-300 text-purple-700 bg-transparent"
-                                  onClick={() => setSelectedDay(day)}
-                                >
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  {language === "id" ? "Lihat" : "View"}
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl max-h-[85vh]">
-                                <DialogHeader>
-                                  <DialogTitle className="text-purple-700">
-                                    {language === "id" ? "Asesmen Lengkap" : "Full Assessment"} -{" "}
-                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                      day: "numeric",
-                                      month: "long",
-                                      year: "numeric",
-                                    })}
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <ScrollArea className="h-[65vh] pr-4">
-                                  {selectedDay?.date === day.date && (
-                                    <div className="space-y-4">
-                                      {selectedDay.messages
-                                        .filter((m) => m.conversation_type === "assessment")
-                                        .map((message) => (
+                                        )}
+                                        <div
+                                          className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                                        >
                                           <div
-                                            key={message.id}
-                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                                            className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
                                           >
                                             <div
-                                              className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
+                                              className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-sky-500" : "bg-yellow-500"}`}
                                             >
-                                              <div
-                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-purple-500" : "bg-purple-300"}`}
-                                              >
-                                                {message.role === "user" ? (
-                                                  <User className="w-4 h-4 text-white" />
-                                                ) : (
-                                                  <Bot className="w-4 h-4 text-purple-800" />
-                                                )}
-                                              </div>
-                                              <div
-                                                className={`rounded-2xl px-4 py-3 ${
-                                                  message.role === "user"
-                                                    ? "bg-purple-500 text-white"
-                                                    : "bg-purple-50 text-gray-900"
-                                                }`}
-                                              >
-                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                              </div>
+                                              {message.role === "user" ? (
+                                                <User className="w-4 h-4 text-white" />
+                                              ) : (
+                                                <Bot className="w-4 h-4 text-white" />
+                                              )}
                                             </div>
-                                          </div>
-                                        ))}
-                                    </div>
-                                  )}
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Tab: Monitoring & Evaluasi */}
-          <TabsContent value="quick" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-cyan-500" />
-                  {language === "id" ? "Hasil Monitoring & Evaluasi" : "Monitoring & Evaluation Results"}
-                </CardTitle>
-                <CardDescription>
-                  {language === "id"
-                    ? "Riwayat sesi monitoring dan evaluasi dengan AI"
-                    : "Monitoring and evaluation session history with AI"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {getConversationsByType("quick-assessment").length === 0 ? (
-                  <div className="text-center py-8">
-                    <Clock className="w-16 h-16 text-cyan-200 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "id" ? "Belum Ada Monitoring" : "No Monitoring Yet"}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {language === "id"
-                        ? "Lakukan sesi monitoring untuk melihat hasilnya di sini"
-                        : "Complete a monitoring session to see results here"}
-                    </p>
-                    <Button onClick={() => router.push("/assessment")} className="bg-cyan-600 hover:bg-cyan-700">
-                      {language === "id" ? "Mulai Monitoring" : "Start Monitoring"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {getConversationsByType("quick-assessment").map((day) => (
-                      <Card key={day.date} className="border-l-4 border-l-cyan-500">
-                        <CardContent className="pt-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="w-5 h-5 text-gray-500" />
-                                <h3 className="text-lg font-semibold">
-                                  {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                    weekday: "long",
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                  })}
-                                </h3>
-                              </div>
-                              <p className="text-sm text-gray-600">
-                                {day.messages.filter((m) => m.conversation_type === "quick-assessment").length}{" "}
-                                {language === "id" ? "pesan monitoring" : "monitoring messages"}
-                              </p>
-                            </div>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-cyan-300 text-cyan-700 bg-transparent"
-                                  onClick={() => setSelectedDay(day)}
-                                >
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  {language === "id" ? "Lihat" : "View"}
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl max-h-[85vh]">
-                                <DialogHeader>
-                                  <DialogTitle className="text-cyan-700">
-                                    {language === "id" ? "Monitoring & Evaluasi" : "Monitoring & Evaluation"} -{" "}
-                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                      day: "numeric",
-                                      month: "long",
-                                      year: "numeric",
-                                    })}
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <ScrollArea className="h-[65vh] pr-4">
-                                  {selectedDay?.date === day.date && (
-                                    <div className="space-y-4">
-                                      {selectedDay.messages
-                                        .filter((m) => m.conversation_type === "quick-assessment")
-                                        .map((message) => (
-                                          <div
-                                            key={message.id}
-                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                                          >
                                             <div
-                                              className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
+                                              className={`rounded-2xl px-4 py-3 ${
+                                                message.role === "user"
+                                                  ? "bg-sky-500 text-white"
+                                                  : "bg-gray-100 text-gray-900"
+                                              }`}
                                             >
-                                              <div
-                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-cyan-500" : "bg-cyan-300"}`}
+                                              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                              <p
+                                                className={`text-xs mt-1 ${message.role === "user" ? "text-sky-100" : "text-gray-500"}`}
                                               >
-                                                {message.role === "user" ? (
-                                                  <User className="w-4 h-4 text-white" />
-                                                ) : (
-                                                  <Bot className="w-4 h-4 text-cyan-800" />
+                                                {new Date(message.created_at).toLocaleTimeString(
+                                                  language === "id" ? "id-ID" : "en-US",
+                                                  {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                  },
                                                 )}
-                                              </div>
-                                              <div
-                                                className={`rounded-2xl px-4 py-3 ${
-                                                  message.role === "user"
-                                                    ? "bg-cyan-500 text-white"
-                                                    : "bg-cyan-50 text-gray-900"
-                                                }`}
-                                              >
-                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                              </div>
+                                              </p>
                                             </div>
                                           </div>
-                                        ))}
-                                    </div>
-                                  )}
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Tab: Tes Pengetahuan */}
-          <TabsContent value="knowledge" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-green-500" />
-                  {language === "id" ? "Hasil Tes Pengetahuan" : "Knowledge Test Results"}
-                </CardTitle>
-                <CardDescription>
-                  {language === "id"
-                    ? "Riwayat sesi tes pengetahuan dengan AI"
-                    : "Knowledge test session history with AI"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {getConversationsByType("knowledge-test").length === 0 ? (
-                  <div className="text-center py-8">
-                    <BookOpen className="w-16 h-16 text-green-200 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {language === "id" ? "Belum Ada Tes Pengetahuan" : "No Knowledge Test Yet"}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {language === "id"
-                        ? "Lakukan tes pengetahuan untuk melihat hasilnya di sini"
-                        : "Complete a knowledge test to see results here"}
-                    </p>
-                    <Button onClick={() => router.push("/assessment")} className="bg-green-600 hover:bg-green-700">
-                      {language === "id" ? "Mulai Tes" : "Start Test"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {getConversationsByType("knowledge-test").map((day) => (
-                      <Card key={day.date} className="border-l-4 border-l-green-500">
-                        <CardContent className="pt-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="w-5 h-5 text-gray-500" />
-                                <h3 className="text-lg font-semibold">
-                                  {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                    weekday: "long",
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
+                                        </div>
+                                      </div>
+                                    )
                                   })}
-                                </h3>
-                              </div>
-                              <p className="text-sm text-gray-600">
-                                {day.messages.filter((m) => m.conversation_type === "knowledge-test").length}{" "}
-                                {language === "id" ? "pesan tes" : "test messages"}
-                              </p>
-                            </div>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-green-300 text-green-700 bg-transparent"
-                                  onClick={() => setSelectedDay(day)}
-                                >
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  {language === "id" ? "Lihat" : "View"}
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl max-h-[85vh]">
-                                <DialogHeader>
-                                  <DialogTitle className="text-green-700">
-                                    {language === "id" ? "Tes Pengetahuan" : "Knowledge Test"} -{" "}
-                                    {new Date(day.date).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
-                                      day: "numeric",
-                                      month: "long",
-                                      year: "numeric",
-                                    })}
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <ScrollArea className="h-[65vh] pr-4">
-                                  {selectedDay?.date === day.date && (
-                                    <div className="space-y-4">
-                                      {selectedDay.messages
-                                        .filter((m) => m.conversation_type === "knowledge-test")
-                                        .map((message) => (
-                                          <div
-                                            key={message.id}
-                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                                          >
-                                            <div
-                                              className={`flex items-start space-x-3 max-w-[80%] ${message.role === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
-                                            >
-                                              <div
-                                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === "user" ? "bg-green-500" : "bg-green-300"}`}
-                                              >
-                                                {message.role === "user" ? (
-                                                  <User className="w-4 h-4 text-white" />
-                                                ) : (
-                                                  <Bot className="w-4 h-4 text-green-800" />
-                                                )}
-                                              </div>
-                                              <div
-                                                className={`rounded-2xl px-4 py-3 ${
-                                                  message.role === "user"
-                                                    ? "bg-green-500 text-white"
-                                                    : "bg-green-50 text-gray-900"
-                                                }`}
-                                              >
-                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        ))}
-                                    </div>
-                                  )}
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                                </div>
+                              )}
+                            </ScrollArea>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Recommendations Card */}
-        <Card className="mt-8">
+        <Card>
           <CardHeader>
             <CardTitle>{t("reports.recommendations")}</CardTitle>
             <CardDescription>{t("reports.recommendationsDesc")}</CardDescription>
@@ -1171,8 +794,8 @@ export default function ReportsPage() {
               </div>
             </div>
             <div className="flex space-x-2 mt-4">
-              <Button onClick={() => router.push("/chat")}>
-                {language === "id" ? "Lanjut Chat" : "Continue Chat"}
+              <Button onClick={() => router.push("/assessment")}>
+                {language === "id" ? "Mulai Asesmen" : "Start Assessment"}
               </Button>
               <Button variant="outline" onClick={() => router.push("/self-help")} className="bg-transparent">
                 {language === "id" ? "Buka Edukasi" : "Open Self-Help"}
