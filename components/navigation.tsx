@@ -83,26 +83,27 @@ export function Navigation() {
             <LanguageSelector />
 
             {user ? (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative z-50 w-36 h-10 flex items-center justify-center space-x-2 text-sm font-medium hover:bg-red-50 cursor-pointer"
+                  <button
+                    type="button"
+                    className="relative bg-transparent w-36 h-10 flex items-center justify-center space-x-2 text-sm font-medium hover:bg-red-50 cursor-pointer rounded-md transition-colors border-0 outline-none focus:outline-none"
+                    style={{ pointerEvents: "auto" }}
                   >
                     <User className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate max-w-16 text-xs">{user.name}</span>
                     <ChevronDown className="w-4 h-4 flex-shrink-0" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 z-50">
+                <DropdownMenuContent align="end" className="w-48" style={{ zIndex: 9999 }}>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center cursor-pointer">
+                    <Link href="/profile" className="flex items-center cursor-pointer w-full">
                       <User className="w-4 h-4 mr-2" />
                       {t("nav.profile")}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings" className="flex items-center cursor-pointer">
+                    <Link href="/settings" className="flex items-center cursor-pointer w-full">
                       <Settings className="w-4 h-4 mr-2" />
                       {t("nav.appSettings")}
                     </Link>
