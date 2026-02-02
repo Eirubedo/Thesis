@@ -46,7 +46,9 @@ import {
   Bell,
   BellOff,
   CalendarClock,
+  HelpCircle,
 } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useBPTracking } from "@/hooks/use-bp-tracking"
 import { useMedicationTracking } from "@/hooks/use-medication-tracking"
 import { useActivityScheduling } from "@/hooks/use-activity-scheduling"
@@ -289,9 +291,42 @@ export default function MonitoringPage() {
                   <DialogDescription>{t("bp.noReadingsDesc")}</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
+                  {/* BP Device Reading Guide */}
+                  <TooltipProvider>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-blue-900 mb-1">
+                            {language === "id" ? "Cara Membaca Alat Ukur" : "How to Read Your Device"}
+                          </p>
+                          <p className="text-blue-700">
+                            {language === "id" 
+                              ? "Pada layar alat ukur tekanan darah digital: angka ATAS (besar) adalah Sistolik, angka BAWAH adalah Diastolik, dan simbol hati/jantung menunjukkan Denyut Nadi."
+                              : "On digital BP monitor display: TOP number (larger) is Systolic, BOTTOM number is Diastolic, and heart symbol shows Pulse Rate."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </TooltipProvider>
+                  
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="systolic">{t("bp.systolic")}</Label>
+                      <div className="flex items-center gap-1">
+                        <Label htmlFor="systolic">{t("bp.systolic")}</Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-[200px]">
+                            <p className="text-xs">
+                              {language === "id" 
+                                ? "Angka ATAS/BESAR pada layar alat. Normal: 90-120 mmHg" 
+                                : "TOP/LARGER number on device. Normal: 90-120 mmHg"}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                       <Input
                         id="systolic"
                         type="number"
@@ -301,7 +336,21 @@ export default function MonitoringPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="diastolic">{t("bp.diastolic")}</Label>
+                      <div className="flex items-center gap-1">
+                        <Label htmlFor="diastolic">{t("bp.diastolic")}</Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-[200px]">
+                            <p className="text-xs">
+                              {language === "id" 
+                                ? "Angka BAWAH/KECIL pada layar alat. Normal: 60-80 mmHg" 
+                                : "BOTTOM/SMALLER number on device. Normal: 60-80 mmHg"}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                       <Input
                         id="diastolic"
                         type="number"
@@ -311,7 +360,21 @@ export default function MonitoringPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="pulse">{t("bp.heartRate")}</Label>
+                      <div className="flex items-center gap-1">
+                        <Label htmlFor="pulse">{t("bp.heartRate")}</Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-[200px]">
+                            <p className="text-xs">
+                              {language === "id" 
+                                ? "Angka dengan simbol hati/jantung. Normal: 60-100 bpm" 
+                                : "Number with heart symbol. Normal: 60-100 bpm"}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                       <Input
                         id="pulse"
                         type="number"

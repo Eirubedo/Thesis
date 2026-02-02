@@ -21,7 +21,7 @@ export default function RegisterPage() {
   const { register, isLoading } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage() // Declare language variable here
 
   const [formData, setFormData] = useState({
     phone_number: "",
@@ -52,11 +52,40 @@ export default function RegisterPage() {
       return
     }
 
-    // Validate password strength
-    if (formData.password.length < 6) {
+    // Validate password strength - must be at least 8 chars with at least one letter
+    const passwordRegex = /^(?=.*[a-zA-Z]).{8,}$/
+    const isNumericOnly = /^\d+$/.test(formData.password)
+    
+    if (formData.password.length < 8) {
       toast({
         title: t("register.weakPassword") || "Weak Password",
-        description: t("register.weakPasswordDesc") || "Password must be at least 6 characters long",
+        description: language === "id" 
+          ? "Password harus minimal 8 karakter" 
+          : "Password must be at least 8 characters long",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+    
+    if (isNumericOnly) {
+      toast({
+        title: t("register.weakPassword") || "Weak Password",
+        description: language === "id"
+          ? "Password tidak boleh hanya berisi angka. Tambahkan minimal satu huruf."
+          : "Password cannot be numeric only. Add at least one letter.",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+    
+    if (!passwordRegex.test(formData.password)) {
+      toast({
+        title: t("register.weakPassword") || "Weak Password",
+        description: language === "id"
+          ? "Password harus mengandung minimal satu huruf"
+          : "Password must contain at least one letter",
         variant: "destructive",
       })
       setIsSubmitting(false)

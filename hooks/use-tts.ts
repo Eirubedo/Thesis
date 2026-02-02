@@ -71,19 +71,55 @@ export function useTTS() {
     (language: string): SpeechSynthesisVoice | null => {
       if (voices.length === 0) return null
 
-      // For Indonesian, prioritize Indonesian voices
+      // For Indonesian, prioritize native Indonesian voices
       if (language === "id-ID") {
-        // First try to find Indonesian voices
-        const indonesianVoices = voices.filter((voice) => voice.lang.startsWith("id") || voice.lang.startsWith("ID"))
+        // First try to find Indonesian voices with exact match
+        const indonesianVoices = voices.filter((voice) => 
+          voice.lang === "id-ID" || 
+          voice.lang === "id_ID" || 
+          voice.lang.toLowerCase().startsWith("id")
+        )
 
         if (indonesianVoices.length > 0) {
-          // Prefer Google Indonesian voices if available
-          const googleVoice = indonesianVoices.find((voice) => voice.name.toLowerCase().includes("google"))
-          if (googleVoice) return googleVoice
+          // Priority order for Indonesian voices:
+          // 1. Google Indonesian (best quality)
+          const googleIndo = indonesianVoices.find((voice) => 
+            voice.name.toLowerCase().includes("google") && 
+            (voice.name.toLowerCase().includes("indonesia") || voice.lang.startsWith("id"))
+          )
+          if (googleIndo) {
+            logTTSEvent("VOICE_PRIORITY", { selected: "Google Indonesian", name: googleIndo.name })
+            return googleIndo
+          }
 
-          // Otherwise return the first Indonesian voice
+          // 2. Microsoft Indonesian
+          const msIndo = indonesianVoices.find((voice) => 
+            voice.name.toLowerCase().includes("microsoft") ||
+            voice.name.toLowerCase().includes("andika") ||
+            voice.name.toLowerCase().includes("gadis")
+          )
+          if (msIndo) {
+            logTTSEvent("VOICE_PRIORITY", { selected: "Microsoft Indonesian", name: msIndo.name })
+            return msIndo
+          }
+
+          // 3. Any other Indonesian voice (avoid English voices speaking Indonesian)
+          const nativeIndo = indonesianVoices.find((voice) => 
+            !voice.name.toLowerCase().includes("english") &&
+            !voice.lang.startsWith("en")
+          )
+          if (nativeIndo) {
+            logTTSEvent("VOICE_PRIORITY", { selected: "Native Indonesian", name: nativeIndo.name })
+            return nativeIndo
+          }
+
+          // 4. First available Indonesian voice
+          logTTSEvent("VOICE_PRIORITY", { selected: "First Indonesian", name: indonesianVoices[0].name })
           return indonesianVoices[0]
         }
+
+        // Fallback: If no Indonesian voice, log warning
+        logTTSEvent("VOICE_WARNING", { message: "No Indonesian voice found, using fallback" })
       }
 
       // For English or if no Indonesian voice found, find matching language
@@ -101,7 +137,7 @@ export function useTTS() {
       // Fallback to default voice
       return voices[0] || null
     },
-    [voices],
+    [voices, logTTSEvent],
   )
 
   const speakWithBrowser = useCallback(

@@ -148,6 +148,22 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Global cursor pointer for interactive elements */
+  button,
+  [role="button"],
+  a,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  select,
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  .cursor-pointer,
+  [data-clickable="true"] {
+    cursor: pointer;
+  }
 }
 
 * {
