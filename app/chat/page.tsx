@@ -25,88 +25,46 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-sky-100">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-sky-100 flex flex-col">
       <Navigation />
 
-      <div className="pt-16 max-w-7xl mx-auto p-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("chat.title")}</h1>
-          <p className="text-gray-600">{t("chat.subtitle")}</p>
+      <div className="flex-1 pt-16 flex flex-col">
+        {/* Compact Info Bar */}
+        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-2">
+          <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-4 text-sm">
+            <div className="flex items-center gap-1.5 text-sky-700">
+              <Clock className="w-4 h-4" />
+              <span>{t("chat.support247")}</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-gray-300" />
+            <div className="flex items-center gap-1.5 text-yellow-700">
+              <Heart className="w-4 h-4" />
+              <span>{t("chat.personalizedCare")}</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-gray-300" />
+            <div className="flex items-center gap-1.5 text-sky-700">
+              <Shield className="w-4 h-4" />
+              <span>{t("chat.privacyFirst")}</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-gray-300" />
+            <button
+              onClick={() => window.open("tel:119", "_self")}
+              className="flex items-center gap-1.5 text-red-600 hover:text-red-700 font-medium"
+            >
+              <span>{t("chat.emergencySupport")}: 119</span>
+            </button>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-6">
-          {/* Main Chat Interface */}
-          <div className="lg:col-span-3">
-            <DifyChatInterface
-              title={t("chat.title")}
-              showHeader={true}
-              minHeight="calc(100vh - 250px)"
-              className="shadow-lg"
-              conversationType="chat"
-            />
-          </div>
-
-          {/* Sidebar with Information */}
-          <div className="space-y-4">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-sky-100">
-              <div className="flex items-center mb-3">
-                <Clock className="w-5 h-5 text-sky-600 mr-2" />
-                <h3 className="font-semibold text-sky-900">{t("chat.support247")}</h3>
-              </div>
-              <p className="text-sm text-sky-800">{t("chat.support247Desc")}</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-yellow-100">
-              <div className="flex items-center mb-3">
-                <Heart className="w-5 h-5 text-yellow-600 mr-2" />
-                <h3 className="font-semibold text-yellow-900">{t("chat.personalizedCare")}</h3>
-              </div>
-              <p className="text-sm text-yellow-800">{t("chat.personalizedCareDesc")}</p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-sky-100">
-              <div className="flex items-center mb-3">
-                <Shield className="w-5 h-5 text-sky-600 mr-2" />
-                <h3 className="font-semibold text-sky-900">{t("chat.privacyFirst")}</h3>
-              </div>
-              <p className="text-sm text-sky-800">{t("chat.privacyFirstDesc")}</p>
-            </div>
-
-            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-              <h3 className="font-semibold text-red-900 mb-2">{t("chat.emergencySupport")}</h3>
-              <p className="text-sm text-red-800 mb-3">{t("chat.emergencySupportDesc")}</p>
-              <button
-                onClick={() => window.open("tel:119", "_self")}
-                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded text-sm font-medium"
-              >
-                {t("chat.emergency119")}
-              </button>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-2">{t("chat.quickActions")}</h3>
-              <div className="space-y-2">
-                <button
-                  onClick={() => router.push("/assessment")}
-                  className="w-full text-left py-2 px-3 text-sm text-gray-700 hover:bg-gray-100 rounded"
-                >
-                  {t("chat.takeAssessment")}
-                </button>
-                <button
-                  onClick={() => router.push("/self-help")}
-                  className="w-full text-left py-2 px-3 text-sm text-gray-700 hover:bg-gray-100 rounded"
-                >
-                  {t("chat.selfHelpResources")}
-                </button>
-                <button
-                  onClick={() => router.push("/reports")}
-                  className="w-full text-left py-2 px-3 text-sm text-gray-700 hover:bg-gray-100 rounded"
-                >
-                  {t("chat.viewReports")}
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* Full-screen Chat Interface */}
+        <div className="flex-1 max-w-4xl w-full mx-auto p-4">
+          <DifyChatInterface
+            title={t("chat.title")}
+            showHeader={true}
+            minHeight="calc(100vh - 180px)"
+            className="shadow-lg h-full"
+            conversationType="chat"
+          />
         </div>
       </div>
     </div>
