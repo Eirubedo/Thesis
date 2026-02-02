@@ -36,6 +36,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { CartesianGrid, Line, LineChart, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts"
+import useSWR from "swr"
+import { supabase } from "@/lib/supabase"
+import { Heart, Pill, Activity } from "lucide-react"
 
 interface DailyConversation {
   date: string
@@ -111,6 +115,69 @@ export default function ReportsPage() {
     quickAssessmentMessages: 0,
     knowledgeTestMessages: 0,
   })
+
+  // SWR fetchers for real-time chart data
+  const fetcher = async (url: string) => {
+    const res = await fetch(url)
+    if (!res.ok) throw new Error("Failed to fetch")
+    return res.json()
+  }
+
+  const { data: bpReadings, mutate: mutateBP } = useSWR(
+    user?.id ? `/api/bp-readings?user_id=${user.id}` : null,
+    fetcher,
+    { refreshInterval: 5000 }
+  )
+
+  const { data: medicationData, mutate: mutateMeds } = useSWR(
+    user?.id ? `/api/medications?user_id=${user.id}` : null,
+    fetcher,
+    { refreshInterval: 5000 }
+  )
+
+  const { data: activityData, mutate: mutateActivity } = useSWR(
+    user?.id ? `/api/schedules?user_id=${user.id}` : null,
+    fetcher,
+    { refreshInterval: 5000 }
+  )
+
+  const { data: chatActivity, mutate: mutateChat } = useSWR(
+    user?.id
+      ? async () => {
+          const thirtyDaysAgo = new Date()
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+          const { data, error } = await supabase
+            .from("conversations")
+            .select("started_at, message_count")
+            .eq("user_id", user.id)
+            .gte("started_at", thirtyDaysAgo.toISOString())
+            .order("started_at", { ascending: true })
+
+          if (error) throw error
+
+          const groupedByDay: { [key: string]: { count: number; messages: number } } = {}
+          data?.forEach((conv: any) => {
+            const date = new Date(conv.started_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })
+            if (!groupedByDay[date]) {
+              groupedByDay[date] = { count: 0, messages: 0 }
+            }
+            groupedByDay[date].count += 1
+            groupedByDay[date].messages += conv.message_count || 0
+          })
+
+          return Object.entries(groupedByDay).map(([date, data]) => ({
+            date,
+            sessions: data.count,
+            messages: data.messages,
+          }))
+        }
+      : null,
+    { refreshInterval: 5000 }
+  )
 
   const [insights, setInsights] = useState<InsightsData | null>(null)
   const [isLoadingInsights, setIsLoadingInsights] = useState(false)
@@ -357,6 +424,251 @@ export default function ReportsPage() {
               {t("reports.print")}
             </Button>
           </div>
+        </div>
+
+        {/* Data Visualizations - 4 Column Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Blood Pressure Over Time */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Heart className="w-4 h-4 text-red-500" />
+                {language === "id" ? "Tekanan Darah" : "Blood Pressure"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {bpReadings && bpReadings.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart
+                    data={bpReadings
+                      .slice(0, 30)
+                      .reverse()
+                      .map((r: any) => ({
+                        date: new Date(r.measurement_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        }),
+                        [language === "id" ? "Sistolik" : "Systolic"]: r.systolic,
+                        [language === "id" ? "Diastolik" : "Diastolic"]: r.diastolic,
+                      }))}
+                    margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" hide />
+                    <YAxis domain={[40, 200]} className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Sistolik" : "Systolic"}
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Diastolik" : "Diastolic"}
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
+                  {language === "id" ? "Belum ada data" : "No data"}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Medication Adherence */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Pill className="w-4 h-4 text-blue-500" />
+                {language === "id" ? "Kepatuhan Obat" : "Med Adherence"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {medicationData && medicationData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart
+                    data={(() => {
+                      const last7Days = []
+                      for (let i = 6; i >= 0; i--) {
+                        const date = new Date()
+                        date.setDate(date.getDate() - i)
+                        const dateStr = date.toISOString().split("T")[0]
+                        const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+
+                        const dayMeds = medicationData.flatMap((med: any) => med.logs || [])
+                        const dayLogs = dayMeds.filter((log: any) => log.taken_at && log.taken_at.startsWith(dateStr))
+                        const taken = dayLogs.filter((log: any) => log.was_taken).length
+                        const missed = dayLogs.filter((log: any) => !log.was_taken).length
+
+                        last7Days.push({
+                          date: dayLabel,
+                          [language === "id" ? "Diminum" : "Taken"]: taken,
+                          [language === "id" ? "Terlewat" : "Missed"]: missed,
+                        })
+                      }
+                      return last7Days
+                    })()}
+                    margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" hide />
+                    <YAxis className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Diminum" : "Taken"}
+                      stroke="#22c55e"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Terlewat" : "Missed"}
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
+                  {language === "id" ? "Belum ada data" : "No data"}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Activity Level */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Activity className="w-4 h-4 text-green-500" />
+                {language === "id" ? "Aktivitas" : "Activity"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {activityData && activityData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart
+                    data={(() => {
+                      const last30Days = []
+                      for (let i = 29; i >= 0; i--) {
+                        const date = new Date()
+                        date.setDate(date.getDate() - i)
+                        const dateStr = date.toISOString().split("T")[0]
+                        const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+
+                        const dayActivities = activityData.flatMap((s: any) => s.logs || [])
+                        const completed = dayActivities.filter(
+                          (log: any) => log.completed_at && log.completed_at.startsWith(dateStr),
+                        ).length
+
+                        last30Days.push({
+                          date: dayLabel,
+                          [language === "id" ? "Selesai" : "Completed"]: completed,
+                        })
+                      }
+                      return last30Days
+                    })()}
+                    margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" hide />
+                    <YAxis className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Selesai" : "Completed"}
+                      stroke="#22c55e"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
+                  {language === "id" ? "Belum ada data" : "No data"}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Chat Activity */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <MessageCircle className="w-4 h-4 text-purple-500" />
+                {language === "id" ? "Aktivitas Chat" : "Chat Activity"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {chatActivity && chatActivity.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart
+                    data={chatActivity.map((d: any) => ({
+                      date: d.date,
+                      [language === "id" ? "Sesi" : "Sessions"]: d.sessions,
+                      [language === "id" ? "Pesan" : "Messages"]: d.messages,
+                    }))}
+                    margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="date" className="text-xs" hide />
+                    <YAxis className="text-xs" />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "6px",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Sesi" : "Sessions"}
+                      stroke="#a855f7"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={language === "id" ? "Pesan" : "Messages"}
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
+                  {language === "id" ? "Belum ada data" : "No data"}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Insights and Recommendation Card */}

@@ -14,6 +14,18 @@ import React from "react"
 
 import { useState } from "react"
 import { Navigation } from "@/components/navigation"
+import { useAuth } from "@/hooks/use-auth"
+import { supabase } from "@/lib/supabase"
+import {
+  ResponsiveContainer,
+  LineChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  Legend,
+  Line,
+} from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -61,13 +73,10 @@ import {
   HelpCircle,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { CartesianGrid, Line, LineChart, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts"
 import { useBPTracking } from "@/hooks/use-bp-tracking"
 import { useMedicationTracking } from "@/hooks/use-medication-tracking"
 import { useActivityScheduling } from "@/hooks/use-activity-scheduling"
 import { useLanguage } from "@/contexts/language-context"
-import { useAuth } from "@/components/auth-provider"
-import { supabase } from "@/lib/supabase"
 import type { ActivityType } from "@/types/database"
 
 export default function MonitoringPage() {
@@ -96,7 +105,7 @@ export default function MonitoringPage() {
     getActivityStatistics,
   } = useActivityScheduling()
 
-  // Chart data state
+  // Chat Activity State
   const [chatActivityData, setChatActivityData] = useState<any[]>([])
   const [isLoadingChartData, setIsLoadingChartData] = useState(true)
 
@@ -270,259 +279,6 @@ export default function MonitoringPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("monitoring.title")}</h1>
           <p className="text-gray-600">{t("monitoring.subtitle")}</p>
-        </div>
-
-        {/* Visualizations Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Blood Pressure Over Time */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="w-5 h-5 text-red-500" />
-                {language === "id" ? "Tekanan Darah (30 Hari)" : "Blood Pressure (30 Days)"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {readings.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
-                    data={readings
-                      .slice(0, 30)
-                      .reverse()
-                      .map((r) => ({
-                        date: new Date(r.measurement_date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        }),
-                        [language === "id" ? "Sistolik" : "Systolic"]: r.systolic,
-                        [language === "id" ? "Diastolik" : "Diastolic"]: r.diastolic,
-                      }))}
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" />
-                    <YAxis domain={[40, 200]} className="text-xs" />
-                    <RechartsTooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "6px",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey={language === "id" ? "Sistolik" : "Systolic"}
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={{ fill: "#ef4444" }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey={language === "id" ? "Diastolik" : "Diastolic"}
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      dot={{ fill: "#3b82f6" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  {t("bp.noReadings")}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Medication Adherence */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Pill className="w-5 h-5 text-blue-500" />
-                {language === "id" ? "Kepatuhan Obat (7 Hari)" : "Medication Adherence (7 Days)"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {medications.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
-                    data={(() => {
-                      const last7Days = []
-                      for (let i = 6; i >= 0; i--) {
-                        const date = new Date()
-                        date.setDate(date.getDate() - i)
-                        const dateStr = date.toISOString().split("T")[0]
-                        const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-
-                        const dayMeds = medications.flatMap((med) => med.logs || [])
-                        const dayLogs = dayMeds.filter((log) => log.taken_at && log.taken_at.startsWith(dateStr))
-                        const taken = dayLogs.filter((log) => log.was_taken).length
-                        const missed = dayLogs.filter((log) => !log.was_taken).length
-
-                        last7Days.push({
-                          date: dayLabel,
-                          [language === "id" ? "Diminum" : "Taken"]: taken,
-                          [language === "id" ? "Terlewat" : "Missed"]: missed,
-                        })
-                      }
-                      return last7Days
-                    })()}
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <RechartsTooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "6px",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey={language === "id" ? "Diminum" : "Taken"}
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      dot={{ fill: "#22c55e" }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey={language === "id" ? "Terlewat" : "Missed"}
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={{ fill: "#ef4444" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  {language === "id" ? "Belum ada data obat" : "No medication data"}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Activity Level */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-green-500" />
-                {language === "id" ? "Tingkat Aktivitas (30 Hari)" : "Activity Level (30 Days)"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {schedules.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
-                    data={(() => {
-                      const last30Days = []
-                      for (let i = 29; i >= 0; i--) {
-                        const date = new Date()
-                        date.setDate(date.getDate() - i)
-                        const dateStr = date.toISOString().split("T")[0]
-                        const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-
-                        const dayActivities = schedules.flatMap((s) => s.logs || [])
-                        const completed = dayActivities.filter(
-                          (log) => log.completed_at && log.completed_at.startsWith(dateStr),
-                        ).length
-
-                        last30Days.push({
-                          date: dayLabel,
-                          [language === "id" ? "Selesai" : "Completed"]: completed,
-                        })
-                      }
-                      return last30Days
-                    })()}
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <RechartsTooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "6px",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey={language === "id" ? "Selesai" : "Completed"}
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      dot={{ fill: "#22c55e" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  {language === "id" ? "Belum ada data aktivitas" : "No activity data"}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Chat Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-purple-500" />
-                {language === "id" ? "Aktivitas Chat (30 Hari)" : "Chat Activity (30 Days)"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoadingChartData ? (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  {language === "id" ? "Memuat..." : "Loading..."}
-                </div>
-              ) : chatActivityData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
-                    data={chatActivityData.map((d) => ({
-                      date: d.date,
-                      [language === "id" ? "Sesi" : "Sessions"]: d.sessions,
-                      [language === "id" ? "Pesan" : "Messages"]: d.messages,
-                    }))}
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" />
-                    <YAxis className="text-xs" />
-                    <RechartsTooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "6px",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey={language === "id" ? "Sesi" : "Sessions"}
-                      stroke="#a855f7"
-                      strokeWidth={2}
-                      dot={{ fill: "#a855f7" }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey={language === "id" ? "Pesan" : "Messages"}
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      dot={{ fill: "#3b82f6" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  {language === "id" ? "Belum ada aktivitas chat" : "No chat activity"}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
         <Tabs defaultValue="bp" className="space-y-6">
