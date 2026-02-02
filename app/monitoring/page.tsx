@@ -1,5 +1,7 @@
 "use client"
 
+import React from "react"
+
 import { useState } from "react"
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
@@ -49,13 +51,18 @@ import {
   HelpCircle,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 import { useBPTracking } from "@/hooks/use-bp-tracking"
 import { useMedicationTracking } from "@/hooks/use-medication-tracking"
 import { useActivityScheduling } from "@/hooks/use-activity-scheduling"
 import { useLanguage } from "@/contexts/language-context"
+import { useAuth } from "@/components/auth-provider"
+import { supabase } from "@/lib/supabase"
 import type { ActivityType } from "@/types/database"
 
 export default function MonitoringPage() {
+  const { user } = useAuth()
   const { language, t } = useLanguage()
   const { readings, addReading, deleteReading, getStats, getAverageReading, getCategoryColor, getCategoryLabel } =
     useBPTracking()
@@ -79,6 +86,10 @@ export default function MonitoringPage() {
     getUpcomingSchedule,
     getActivityStatistics,
   } = useActivityScheduling()
+
+  // Chart data state
+  const [chatActivityData, setChatActivityData] = useState<any[]>([])
+  const [isLoadingChartData, setIsLoadingChartData] = useState(true)
 
   // BP Form State
   const [systolic, setSystolic] = useState("")
@@ -193,6 +204,55 @@ export default function MonitoringPage() {
   const totalScheduledToday = todaysMeds.reduce((total, med) => total + (med.times?.length || 0), 0)
   const takenToday = todaysMeds.reduce((total, med) => total + (med.logs?.filter((log) => log.taken).length || 0), 0)
 
+  // Fetch chat activity data
+  React.useEffect(() => {
+    const fetchChatActivity = async () => {
+      if (!user?.id) return
+
+      try {
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("started_at, message_count")
+          .eq("user_id", user.id)
+          .gte("started_at", thirtyDaysAgo.toISOString())
+          .order("started_at", { ascending: true })
+
+        if (error) throw error
+
+        // Group by day
+        const groupedByDay: { [key: string]: { count: number; messages: number } } = {}
+        data?.forEach((conv: any) => {
+          const date = new Date(conv.started_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          })
+          if (!groupedByDay[date]) {
+            groupedByDay[date] = { count: 0, messages: 0 }
+          }
+          groupedByDay[date].count += 1
+          groupedByDay[date].messages += conv.message_count || 0
+        })
+
+        const chartData = Object.entries(groupedByDay).map(([date, data]) => ({
+          date,
+          sessions: data.count,
+          messages: data.messages,
+        }))
+
+        setChatActivityData(chartData)
+      } catch (error) {
+        console.error("Error fetching chat activity:", error)
+      } finally {
+        setIsLoadingChartData(false)
+      }
+    }
+
+    fetchChatActivity()
+  }, [user?.id])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 pt-20 pb-12">
       <Navigation />
@@ -201,6 +261,222 @@ export default function MonitoringPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("monitoring.title")}</h1>
           <p className="text-gray-600">{t("monitoring.subtitle")}</p>
+        </div>
+
+        {/* Visualizations Section */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {/* Blood Pressure Over Time */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="w-5 h-5 text-red-500" />
+                {language === "id" ? "Tekanan Darah (30 Hari)" : "Blood Pressure (30 Days)"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {readings.length > 0 ? (
+                <ChartContainer
+                  config={{
+                    systolic: {
+                      label: language === "id" ? "Sistolik" : "Systolic",
+                      color: "hsl(0, 84%, 60%)",
+                    },
+                    diastolic: {
+                      label: language === "id" ? "Diastolik" : "Diastolic",
+                      color: "hsl(221, 83%, 53%)",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <LineChart
+                    data={readings
+                      .slice(0, 30)
+                      .reverse()
+                      .map((r) => ({
+                        date: new Date(r.measurement_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        }),
+                        systolic: r.systolic,
+                        diastolic: r.diastolic,
+                      }))}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis domain={[40, 200]} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Line type="monotone" dataKey="systolic" stroke="var(--color-systolic)" strokeWidth={2} />
+                    <Line type="monotone" dataKey="diastolic" stroke="var(--color-diastolic)" strokeWidth={2} />
+                  </LineChart>
+                </ChartContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  {t("bp.noReadings")}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Medication Adherence */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Pill className="w-5 h-5 text-blue-500" />
+                {language === "id" ? "Kepatuhan Obat (7 Hari)" : "Medication Adherence (7 Days)"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {medications.length > 0 ? (
+                <ChartContainer
+                  config={{
+                    taken: {
+                      label: language === "id" ? "Diminum" : "Taken",
+                      color: "hsl(142, 76%, 36%)",
+                    },
+                    missed: {
+                      label: language === "id" ? "Terlewat" : "Missed",
+                      color: "hsl(0, 84%, 60%)",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <LineChart
+                    data={(() => {
+                      const last7Days = []
+                      for (let i = 6; i >= 0; i--) {
+                        const date = new Date()
+                        date.setDate(date.getDate() - i)
+                        const dateStr = date.toISOString().split("T")[0]
+                        const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+
+                        const dayMeds = medications.flatMap((med) => med.logs || [])
+                        const dayLogs = dayMeds.filter(
+                          (log) => log.taken_at && log.taken_at.startsWith(dateStr),
+                        )
+                        const taken = dayLogs.filter((log) => log.was_taken).length
+                        const missed = dayLogs.filter((log) => !log.was_taken).length
+
+                        last7Days.push({ date: dayLabel, taken, missed })
+                      }
+                      return last7Days
+                    })()}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Line type="monotone" dataKey="taken" stroke="var(--color-taken)" strokeWidth={2} />
+                    <Line type="monotone" dataKey="missed" stroke="var(--color-missed)" strokeWidth={2} />
+                  </LineChart>
+                </ChartContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  {language === "id" ? "Belum ada data obat" : "No medication data"}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Activity Level */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="w-5 h-5 text-green-500" />
+                {language === "id" ? "Tingkat Aktivitas (30 Hari)" : "Activity Level (30 Days)"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {schedules.length > 0 ? (
+                <ChartContainer
+                  config={{
+                    completed: {
+                      label: language === "id" ? "Selesai" : "Completed",
+                      color: "hsl(142, 76%, 36%)",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <LineChart
+                    data={(() => {
+                      const last30Days = []
+                      for (let i = 29; i >= 0; i--) {
+                        const date = new Date()
+                        date.setDate(date.getDate() - i)
+                        const dateStr = date.toISOString().split("T")[0]
+                        const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+
+                        const dayActivities = schedules.flatMap((s) => s.logs || [])
+                        const completed = dayActivities.filter(
+                          (log) => log.completed_at && log.completed_at.startsWith(dateStr),
+                        ).length
+
+                        last30Days.push({ date: dayLabel, completed })
+                      }
+                      return last30Days
+                    })()}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Line type="monotone" dataKey="completed" stroke="var(--color-completed)" strokeWidth={2} />
+                  </LineChart>
+                </ChartContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  {language === "id" ? "Belum ada data aktivitas" : "No activity data"}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Chat Activity */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-purple-500" />
+                {language === "id" ? "Aktivitas Chat (30 Hari)" : "Chat Activity (30 Days)"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingChartData ? (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  {language === "id" ? "Memuat..." : "Loading..."}
+                </div>
+              ) : chatActivityData.length > 0 ? (
+                <ChartContainer
+                  config={{
+                    sessions: {
+                      label: language === "id" ? "Sesi" : "Sessions",
+                      color: "hsl(262, 83%, 58%)",
+                    },
+                    messages: {
+                      label: language === "id" ? "Pesan" : "Messages",
+                      color: "hsl(221, 83%, 53%)",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <LineChart data={chatActivityData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Line type="monotone" dataKey="sessions" stroke="var(--color-sessions)" strokeWidth={2} />
+                    <Line type="monotone" dataKey="messages" stroke="var(--color-messages)" strokeWidth={2} />
+                  </LineChart>
+                </ChartContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  {language === "id" ? "Belum ada aktivitas chat" : "No chat activity"}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         <Tabs defaultValue="bp" className="space-y-6">
