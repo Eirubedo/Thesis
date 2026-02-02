@@ -454,45 +454,25 @@ export function DifyChatInterface({
           
           {/* TTS Audio Visualization */}
           {(isPlaying || ttsLoading) && (
-            <div className="flex justify-center my-6">
-              <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-2xl p-6 shadow-lg max-w-md w-full">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center animate-pulse">
-                      <Volume2 className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-yellow-900">
-                        {ttsLoading ? (language === "id" ? "Menyiapkan audio..." : "Preparing audio...") : (language === "id" ? "Memutar audio" : "Playing audio")}
-                      </p>
-                      <p className="text-xs text-yellow-700">{currentProvider}</p>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={stopSpeech} 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-yellow-700 hover:bg-yellow-200 h-8 w-8 p-0 rounded-full"
-                    aria-label="Stop audio"
-                  >
-                    <VolumeX className="w-4 h-4" />
-                  </Button>
-                </div>
-                
-                {/* Animated Waveform */}
-                <div className="flex items-center justify-center gap-1 h-16">
-                  {[...Array(12)].map((_, i) => (
+            <div className="flex justify-start mb-2">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                <Volume2 className="w-3 h-3 text-yellow-600 animate-pulse" />
+                <div className="flex items-center gap-0.5 h-4">
+                  {[...Array(8)].map((_, i) => (
                     <div
                       key={i}
-                      className="w-1.5 bg-yellow-600 rounded-full animate-pulse"
+                      className="w-0.5 bg-yellow-500 rounded-full animate-pulse"
                       style={{
-                        height: `${20 + Math.sin(i * 0.5) * 20}%`,
+                        height: `${30 + Math.sin(i * 0.5) * 30}%`,
                         animationDelay: `${i * 0.1}s`,
                         animationDuration: `${0.6 + (i % 3) * 0.2}s`
                       }}
                     />
                   ))}
                 </div>
+                <span className="text-xs text-yellow-700">
+                  {ttsLoading ? (language === "id" ? "Menyiapkan..." : "Preparing...") : (language === "id" ? "Memutar" : "Playing")}
+                </span>
               </div>
             </div>
           )}
@@ -515,20 +495,37 @@ export function DifyChatInterface({
         )}
 
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={placeholder || t("chat.placeholder")}
-            disabled={isLoading}
-            className="flex-1"
-          />
+          <div className="relative flex-1">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={placeholder || t("chat.placeholder")}
+              disabled={isLoading}
+              className="flex-1 pr-24"
+            />
+            {isListening && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 h-4">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-0.5 bg-red-500 rounded-full animate-pulse"
+                    style={{
+                      height: `${30 + Math.sin(i * 0.5) * 30}%`,
+                      animationDelay: `${i * 0.1}s`,
+                      animationDuration: `${0.6 + (i % 3) * 0.2}s`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={isListening ? stopListening : startListening}
             disabled={isLoading}
-            className={isListening ? "bg-yellow-100 text-yellow-600 border-yellow-300" : ""}
+            className={isListening ? "bg-red-100 text-red-600 border-red-300" : ""}
             aria-pressed={isListening}
             aria-label={isListening ? "Stop voice input" : "Start voice input"}
           >
