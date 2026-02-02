@@ -39,7 +39,7 @@ export default function AssessmentPage() {
       id: "comprehensive",
       title: t("assessment.comprehensive"),
       description: t("assessment.comprehensiveDesc"),
-      duration: "15-20 min",
+      duration: "30-60 min",
       icon: Brain,
       color: "bg-red-100 text-red-700",
       features: [
@@ -60,7 +60,7 @@ export default function AssessmentPage() {
       id: "quick",
       title: t("assessment.quick"),
       description: t("assessment.quickDesc"),
-      duration: "10-15 min",
+      duration: "15-30 min",
       icon: Clock,
       color: "bg-blue-100 text-blue-700",
       features: [
@@ -81,7 +81,7 @@ export default function AssessmentPage() {
       id: "knowledge",
       title: t("assessment.knowledge"),
       description: t("assessment.knowledgeDesc"),
-      duration: "10-12 min",
+      duration: "15-30 min",
       icon: BookOpen,
       color: "bg-green-100 text-green-700",
       features: [
@@ -552,7 +552,11 @@ export default function AssessmentPage() {
               <div className="flex items-start gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <Clock className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold text-yellow-900">{t("assessment.disclaimerDuration")}</p>
+                  <p className="font-semibold text-yellow-900">
+                    {language === "id" ? "Waktu yang Dibutuhkan: " : "Time Commitment: "}
+                    {pendingAssessmentType === "comprehensive" ? "30-60 " : "15-30 "}
+                    {language === "id" ? "menit" : "minutes"}
+                  </p>
                   <p className="text-sm text-yellow-800">{t("assessment.disclaimerDurationDesc")}</p>
                 </div>
               </div>
