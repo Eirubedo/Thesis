@@ -120,68 +120,33 @@ export default function AssessmentPage() {
 
   if (assessmentMode === "quick") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col">
         <Navigation />
 
-        <div className="pt-16 max-w-7xl mx-auto p-4 py-8">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("assessment.quick")}</h1>
-              <p className="text-gray-600">{t("assessment.quickDesc")}</p>
+        <div className="flex-1 pt-16 flex flex-col">
+          {/* Back button bar */}
+          <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-2">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <Button onClick={() => setAssessmentMode("overview")} variant="ghost" size="sm" className="bg-transparent">
+                <ArrowRight className="w-4 h-4 mr-1 rotate-180" />
+                {t("assessment.backToOverview")}
+              </Button>
             </div>
-            <Button onClick={() => setAssessmentMode("overview")} variant="outline" className="bg-transparent">
-              {t("assessment.backToOverview")}
-            </Button>
           </div>
 
-          <div className="grid lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-3">
-              <DifyChatInterface
-                title={t("assessment.quick")}
-                showHeader={true}
-                minHeight="calc(100vh - 250px)"
-                className="shadow-lg"
-                placeholder={t("assessment.chatPlaceholder")}
-                apiPath="/api/dify/quick-assessment"
-                conversationType="quick-assessment"
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Card className="border-blue-100">
-                <CardHeader>
-                  <CardTitle className="text-lg">{t("assessment.progressTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm">{t("assessment.startedConversation")}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
-                    <span className="text-sm text-gray-500">Screening cepat</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
-                    <span className="text-sm text-gray-500">{t("assessment.receiveInsights")}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-blue-100 bg-blue-50">
-                <CardHeader>
-                  <CardTitle className="text-lg text-blue-900">{t("assessment.tipsTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-blue-800 space-y-2">
-                    <div>• Pilih jenis diagnosis yang akan dievaluasi</div>
-                    <div>• Siapkan informasi tanda dan gejala</div>
-                    <div>• Catat kemampuan yang sudah dipelajari</div>
-                    <div>• Sebutkan praktik yang sudah dilakukan</div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Full-screen Chat Interface */}
+          <div className="flex-1 max-w-4xl w-full mx-auto p-4">
+            <DifyChatInterface
+              title={t("assessment.quick")}
+              showHeader={true}
+              minHeight="calc(100vh - 180px)"
+              className="shadow-lg h-full"
+              placeholder={t("assessment.chatPlaceholder")}
+              apiPath="/api/dify/quick-assessment"
+              conversationType="quick-assessment"
+              showProgressStatus={true}
+              assessmentType="quick-assessment"
+            />
           </div>
         </div>
       </div>
@@ -190,69 +155,33 @@ export default function AssessmentPage() {
 
   if (assessmentMode === "comprehensive") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-blue-50 flex flex-col">
         <Navigation />
 
-        <div className="pt-16 max-w-7xl mx-auto p-4 py-8">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("assessment.comprehensive")}</h1>
-              <p className="text-gray-600">{t("assessment.comprehensiveDesc")}</p>
+        <div className="flex-1 pt-16 flex flex-col">
+          {/* Back button bar */}
+          <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-2">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <Button onClick={() => setAssessmentMode("overview")} variant="ghost" size="sm" className="bg-transparent">
+                <ArrowRight className="w-4 h-4 mr-1 rotate-180" />
+                {t("assessment.backToOverview")}
+              </Button>
             </div>
-            <Button onClick={() => setAssessmentMode("overview")} variant="outline" className="bg-transparent">
-              {t("assessment.backToOverview")}
-            </Button>
           </div>
 
-          <div className="grid lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-3">
-              <DifyChatInterface
-                title={t("assessment.comprehensive")}
-                showHeader={true}
-                minHeight="calc(100vh - 250px)"
-                className="shadow-lg"
-                placeholder={t("assessment.chatPlaceholder")}
-                apiPath="/api/dify/assessment"
-                conversationType="assessment"
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Card className="border-red-100">
-                <CardHeader>
-                  <CardTitle className="text-lg">{t("assessment.progressTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm">{t("assessment.startedConversation")}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
-                    <span className="text-sm text-gray-500">{t("assessment.completeAssessment")}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
-                    <span className="text-sm text-gray-500">{t("assessment.receiveInsights")}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-yellow-100 bg-yellow-50">
-                <CardHeader>
-                  <CardTitle className="text-lg text-yellow-900">{t("assessment.tipsTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-yellow-800 space-y-2">
-                    {t("assessment.tips")
-                      .split("\n")
-                      .map((tip, index) => (
-                        <div key={index}>{tip}</div>
-                      ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Full-screen Chat Interface */}
+          <div className="flex-1 max-w-4xl w-full mx-auto p-4">
+            <DifyChatInterface
+              title={t("assessment.comprehensive")}
+              showHeader={true}
+              minHeight="calc(100vh - 180px)"
+              className="shadow-lg h-full"
+              placeholder={t("assessment.chatPlaceholder")}
+              apiPath="/api/dify/assessment"
+              conversationType="assessment"
+              showProgressStatus={true}
+              assessmentType="assessment"
+            />
           </div>
         </div>
       </div>
@@ -261,69 +190,33 @@ export default function AssessmentPage() {
 
   if (assessmentMode === "knowledge") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 flex flex-col">
         <Navigation />
 
-        <div className="pt-16 max-w-7xl mx-auto p-4 py-8">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("assessment.knowledge")}</h1>
-              <p className="text-gray-600">{t("assessment.knowledgeDesc")}</p>
+        <div className="flex-1 pt-16 flex flex-col">
+          {/* Back button bar */}
+          <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-2">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <Button onClick={() => setAssessmentMode("overview")} variant="ghost" size="sm" className="bg-transparent">
+                <ArrowRight className="w-4 h-4 mr-1 rotate-180" />
+                {t("assessment.backToOverview")}
+              </Button>
             </div>
-            <Button onClick={() => setAssessmentMode("overview")} variant="outline" className="bg-transparent">
-              {t("assessment.backToOverview")}
-            </Button>
           </div>
 
-          <div className="grid lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-3">
-              <DifyChatInterface
-                title={t("assessment.knowledge")}
-                showHeader={true}
-                minHeight="calc(100vh - 250px)"
-                className="shadow-lg"
-                placeholder={t("assessment.chatPlaceholder")}
-                apiPath="/api/dify/knowledge-test"
-                conversationType="knowledge-test"
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Card className="border-green-100">
-                <CardHeader>
-                  <CardTitle className="text-lg">{t("assessment.progressTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm">{t("assessment.startedConversation")}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
-                    <span className="text-sm text-gray-500">{t("assessment.completeAssessment")}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
-                    <span className="text-sm text-gray-500">{t("assessment.receiveInsights")}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-green-100 bg-green-50">
-                <CardHeader>
-                  <CardTitle className="text-lg text-green-900">{t("assessment.tipsTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-green-800 space-y-2">
-                    {t("assessment.knowledgeTips")
-                      .split("\n")
-                      .map((tip, index) => (
-                        <div key={index}>{tip}</div>
-                      ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Full-screen Chat Interface */}
+          <div className="flex-1 max-w-4xl w-full mx-auto p-4">
+            <DifyChatInterface
+              title={t("assessment.knowledge")}
+              showHeader={true}
+              minHeight="calc(100vh - 180px)"
+              className="shadow-lg h-full"
+              placeholder={t("assessment.chatPlaceholder")}
+              apiPath="/api/dify/knowledge-test"
+              conversationType="knowledge-test"
+              showProgressStatus={true}
+              assessmentType="knowledge-test"
+            />
           </div>
         </div>
       </div>
