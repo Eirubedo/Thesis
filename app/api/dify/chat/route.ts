@@ -89,34 +89,76 @@ export async function POST(request: NextRequest) {
     const contextString = buildContextString(userContext)
     const enhancedMessage = contextString ? `${message}${contextString}` : message
 
-    const difyResponse = await fetch("https://api.dify.ai/v1/chat-messages", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${DIFY_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputs: {},
-        query: enhancedMessage,
-        response_mode: "blocking",
-        conversation_id: conversation_id || "",
-        user: user_id || "anonymous",
-      }),
-    })
+    // Try streaming first with a timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 25000) // 25 second timeout
 
-    if (!difyResponse.ok) {
-      const errorText = await difyResponse.text()
-      console.error("Dify API error:", errorText)
-      return NextResponse.json({ error: "Failed to get response from AI assistant" }, { status: difyResponse.status })
+    try {
+      const difyResponse = await fetch("https://api.dify.ai/v1/chat-messages", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${DIFY_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: {},
+          query: enhancedMessage,
+          response_mode: "streaming",
+          conversation_id: conversation_id || "",
+          user: user_id || "anonymous",
+        }),
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!difyResponse.ok) {
+        throw new Error(`Dify API returned status ${difyResponse.status}`)
+      }
+
+      // Return the streaming response directly
+      return new Response(difyResponse.body, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+        },
+      })
+    } catch (streamError: any) {
+      clearTimeout(timeoutId)
+      console.log("[v0] Streaming failed, falling back to blocking mode:", streamError.message)
+
+      // Fallback to blocking mode if streaming fails
+      const blockingResponse = await fetch("https://api.dify.ai/v1/chat-messages", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${DIFY_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: {},
+          query: enhancedMessage,
+          response_mode: "blocking",
+          conversation_id: conversation_id || "",
+          user: user_id || "anonymous",
+        }),
+      })
+
+      if (!blockingResponse.ok) {
+        const errorText = await blockingResponse.text()
+        console.error("Dify API error (blocking mode):", errorText)
+        return NextResponse.json({ error: "Failed to get response from AI assistant" }, { status: blockingResponse.status })
+      }
+
+      const data = await blockingResponse.json()
+
+      return NextResponse.json({
+        message: data.answer || "Saya disini untuk membantu Anda. Apakah bisa diulangi lagi pertanyaannya?",
+        conversation_id: data.conversation_id,
+        message_id: data.id,
+        mode: "blocking",
+      })
     }
-
-    const data = await difyResponse.json()
-
-    return NextResponse.json({
-      message: data.answer || "Saya disini untuk membantu Anda. Apakah bisa diulangi lagi pertanyaannya?",
-      conversation_id: data.conversation_id,
-      message_id: data.id,
-    })
   } catch (error) {
     console.error("Chat API error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

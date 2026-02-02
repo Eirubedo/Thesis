@@ -14,11 +14,13 @@ import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { User, Calendar, Settings, Shield, Bell, MapPin, Loader2 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 export default function ProfilePage() {
   const { user, logout, updateProfile } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
+  const { t } = useLanguage()
 
   const [isEditing, setIsEditing] = useState(false)
   const [isLoadingLocation, setIsLoadingLocation] = useState(false)
@@ -60,8 +62,8 @@ export default function ProfilePage() {
     // Validate file type
     if (!file.type.startsWith("image/")) {
       toast({
-        title: "Invalid File",
-        description: "Please select an image file",
+        title: t("profile.invalidFile"),
+        description: t("profile.invalidFileDesc"),
         variant: "destructive",
       })
       return
@@ -70,8 +72,8 @@ export default function ProfilePage() {
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       toast({
-        title: "File Too Large",
-        description: "Please select an image smaller than 2MB",
+        title: t("profile.fileTooLarge"),
+        description: t("profile.fileTooLargeDesc"),
         variant: "destructive",
       })
       return
@@ -98,13 +100,13 @@ export default function ProfilePage() {
         if (response.ok) {
           setProfilePicture(base64String)
           toast({
-            title: "Success",
-            description: "Profile picture updated successfully",
+            title: t("profile.uploadSuccess"),
+            description: t("profile.uploadSuccessDesc"),
           })
         } else {
           toast({
-            title: "Upload Failed",
-            description: "Failed to upload profile picture",
+            title: t("profile.uploadFailed"),
+            description: t("profile.uploadFailedDesc"),
             variant: "destructive",
           })
         }
@@ -113,8 +115,8 @@ export default function ProfilePage() {
       reader.readAsDataURL(file)
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An error occurred while uploading your picture",
+        title: t("profile.uploadError"),
+        description: t("profile.uploadErrorDesc"),
         variant: "destructive",
       })
       setUploadingPicture(false)
@@ -136,20 +138,20 @@ export default function ProfilePage() {
       if (result.success) {
         setIsEditing(false)
         toast({
-          title: "Profile Updated",
-          description: "Your profile has been successfully updated.",
+          title: t("profile.updateSuccess"),
+          description: t("profile.updateSuccessDesc"),
         })
       } else {
         toast({
-          title: "Update Failed",
-          description: result.error || "Failed to update profile",
+          title: t("profile.updateFailed"),
+          description: result.error || t("profile.updateFailedDesc"),
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An error occurred while updating your profile",
+        title: t("profile.updateError"),
+        description: t("profile.updateErrorDesc"),
         variant: "destructive",
       })
     }
@@ -254,8 +256,8 @@ export default function ProfilePage() {
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       toast({
-        title: "Location Not Supported",
-        description: "Your browser doesn't support geolocation",
+        title: t("profile.locationNotSupported"),
+        description: t("profile.locationNotSupportedDesc"),
         variant: "destructive",
       })
       return
@@ -269,8 +271,8 @@ export default function ProfilePage() {
           const { latitude, longitude } = position.coords
 
           toast({
-            title: "Getting Location...",
-            description: "Converting coordinates to address...",
+            title: t("profile.gettingLocation"),
+            description: t("profile.gettingLocationDesc"),
           })
 
           const geocodeResult = await reverseGeocode(latitude, longitude)
@@ -282,8 +284,8 @@ export default function ProfilePage() {
           }))
 
           toast({
-            title: "Location Retrieved",
-            description: `Address found using ${geocodeResult.source}`,
+            title: t("profile.locationRetrieved"),
+            description: t("profile.locationRetrievedDesc").replace("{source}", geocodeResult.source),
           })
         } catch (error) {
           console.error("Error getting address:", error)
@@ -296,8 +298,8 @@ export default function ProfilePage() {
           }))
 
           toast({
-            title: "Location Retrieved",
-            description: "GPS coordinates saved. Please update address manually if needed.",
+            title: t("profile.locationRetrieved"),
+            description: t("profile.locationFallback"),
           })
         } finally {
           setIsLoadingLocation(false)
@@ -305,22 +307,22 @@ export default function ProfilePage() {
       },
       (error) => {
         setIsLoadingLocation(false)
-        let errorMessage = "Could not retrieve your location"
+        let errorMessage = t("profile.locationDenied")
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied. Please enable location permissions in your browser."
+            errorMessage = t("profile.locationDenied")
             break
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information is unavailable. Please check your GPS/internet connection."
+            errorMessage = t("profile.locationUnavailable")
             break
           case error.TIMEOUT:
-            errorMessage = "Location request timed out. Please try again."
+            errorMessage = t("profile.locationTimeout")
             break
         }
 
         toast({
-          title: "Location Error",
+          title: t("profile.locationError"),
           description: errorMessage,
           variant: "destructive",
         })
@@ -334,12 +336,12 @@ export default function ProfilePage() {
   }
 
   const handleDeleteAccount = () => {
-    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+    if (confirm(t("profile.deleteConfirm"))) {
       logout()
       router.push("/")
       toast({
-        title: "Account Deleted",
-        description: "Your account has been successfully deleted.",
+        title: t("profile.accountDeleted"),
+        description: t("profile.accountDeletedDesc"),
       })
     }
   }
@@ -359,8 +361,8 @@ export default function ProfilePage() {
 
       <div className="pt-16 max-w-4xl mx-auto p-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile Settings</h1>
-          <p className="text-gray-600">Manage your account information and preferences</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("profile.title")}</h1>
+          <p className="text-gray-600">{t("profile.subtitle")}</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -370,9 +372,9 @@ export default function ProfilePage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <User className="w-5 h-5 mr-2" />
-                  Personal Information
+                  {t("profile.personalInfo")}
                 </CardTitle>
-                <CardDescription>Update your personal details and profile information</CardDescription>
+                <CardDescription>{t("profile.personalInfoDesc")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Profile Picture Upload */}
@@ -394,7 +396,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col items-center gap-2">
                     <Label htmlFor="profile_picture" className="cursor-pointer">
                       <div className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors">
-                        {profilePicture ? "Change Picture" : "Upload Picture"}
+                        {profilePicture ? t("profile.changePicture") : t("profile.uploadPicture")}
                       </div>
                     </Label>
                     <Input
@@ -404,42 +406,42 @@ export default function ProfilePage() {
                       onChange={handleProfilePictureChange}
                       className="hidden"
                     />
-                    <p className="text-xs text-gray-500">Max 2MB, JPG/PNG</p>
+                    <p className="text-xs text-gray-500">{t("profile.maxFileSize")}</p>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name / Nama Lengkap</Label>
+                    <Label htmlFor="full_name">{t("profile.fullName")}</Label>
                     <Input
                       id="full_name"
                       value={formData.full_name}
                       onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
                       disabled={!isEditing}
-                      placeholder="Enter your full name"
+                      placeholder={t("profile.fullName")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="gender">Gender / Jenis Kelamin</Label>
+                    <Label htmlFor="gender">{t("profile.gender")}</Label>
                     <Select
                       value={formData.gender}
                       onValueChange={(value) => setFormData((prev) => ({ ...prev, gender: value }))}
                       disabled={!isEditing}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
+                        <SelectValue placeholder={t("profile.selectGender")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="male">Male / Laki-laki</SelectItem>
-                        <SelectItem value="female">Female / Perempuan</SelectItem>
-                        <SelectItem value="other">Other / Lainnya</SelectItem>
+                        <SelectItem value="male">{t("profile.male")}</SelectItem>
+                        <SelectItem value="female">{t("profile.female")}</SelectItem>
+                        <SelectItem value="other">{t("profile.other")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="birth_date">Date of Birth / Tanggal Lahir</Label>
+                  <Label htmlFor="birth_date">{t("profile.birthDate")}</Label>
                   <Input
                     id="birth_date"
                     type="date"
@@ -450,11 +452,11 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">Complete Address / Alamat Lengkap</Label>
+                  <Label htmlFor="address">{t("profile.address")}</Label>
                   <div className="flex gap-2">
                     <Textarea
                       id="address"
-                      placeholder="Enter your complete address"
+                      placeholder={t("profile.addressPlaceholder")}
                       value={formData.address}
                       onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))}
                       disabled={!isEditing}
@@ -480,27 +482,27 @@ export default function ProfilePage() {
                     )}
                   </div>
                   <p className="text-xs text-gray-500">
-                    Click GPS button to automatically detect and fill your current address
+                    {t("profile.gpsHint")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="postal_code">Postal Code / Kode Pos</Label>
+                  <Label htmlFor="postal_code">{t("profile.postalCode")}</Label>
                   <Input
                     id="postal_code"
                     value={formData.postal_code}
                     onChange={(e) => setFormData((prev) => ({ ...prev, postal_code: e.target.value }))}
                     disabled={!isEditing}
-                    placeholder="Enter postal code"
+                    placeholder={t("profile.postalCodePlaceholder")}
                     maxLength={5}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio (Optional)</Label>
+                  <Label htmlFor="bio">{t("profile.bio")}</Label>
                   <Textarea
                     id="bio"
-                    placeholder="Tell us a bit about yourself..."
+                    placeholder={t("profile.bioPlaceholder")}
                     value={formData.bio}
                     onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
                     disabled={!isEditing}
@@ -512,14 +514,14 @@ export default function ProfilePage() {
                   {isEditing ? (
                     <>
                       <Button variant="outline" onClick={() => setIsEditing(false)}>
-                        Cancel
+                        {t("profile.cancel")}
                       </Button>
-                      <Button onClick={handleSave}>Save Changes</Button>
+                      <Button onClick={handleSave}>{t("profile.saveChanges")}</Button>
                     </>
                   ) : (
                     <Button onClick={() => setIsEditing(true)}>
                       <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
+                      {t("profile.editProfile")}
                     </Button>
                   )}
                 </div>
@@ -531,43 +533,43 @@ export default function ProfilePage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Shield className="w-5 h-5 mr-2" />
-                  Privacy & Security
+                  {t("profile.privacySecurity")}
                 </CardTitle>
-                <CardDescription>Manage your privacy settings and data preferences</CardDescription>
+                <CardDescription>{t("profile.privacyDesc")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium">Email Notifications</h4>
-                    <p className="text-sm text-gray-600">Receive updates about your mental health journey</p>
+                    <h4 className="font-medium">{t("profile.emailNotifications")}</h4>
+                    <p className="text-sm text-gray-600">{t("profile.emailNotificationsDesc")}</p>
                   </div>
                   <Button
                     variant={formData.notifications ? "default" : "outline"}
                     size="sm"
                     onClick={() => setFormData((prev) => ({ ...prev, notifications: !prev.notifications }))}
                   >
-                    {formData.notifications ? "Enabled" : "Disabled"}
+                    {formData.notifications ? t("profile.enabled") : t("profile.disabled")}
                   </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium">Anonymous Data Sharing</h4>
-                    <p className="text-sm text-gray-600">Help improve our AI by sharing anonymized data</p>
+                    <h4 className="font-medium">{t("profile.dataSharing")}</h4>
+                    <p className="text-sm text-gray-600">{t("profile.dataSharingDesc")}</p>
                   </div>
                   <Button
                     variant={formData.dataSharing ? "default" : "outline"}
                     size="sm"
                     onClick={() => setFormData((prev) => ({ ...prev, dataSharing: !prev.dataSharing }))}
                   >
-                    {formData.dataSharing ? "Enabled" : "Disabled"}
+                    {formData.dataSharing ? t("profile.enabled") : t("profile.disabled")}
                   </Button>
                 </div>
 
                 <div className="pt-4 border-t">
                   <Button variant="outline" className="w-full bg-transparent">
                     <Shield className="w-4 h-4 mr-2" />
-                    Change Password
+                    {t("profile.changePassword")}
                   </Button>
                 </div>
               </CardContent>
@@ -576,15 +578,15 @@ export default function ProfilePage() {
             {/* Danger Zone */}
             <Card className="border-red-200">
               <CardHeader>
-                <CardTitle className="text-red-600">Danger Zone</CardTitle>
-                <CardDescription>Irreversible actions that will affect your account</CardDescription>
+                <CardTitle className="text-red-600">{t("profile.dangerZone")}</CardTitle>
+                <CardDescription>{t("profile.dangerZoneDesc")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button variant="destructive" onClick={handleDeleteAccount} className="w-full">
-                  Delete Account
+                  {t("profile.deleteAccount")}
                 </Button>
                 <p className="text-xs text-gray-500 mt-2">
-                  This action cannot be undone. All your data will be permanently deleted.
+                  {t("profile.deleteWarning")}
                 </p>
               </CardContent>
             </Card>
@@ -595,35 +597,35 @@ export default function ProfilePage() {
             {/* Account Summary */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Account Summary</CardTitle>
+                <CardTitle className="text-lg">{t("profile.accountSummary")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <User className="w-4 h-4 text-gray-400" />
                   <div>
-                    <p className="text-sm font-medium">Phone Number</p>
+                    <p className="text-sm font-medium">{t("profile.phoneNumber")}</p>
                     <p className="text-xs text-gray-600">{user.phone_number}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Calendar className="w-4 h-4 text-gray-400" />
                   <div>
-                    <p className="text-sm font-medium">Date of Birth</p>
-                    <p className="text-xs text-gray-600">{user.birth_date ? formatDate(user.birth_date) : "Not set"}</p>
+                    <p className="text-sm font-medium">{t("profile.birthDate")}</p>
+                    <p className="text-xs text-gray-600">{user.birth_date ? formatDate(user.birth_date) : t("profile.notSet")}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <MapPin className="w-4 h-4 text-gray-400" />
                   <div>
-                    <p className="text-sm font-medium">Postal Code</p>
-                    <p className="text-xs text-gray-600">{user.postal_code || "Not set"}</p>
+                    <p className="text-sm font-medium">{t("profile.postalCode")}</p>
+                    <p className="text-xs text-gray-600">{user.postal_code || t("profile.notSet")}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Bell className="w-4 h-4 text-gray-400" />
                   <div>
-                    <p className="text-sm font-medium">Notifications</p>
-                    <p className="text-xs text-gray-600">{formData.notifications ? "Enabled" : "Disabled"}</p>
+                    <p className="text-sm font-medium">{t("profile.emailNotifications")}</p>
+                    <p className="text-xs text-gray-600">{formData.notifications ? t("profile.enabled") : t("profile.disabled")}</p>
                   </div>
                 </div>
               </CardContent>
@@ -632,7 +634,7 @@ export default function ProfilePage() {
             {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
+                <CardTitle className="text-lg">{t("profile.quickActions")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button
@@ -640,35 +642,35 @@ export default function ProfilePage() {
                   className="w-full justify-start bg-transparent"
                   onClick={() => router.push("/assessment")}
                 >
-                  Take Assessment
+                  {t("profile.takeAssessment")}
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full justify-start bg-transparent"
                   onClick={() => router.push("/reports")}
                 >
-                  View Reports
+                  {t("profile.viewReports")}
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full justify-start bg-transparent"
                   onClick={() => router.push("/self-help")}
                 >
-                  Self-Help Resources
+                  {t("profile.selfHelpResources")}
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full justify-start bg-transparent"
                   onClick={() => router.push("/bp-tracking")}
                 >
-                  Blood Pressure Tracking
+                  {t("profile.bloodPressureTracking")}
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full justify-start bg-transparent"
                   onClick={() => router.push("/medications")}
                 >
-                  Medication Management
+                  {t("profile.medicationManagement")}
                 </Button>
               </CardContent>
             </Card>
