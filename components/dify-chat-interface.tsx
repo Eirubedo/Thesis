@@ -312,63 +312,84 @@ export function DifyChatInterface({
         throw new Error("Failed to get response")
       }
 
-      // Handle streaming response
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-
-      if (!reader) {
-        throw new Error("No response body")
-      }
-
-      let assistantMessageId = (Date.now() + 1).toString()
+      // Check if response is JSON (blocking mode) or streaming
+      const contentType = response.headers.get("content-type")
+      
       let fullContent = ""
+      let assistantMessageId = (Date.now() + 1).toString()
       let streamConversationId = conversationId
 
-      // Create initial empty assistant message
-      const assistantMessage: Message = {
-        id: assistantMessageId,
-        content: "",
-        role: "assistant",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, assistantMessage])
+      if (contentType?.includes("application/json")) {
+        // Blocking mode response
+        const data = await response.json()
+        
+        fullContent = data.message || ""
+        streamConversationId = data.conversation_id || conversationId
+        assistantMessageId = data.message_id || assistantMessageId
 
-      // Read the stream
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+        // Add the complete message directly
+        const assistantMessage: Message = {
+          id: assistantMessageId,
+          content: fullContent,
+          role: "assistant",
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, assistantMessage])
+      } else {
+        // Streaming mode response
+        const reader = response.body?.getReader()
+        const decoder = new TextDecoder()
 
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split("\n")
+        if (!reader) {
+          throw new Error("No response body")
+        }
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            try {
-              const jsonStr = line.slice(6).trim()
-              if (!jsonStr || jsonStr === "[DONE]") continue
+        // Create initial empty assistant message
+        const assistantMessage: Message = {
+          id: assistantMessageId,
+          content: "",
+          role: "assistant",
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, assistantMessage])
 
-              const data = JSON.parse(jsonStr)
+        // Read the stream
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
 
-              if (data.event === "message" || data.event === "agent_message") {
-                fullContent += data.answer || ""
-                streamConversationId = data.conversation_id || streamConversationId
-                assistantMessageId = data.message_id || assistantMessageId
+          const chunk = decoder.decode(value, { stream: true })
+          const lines = chunk.split("\n")
 
-                // Update the message in real-time
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessage.id
-                      ? { ...msg, id: assistantMessageId, content: fullContent }
-                      : msg
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              try {
+                const jsonStr = line.slice(6).trim()
+                if (!jsonStr || jsonStr === "[DONE]") continue
+
+                const data = JSON.parse(jsonStr)
+
+                if (data.event === "message" || data.event === "agent_message") {
+                  fullContent += data.answer || ""
+                  streamConversationId = data.conversation_id || streamConversationId
+                  assistantMessageId = data.message_id || assistantMessageId
+
+                  // Update the message in real-time
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === assistantMessage.id
+                        ? { ...msg, id: assistantMessageId, content: fullContent }
+                        : msg
+                    )
                   )
-                )
-              } else if (data.event === "message_end") {
-                streamConversationId = data.conversation_id || streamConversationId
-              } else if (data.event === "error") {
-                throw new Error(data.message || "Stream error")
+                } else if (data.event === "message_end") {
+                  streamConversationId = data.conversation_id || streamConversationId
+                } else if (data.event === "error") {
+                  throw new Error(data.message || "Stream error")
+                }
+              } catch (parseError) {
+                console.error("Error parsing stream chunk:", parseError)
               }
-            } catch (parseError) {
-              console.error("Error parsing stream chunk:", parseError)
             }
           }
         }
