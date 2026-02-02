@@ -1,5 +1,7 @@
 "use client"
 
+import React from "react"
+
 import { useState, useEffect } from "react"
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,6 +22,8 @@ export default function ProfilePage() {
 
   const [isEditing, setIsEditing] = useState(false)
   const [isLoadingLocation, setIsLoadingLocation] = useState(false)
+  const [profilePicture, setProfilePicture] = useState<string | null>(user?.profile_picture || null)
+  const [uploadingPicture, setUploadingPicture] = useState(false)
   const [formData, setFormData] = useState({
     full_name: user?.full_name || "",
     gender: user?.gender || "",
@@ -47,6 +51,74 @@ export default function ProfilePage() {
   if (!user) {
     router.push("/login")
     return null
+  }
+
+  const handleProfilePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image smaller than 2MB",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setUploadingPicture(true)
+
+    try {
+      // Convert to base64
+      const reader = new FileReader()
+      reader.onloadend = async () => {
+        const base64String = reader.result as string
+
+        // Save to database
+        const response = await fetch("/api/profile-picture", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.id,
+            profile_picture: base64String,
+          }),
+        })
+
+        if (response.ok) {
+          setProfilePicture(base64String)
+          toast({
+            title: "Success",
+            description: "Profile picture updated successfully",
+          })
+        } else {
+          toast({
+            title: "Upload Failed",
+            description: "Failed to upload profile picture",
+            variant: "destructive",
+          })
+        }
+        setUploadingPicture(false)
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while uploading your picture",
+        variant: "destructive",
+      })
+      setUploadingPicture(false)
+    }
   }
 
   const handleSave = async () => {
@@ -303,6 +375,39 @@ export default function ProfilePage() {
                 <CardDescription>Update your personal details and profile information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Profile Picture Upload */}
+                <div className="flex flex-col items-center gap-4 pb-4 border-b">
+                  <div className="relative">
+                    <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                      {profilePicture ? (
+                        <img src={profilePicture || "/placeholder.svg"} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="w-16 h-16 text-gray-400" />
+                      )}
+                    </div>
+                    {uploadingPicture && (
+                      <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                        <Loader2 className="w-8 h-8 text-white animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Label htmlFor="profile_picture" className="cursor-pointer">
+                      <div className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors">
+                        {profilePicture ? "Change Picture" : "Upload Picture"}
+                      </div>
+                    </Label>
+                    <Input
+                      id="profile_picture"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePictureChange}
+                      className="hidden"
+                    />
+                    <p className="text-xs text-gray-500">Max 2MB, JPG/PNG</p>
+                  </div>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="full_name">Full Name / Nama Lengkap</Label>

@@ -95,6 +95,7 @@ export function DifyChatInterface({
   const [userContext, setUserContext] = useState<UserContext | null>(null)
   const [contextLoaded, setContextLoaded] = useState(false)
   const [assessmentProgress, setAssessmentProgress] = useState<AssessmentProgress | null>(null)
+  const [profilePicture, setProfilePicture] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
@@ -120,6 +121,25 @@ export function DifyChatInterface({
     }
 
     fetchUserContext()
+  }, [user?.id])
+
+  // Fetch profile picture
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (!user?.id) return
+
+      try {
+        const response = await fetch(`/api/profile-picture?user_id=${user.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          setProfilePicture(data.profile_picture)
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile picture:", error)
+      }
+    }
+
+    fetchProfilePicture()
   }, [user?.id])
 
   // Fetch and update assessment progress
@@ -402,12 +422,16 @@ export function DifyChatInterface({
                 }`}
               >
                 <div
-                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ${
                     message.role === "user" ? "bg-sky-500" : "bg-yellow-500"
                   }`}
                 >
                   {message.role === "user" ? (
-                    <User className="w-4 h-4 text-white" />
+                    profilePicture ? (
+                      <img src={profilePicture || "/placeholder.svg"} alt="User" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-4 h-4 text-white" />
+                    )
                   ) : (
                     <Bot className="w-4 h-4 text-white" />
                   )}
