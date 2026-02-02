@@ -72,6 +72,17 @@ export async function GET(request: NextRequest) {
       console.error("Error fetching schedules:", schedError)
     }
 
+    // Fetch full assessment data
+    const { data: fullAssessment, error: assessError } = await supabase
+      .from("full_assessments")
+      .select("*")
+      .eq("user_id", userId)
+      .single()
+
+    if (assessError && assessError.code !== "PGRST116") {
+      console.error("Error fetching full assessment:", assessError)
+    }
+
     // Calculate age if birth_date exists
     let age = null
     if (user?.birth_date) {
@@ -122,6 +133,7 @@ export async function GET(request: NextRequest) {
       },
       medications: medications || [],
       activities: schedules || [],
+      fullAssessment: fullAssessment || null,
     }
 
     return NextResponse.json(context)
