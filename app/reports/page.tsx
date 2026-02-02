@@ -153,20 +153,29 @@ export default function ReportsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id, date, lang: language }),
       })
+      const data = await response.json()
+      
       if (response.ok) {
-        const summary = await response.json()
-        setDailySummaries((prev) => ({ ...prev, [date]: summary }))
+        setDailySummaries((prev) => ({ ...prev, [date]: data }))
         toast({
           title: language === "id" ? "Ringkasan dibuat" : "Summary generated",
           description: language === "id" ? "Ringkasan harian berhasil dibuat" : "Daily summary has been generated",
         })
       } else {
-        throw new Error("Failed to generate summary")
+        // Show specific error from API
+        const errorMessage = data?.error || "Unknown error"
+        console.log("[v0] API error response:", data)
+        toast({
+          title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
+          description: errorMessage,
+          variant: "destructive",
+        })
       }
-    } catch (error) {
-      console.error("Failed to generate summary:", error)
+    } catch (error: any) {
+      console.error("[v0] Failed to generate summary:", error)
       toast({
         title: language === "id" ? "Gagal membuat ringkasan" : "Failed to generate summary",
+        description: error?.message || "Network error",
         variant: "destructive",
       })
     } finally {
