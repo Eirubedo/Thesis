@@ -10,7 +10,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuth } from "@/components/auth-provider"
 import { useLanguage } from "@/contexts/language-context"
 import { useTTS } from "@/hooks/use-tts"
-import { Send, Mic, MicOff, Volume2, VolumeX, Loader2, MessageCircle, Bot, User, Play } from "lucide-react"
+import { Send, Mic, MicOff, Volume2, VolumeX, Loader2, MessageCircle, Bot, User, Play, CheckCircle, Circle, Clock } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import type { SpeechRecognition } from "types/speech-recognition"
 
@@ -47,6 +48,16 @@ interface UserContext {
   activities: any[]
 }
 
+interface AssessmentProgress {
+  id: string
+  user_id: string
+  assessment_type: string
+  status: "started" | "assessed" | "completed"
+  started_at: string | null
+  assessed_at: string | null
+  completed_at: string | null
+}
+
 interface DifyChatInterfaceProps {
   title?: string
   showHeader?: boolean
@@ -55,6 +66,8 @@ interface DifyChatInterfaceProps {
   placeholder?: string
   apiPath?: string
   conversationType?: "chat" | "assessment" | "education" | "quick-assessment" | "knowledge-test"
+  showProgressStatus?: boolean
+  assessmentType?: string
 }
 
 export function DifyChatInterface({
@@ -65,6 +78,8 @@ export function DifyChatInterface({
   placeholder,
   apiPath = "/api/dify/chat",
   conversationType = "chat",
+  showProgressStatus = false,
+  assessmentType,
 }: DifyChatInterfaceProps) {
   const { user } = useAuth()
   const { t, language } = useLanguage()
@@ -79,6 +94,7 @@ export function DifyChatInterface({
   const [dbConversationId, setDbConversationId] = useState<string>("")
   const [userContext, setUserContext] = useState<UserContext | null>(null)
   const [contextLoaded, setContextLoaded] = useState(false)
+  const [assessmentProgress, setAssessmentProgress] = useState<AssessmentProgress | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
@@ -105,6 +121,77 @@ export function DifyChatInterface({
 
     fetchUserContext()
   }, [user?.id])
+
+  // Fetch and update assessment progress
+  useEffect(() => {
+    if (!showProgressStatus || !assessmentType || !user?.id) return
+
+    const fetchProgress = async () => {
+      try {
+        const response = await fetch(`/api/assessment-progress?user_id=${user.id}&assessment_type=${assessmentType}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data) {
+            setAssessmentProgress(data)
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch assessment progress:", error)
+      }
+    }
+
+    fetchProgress()
+  }, [showProgressStatus, assessmentType, user?.id])
+
+  // Start assessment progress when chat begins
+  useEffect(() => {
+    if (!showProgressStatus || !assessmentType || !user?.id || assessmentProgress) return
+
+    const startProgress = async () => {
+      try {
+        const response = await fetch("/api/assessment-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.id,
+            assessment_type: assessmentType,
+            status: "started",
+          }),
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setAssessmentProgress(data)
+        }
+      } catch (error) {
+        console.error("Failed to start assessment progress:", error)
+      }
+    }
+
+    startProgress()
+  }, [showProgressStatus, assessmentType, user?.id, assessmentProgress])
+
+  const updateAssessmentProgress = async (status: "assessed" | "completed") => {
+    if (!showProgressStatus || !assessmentType || !user?.id) return
+
+    try {
+      const response = await fetch("/api/assessment-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: user.id,
+          assessment_type: assessmentType,
+          status,
+          conversation_id: dbConversationId,
+        }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setAssessmentProgress(data)
+      }
+    } catch (error) {
+      console.error("Failed to update assessment progress:", error)
+    }
+  }
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -222,6 +309,33 @@ export function DifyChatInterface({
       setConversationId(data.conversation_id)
 
       await saveConversation(assistantMessage, "assistant")
+
+      // Check for assessment progress triggers in assistant response
+      if (showProgressStatus && assessmentProgress?.status === "started") {
+        // Keywords that indicate data has been gathered (assessed)
+        const assessedKeywords = [
+          "berdasarkan informasi", "dari data yang", "hasil evaluasi", "ringkasan",
+          "rekomendasi untuk anda", "based on", "from your data", "summary",
+          "kemampuan yang diketahui", "kemampuan yang dilakukan", "tanda dan gejala"
+        ]
+        const lowerContent = data.message.toLowerCase()
+        if (assessedKeywords.some(keyword => lowerContent.includes(keyword))) {
+          await updateAssessmentProgress("assessed")
+        }
+      }
+
+      // Check for completion triggers
+      if (showProgressStatus && assessmentProgress?.status !== "completed") {
+        const completionKeywords = [
+          "asesmen selesai", "terima kasih telah menyelesaikan", "assessment complete",
+          "selamat anda telah", "hasil akhir", "final result", "semoga bermanfaat",
+          "jangan ragu untuk kembali", "sampai jumpa"
+        ]
+        const lowerContent = data.message.toLowerCase()
+        if (completionKeywords.some(keyword => lowerContent.includes(keyword))) {
+          await updateAssessmentProgress("completed")
+        }
+      }
 
       // TTS is now on-demand only - user must click play button to hear audio
       // Removed auto-play: await speak(assistantMessage.content, language === "id" ? "id-ID" : "en-US")
@@ -415,14 +529,50 @@ export function DifyChatInterface({
     return <div className="w-full">{chatContent}</div>
   }
 
+  const getProgressBadge = () => {
+    if (!showProgressStatus || !assessmentProgress) return null
+
+    const status = assessmentProgress.status
+    const statusConfig = {
+      started: {
+        label: language === "id" ? "Dimulai" : "Started",
+        icon: Clock,
+        className: "bg-blue-100 text-blue-700 border-blue-200",
+      },
+      assessed: {
+        label: language === "id" ? "Data Terkumpul" : "Assessed",
+        icon: CheckCircle,
+        className: "bg-yellow-100 text-yellow-700 border-yellow-200",
+      },
+      completed: {
+        label: language === "id" ? "Selesai" : "Completed",
+        icon: CheckCircle,
+        className: "bg-green-100 text-green-700 border-green-200",
+      },
+    }
+
+    const config = statusConfig[status]
+    const Icon = config.icon
+
+    return (
+      <Badge variant="outline" className={`${config.className} flex items-center gap-1`}>
+        <Icon className="w-3 h-3" />
+        {config.label}
+      </Badge>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <Card className="w-full border-sky-100">
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center">
-              <MessageCircle className="w-6 h-6 mr-2 text-sky-600" />
-              {title || t("chat.title")}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center">
+                <MessageCircle className="w-6 h-6 mr-2 text-sky-600" />
+                {title || t("chat.title")}
+              </div>
+              {getProgressBadge()}
             </div>
             {showHeader && (
               <div className="flex items-center space-x-2">
