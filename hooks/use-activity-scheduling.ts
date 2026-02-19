@@ -246,6 +246,34 @@ export function useActivityScheduling() {
     }
   }
 
+  const deleteActivityLog = async (scheduleId: string) => {
+    const userId = getUserId()
+    if (!userId) return { success: false, error: "Not authenticated" }
+
+    try {
+      const today = new Date().toISOString().split("T")[0]
+
+      const { data, error } = await supabase
+        .from("activity_logs")
+        .delete()
+        .eq("user_id", userId)
+        .eq("schedule_id", scheduleId)
+        .gte("completed_at", `${today}T00:00:00`)
+        .lte("completed_at", `${today}T23:59:59`)
+        .select()
+
+      if (error) throw error
+
+      await loadSchedules()
+      await loadActivityLogs()
+
+      return { success: true }
+    } catch (error) {
+      console.error("Error deleting activity log:", error)
+      return { success: false, error: "Failed to delete activity log" }
+    }
+  }
+
   const scheduleNotifications = (schedule: ActivitySchedule) => {
     if (typeof window === "undefined" || !("Notification" in window)) return
     if (Notification.permission !== "granted" || !schedule.reminder_enabled) return
@@ -335,6 +363,7 @@ export function useActivityScheduling() {
     logActivity,
     updateSchedule,
     deleteSchedule,
+    deleteActivityLog,
     getTodaysSchedule,
     getUpcomingSchedule,
     getActivityStatistics,

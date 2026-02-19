@@ -99,8 +99,10 @@ export default function MonitoringPage() {
   const {
     schedules,
     addSchedule,
-    logActivity,
+    updateSchedule,
     deleteSchedule,
+    logActivity,
+    deleteActivityLog,
     getTodaysSchedule,
     getUpcomingSchedule,
     getActivityStatistics,
@@ -130,6 +132,15 @@ export default function MonitoringPage() {
   const [scheduleDesc, setScheduleDesc] = useState("")
   const [scheduleTime, setScheduleTime] = useState("")
   const [scheduleDuration, setScheduleDuration] = useState("10")
+  const [scheduleDays, setScheduleDays] = useState<string[]>([
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ])
   const [reminderEnabled, setReminderEnabled] = useState(true)
   const [reminderBefore, setReminderBefore] = useState("15")
   const [isAddingSchedule, setIsAddingSchedule] = useState(false)
@@ -185,12 +196,13 @@ export default function MonitoringPage() {
 
   // Schedule Handlers
   const handleAddSchedule = async () => {
-    if (scheduleTitle && scheduleTime) {
+    if (scheduleTitle && scheduleTime && scheduleDays.length > 0) {
       await addSchedule({
         activity_type: scheduleType,
         title: scheduleTitle,
         description: scheduleDesc,
         scheduled_time: scheduleTime,
+        scheduled_days: scheduleDays as any,
         duration_minutes: Number.parseInt(scheduleDuration),
         reminder_enabled: reminderEnabled,
         reminder_minutes_before: Number.parseInt(reminderBefore),
@@ -199,14 +211,35 @@ export default function MonitoringPage() {
       setScheduleDesc("")
       setScheduleTime("")
       setScheduleDuration("10")
+      setScheduleDays(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"])
       setReminderEnabled(true)
       setReminderBefore("15")
       setIsAddingSchedule(false)
     }
   }
 
+  const toggleDay = (day: string) => {
+    setScheduleDays((prev) => {
+      if (prev.includes(day)) {
+        // Don't allow removing the last day
+        if (prev.length === 1) return prev
+        return prev.filter((d) => d !== day)
+      } else {
+        return [...prev, day]
+      }
+    })
+  }
+
   const handleCompleteActivity = async (scheduleId: string) => {
     await logActivity(scheduleId)
+  }
+
+  const handleActivityToggle = async (scheduleId: string, isCompleted: boolean) => {
+    if (isCompleted) {
+      await logActivity(scheduleId)
+    } else {
+      await deleteActivityLog(scheduleId)
+    }
   }
 
   const stats = getStats(30)
@@ -282,10 +315,16 @@ export default function MonitoringPage() {
           <p className="text-gray-600">{t("monitoring.subtitle")}</p>
         </div>
 
-        {/* Monitoring Notifications Widget */}
-        <div className="mb-6">
-          <MonitoringNotifications userId={user?.id} />
-        </div>
+      {/* Monitoring Notifications Widget with To-Do List */}
+      <div className="mb-6">
+        <MonitoringNotifications 
+          userId={user?.id}
+          todaysMeds={todaysMeds}
+          todaysActivities={todaysActivities}
+          handleMedicationCheck={handleMedicationCheck}
+          handleActivityToggle={handleActivityToggle}
+        />
+      </div>
 
         <Tabs defaultValue="bp" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -737,8 +776,10 @@ export default function MonitoringPage() {
               </CardContent>
             </Card>
 
-            {/* Today's Medication Checklist */}
-            <Card>
+            {/* Today's To-Do List is now in the Pemberitahuan Monitoring card at the top */}
+
+            {/* Original Detailed Medication Checklist (kept for reference) */}
+            <Card className="hidden">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5" />
@@ -960,6 +1001,35 @@ export default function MonitoringPage() {
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <Label>{language === "id" ? "Hari" : "Days"}</Label>
+                    <div className="grid grid-cols-7 gap-2">
+                      {[
+                        { key: "monday", label: language === "id" ? "Sen" : "Mon" },
+                        { key: "tuesday", label: language === "id" ? "Sel" : "Tue" },
+                        { key: "wednesday", label: language === "id" ? "Rab" : "Wed" },
+                        { key: "thursday", label: language === "id" ? "Kam" : "Thu" },
+                        { key: "friday", label: language === "id" ? "Jum" : "Fri" },
+                        { key: "saturday", label: language === "id" ? "Sab" : "Sat" },
+                        { key: "sunday", label: language === "id" ? "Min" : "Sun" },
+                      ].map((day) => (
+                        <Button
+                          key={day.key}
+                          type="button"
+                          variant={scheduleDays.includes(day.key) ? "default" : "outline"}
+                          size="sm"
+                          className="h-10 text-xs"
+                          onClick={() => toggleDay(day.key)}
+                        >
+                          {day.label}
+                        </Button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {language === "id" ? "Pilih minimal 1 hari" : "Select at least 1 day"}
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="schedule-time">{t("monitoring.scheduledTime") || "Waktu"}</Label>
@@ -1022,93 +1092,7 @@ export default function MonitoringPage() {
               </DialogContent>
             </Dialog>
 
-            {/* Today's Activities */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  {t("monitoring.todaysSchedule") || "Jadwal Hari Ini"}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  {t("monitoring.todaysScheduleDesc") || "Aktivitas yang dijadwalkan untuk hari ini"}
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {todaysActivities.length > 0 ? (
-                    todaysActivities.map((activity) => (
-                      <div
-                        key={activity.id}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                      >
-                        <div className="flex items-center space-x-4 flex-1">
-                          <div className="text-center">
-                            <div className="text-sm font-medium">{activity.scheduled_time}</div>
-                            <div className="text-xs text-muted-foreground">{activity.duration_minutes} min</div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-semibold">{activity.title}</div>
-                            {activity.description && (
-                              <div className="text-sm text-muted-foreground">{activity.description}</div>
-                            )}
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs">
-                                {activity.activity_type}
-                              </Badge>
-                              {activity.reminder_enabled && (
-                                <Badge variant="outline" className="text-xs">
-                                  <Bell className="w-3 h-3 mr-1" />
-                                  {activity.reminder_minutes_before} min
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {activity.todayCompleted ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle2 className="w-3 h-3 mr-1" />
-                              {t("monitoring.completed") || "Selesai"}
-                            </Badge>
-                          ) : (
-                            <Button size="sm" onClick={() => handleCompleteActivity(activity.id)}>
-                              <CheckCircle2 className="w-4 h-4 mr-1" />
-                              {t("monitoring.markComplete") || "Tandai Selesai"}
-                            </Button>
-                          )}
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>{t("monitoring.deleteSchedule") || "Hapus Jadwal?"}</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {t("monitoring.deleteScheduleDesc") ||
-                                    "Jadwal ini akan dihapus dan tidak dapat dikembalikan"}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>{t("monitoring.cancel") || "Batal"}</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteSchedule(activity.id)}>
-                                  {t("monitoring.delete") || "Hapus"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      {t("monitoring.noScheduleToday") || "Tidak ada jadwal untuk hari ini"}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Today's activities are now shown in the unified To-Do List in the medications tab */}
 
             {/* All Schedules */}
             <Card>
@@ -1130,7 +1114,7 @@ export default function MonitoringPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {schedules.map((schedule) => (
+                    {schedules.filter(s => s.is_active !== false).map((schedule) => (
                       <TableRow key={schedule.id}>
                         <TableCell>
                           <div>
