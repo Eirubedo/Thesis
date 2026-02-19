@@ -327,18 +327,18 @@ export default function MonitoringPage() {
       </div>
 
         <Tabs defaultValue="bp" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="bp" className="flex items-center gap-2">
-              <Heart className="w-4 h-4" />
-              {t("monitoring.bpInput")}
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="bp" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+              <Heart className="w-4 h-4 sm:w-4 sm:h-4" />
+              <span className="text-center">{t("monitoring.bpInput")}</span>
             </TabsTrigger>
-            <TabsTrigger value="medication" className="flex items-center gap-2">
-              <Pill className="w-4 h-4" />
-              {t("monitoring.medicationInput")}
+            <TabsTrigger value="medication" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+              <Pill className="w-4 h-4 sm:w-4 sm:h-4" />
+              <span className="text-center">{t("monitoring.medicationInput")}</span>
             </TabsTrigger>
-            <TabsTrigger value="schedule" className="flex items-center gap-2">
-              <CalendarClock className="w-4 h-4" />
-              {t("monitoring.scheduleTab") || "Jadwal Aktivitas"}
+            <TabsTrigger value="schedule" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+              <CalendarClock className="w-4 h-4 sm:w-4 sm:h-4" />
+              <span className="text-center">{t("monitoring.scheduleTab") || "Jadwal Aktivitas"}</span>
             </TabsTrigger>
           </TabsList>
 
