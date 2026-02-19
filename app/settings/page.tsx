@@ -9,8 +9,9 @@ import { useAuth } from "@/hooks/use-auth"
 import { useLanguage } from "@/contexts/language-context"
 import { useRouter } from "next/navigation"
 import { Globe, Bell, Shield, Info, Palette, FileText } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { useTheme } from "next-themes"
 import { NotificationPreferences } from "@/components/notification-preferences"
 import { SessionPreferences } from "@/components/session-preferences"
 
@@ -19,8 +20,13 @@ export default function SettingsPage() {
   const { language, setLanguage, t } = useLanguage()
   const router = useRouter()
   const { toast } = useToast()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
-  const [darkMode, setDarkMode] = useState(false)
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Wait for auth to load before checking
   if (isLoading) {
@@ -47,14 +53,24 @@ export default function SettingsPage() {
     })
   }
 
+  const handleDarkModeToggle = (enabled: boolean) => {
+    setTheme(enabled ? "dark" : "light")
+    toast({
+      title: language === "id" ? "Tampilan Diperbarui" : "Appearance Updated",
+      description: enabled 
+        ? (language === "id" ? "Mode gelap diaktifkan" : "Dark mode enabled")
+        : (language === "id" ? "Mode terang diaktifkan" : "Light mode enabled"),
+    })
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-sky-100">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-sky-100 dark:from-gray-900 dark:to-gray-800">
       <Navigation />
 
       <div className="pt-16 max-w-4xl mx-auto p-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("settings.title")}</h1>
-          <p className="text-gray-600">{t("settings.subtitle")}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("settings.title")}</h1>
+          <p className="text-gray-600 dark:text-gray-300">{t("settings.subtitle")}</p>
         </div>
 
         <div className="space-y-6">
@@ -106,9 +122,13 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="dark-mode">{t("settings.darkMode")}</Label>
-                  <p className="text-sm text-gray-500">{t("settings.darkModeDesc")}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t("settings.darkModeDesc")}</p>
                 </div>
-                <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
+                <Switch 
+                  id="dark-mode" 
+                  checked={mounted && theme === "dark"} 
+                  onCheckedChange={handleDarkModeToggle} 
+                />
               </div>
             </CardContent>
           </Card>

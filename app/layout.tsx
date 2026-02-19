@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/components/auth-provider"
 import { LanguageProvider } from "@/contexts/language-context"
+import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { TutorialProvider } from "@/components/tutorial-provider"
 import { EmergencySupport } from "@/components/emergency-support"
@@ -23,17 +24,24 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <LanguageProvider>
-          <AuthProvider>
-            <TutorialProvider>
-              {children}
-              <EmergencySupport />
-              <Toaster />
-            </TutorialProvider>
-          </AuthProvider>
-        </LanguageProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange={false}
+        >
+          <LanguageProvider>
+            <AuthProvider>
+              <TutorialProvider>
+                {children}
+                <EmergencySupport />
+                <Toaster />
+              </TutorialProvider>
+            </AuthProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
