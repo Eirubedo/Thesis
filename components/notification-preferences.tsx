@@ -28,15 +28,21 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
   const [isUpdating, setIsUpdating] = useState(false)
 
   const handleToggleNotifications = async (enabled: boolean) => {
+    console.log("[v0] Toggle Notifications:", enabled)
     setIsUpdating(true)
     try {
       if (enabled && permission !== "granted") {
-        await subscribe("VAPID_PUBLIC_KEY_HERE")
+        console.log("[v0] Requesting permission and subscribing...")
+        const result = await subscribe("VAPID_PUBLIC_KEY_HERE")
+        console.log("[v0] Subscribe result:", result)
       } else if (!enabled && deviceTokens?.length) {
+        console.log("[v0] Unsubscribing devices...")
         for (const token of deviceTokens) {
           await unsubscribe(token.id)
         }
       }
+    } catch (error) {
+      console.error("[v0] Error toggling notifications:", error)
     } finally {
       setIsUpdating(false)
     }
@@ -123,7 +129,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
             </div>
           </div>
           <Switch
-            checked={preferences?.notifications_enabled ?? false}
+            checked={preferences?.notification_medications ?? false}
             onCheckedChange={handleToggleNotifications}
             disabled={isUpdating || (permission === "denied")}
           />

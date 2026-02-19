@@ -50,7 +50,12 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
       setIsSupported(pushNotificationService.isSupported())
       if (pushNotificationService.isSupported()) {
         setPermission(Notification.permission)
-        await pushNotificationService.registerServiceWorker()
+        try {
+          await pushNotificationService.registerServiceWorker()
+        } catch (error) {
+          console.log("[v0] Service Worker registration failed:", error)
+          // Don't crash the app if service worker fails
+        }
       }
     }
 
@@ -59,7 +64,7 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
 
   // Auto-schedule medication reminders based on medications and schedules
   useEffect(() => {
-    if (!medications || !schedules || !preferences?.notifications_enabled) return
+    if (!medications || !schedules || !preferences?.notification_medications) return
 
     const scheduleReminders = async () => {
       try {

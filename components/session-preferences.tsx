@@ -45,6 +45,7 @@ export function SessionPreferences() {
   }
 
   const handleToggleKeepLoggedIn = async (enabled: boolean) => {
+    console.log("[v0] Toggle Keep Logged In:", enabled)
     setIsUpdating(true)
     try {
       const response = await fetch("/api/user-preferences", {
@@ -56,16 +57,25 @@ export function SessionPreferences() {
         }),
       })
 
+      console.log("[v0] Response status:", response.status)
+      const data = await response.json()
+      console.log("[v0] Response data:", data)
+
       if (response.ok) {
         setKeepLoggedIn(enabled)
         localStorage.setItem("keep_logged_in", String(enabled))
         await mutate()
+        console.log("[v0] Successfully updated keep_logged_in to:", enabled)
         
         if (enabled) {
           setShowWarning(true)
           setTimeout(() => setShowWarning(false), 5000)
         }
+      } else {
+        console.error("[v0] Failed to update:", data)
       }
+    } catch (error) {
+      console.error("[v0] Error updating keep_logged_in:", error)
     } finally {
       setIsUpdating(false)
     }
