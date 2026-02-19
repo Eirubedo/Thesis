@@ -232,6 +232,13 @@ export default function MonitoringPage() {
     await logActivity(scheduleId)
   }
 
+  const handleActivityToggle = async (scheduleId: string, isCompleted: boolean) => {
+    if (isCompleted) {
+      await logActivity(scheduleId)
+    }
+    // If uncompleting, we would need to delete the log, but for now we just mark as complete
+  }
+
   const stats = getStats(30)
   const averageReading = getAverageReading(30)
   const adherenceStats = getAdherenceRate(30)
@@ -760,8 +767,282 @@ export default function MonitoringPage() {
               </CardContent>
             </Card>
 
-            {/* Today's Medication Checklist */}
+            {/* Today's Combined To-Do List */}
             <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5" />
+                  {language === "id" ? "Daftar Tugas Hari Ini" : "Today's To-Do List"}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  {language === "id" ? "Obat dan aktivitas yang harus dilakukan hari ini" : "Medications and activities to complete today"}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* AM (Morning) Column */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-4 pb-2 border-b">
+                      <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-semibold">
+                        {language === "id" ? "Pagi" : "AM"}
+                      </div>
+                      <span className="text-sm text-muted-foreground">(00:00 - 11:59)</span>
+                    </div>
+
+                    {/* AM Medications */}
+                    {todaysMeds && todaysMeds.length > 0 ? (
+                      todaysMeds.map((med) => 
+                        med.times?.filter((time) => {
+                          const [hours] = time.split(":").map(Number)
+                          return hours < 12
+                        }).map((time, index) => {
+                          const log = med.logs?.find((l) => l.scheduledTime === time)
+                          const isTaken = log?.taken || false
+                          const currentTime = new Date()
+                          const scheduleTime = new Date()
+                          const [hours, minutes] = time.split(":")
+                          scheduleTime.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0)
+                          const isPastDue = currentTime > scheduleTime
+
+                          return (
+                            <div
+                              key={`${med.id}-${time}`}
+                              className={`p-3 rounded-lg border-2 transition-all ${
+                                isTaken
+                                  ? "bg-green-50 border-green-200"
+                                  : isPastDue
+                                    ? "bg-red-50 border-red-200"
+                                    : "bg-gray-50 border-gray-200"
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <button
+                                  onClick={() => handleMedicationCheck(med.id, time, !isTaken)}
+                                  className="flex items-center justify-center mt-0.5"
+                                >
+                                  {isTaken ? (
+                                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                                  ) : (
+                                    <Circle className="w-5 h-5 text-gray-400 hover:text-green-600 transition-colors" />
+                                  )}
+                                </button>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Pill className="w-4 h-4 text-blue-600" />
+                                    <span className="font-medium text-sm">{med.name}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{time}</span>
+                                    <span>•</span>
+                                    <span>{med.dosage}</span>
+                                  </div>
+                                  {isTaken && (
+                                    <Badge className="mt-2 bg-green-100 text-green-800 text-xs">
+                                      {t("monitoring.taken")}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })
+                      )
+                    ) : null}
+
+                    {/* AM Activities */}
+                    {todaysActivities
+                      ?.filter((activity) => {
+                        const [hours] = activity.scheduled_time.split(":").map(Number)
+                        return hours < 12
+                      })
+                      .map((activity) => {
+                        const isCompleted = activity.completed_at !== null
+
+                        return (
+                          <div
+                            key={activity.id}
+                            className={`p-3 rounded-lg border-2 transition-all ${
+                              isCompleted ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <button
+                                onClick={() => handleActivityToggle(activity.id, !isCompleted)}
+                                className="flex items-center justify-center mt-0.5"
+                              >
+                                {isCompleted ? (
+                                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                                ) : (
+                                  <Circle className="w-5 h-5 text-gray-400 hover:text-green-600 transition-colors" />
+                                )}
+                              </button>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Activity className="w-4 h-4 text-purple-600" />
+                                  <span className="font-medium text-sm">{activity.title}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <Clock className="w-3 h-3" />
+                                  <span>{activity.scheduled_time}</span>
+                                  <span>•</span>
+                                  <span>{activity.duration_minutes} {language === "id" ? "menit" : "min"}</span>
+                                </div>
+                                {isCompleted && (
+                                  <Badge className="mt-2 bg-green-100 text-green-800 text-xs">
+                                    {t("monitoring.completed")}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+
+                    {/* Empty state for AM */}
+                    {(!todaysMeds || todaysMeds.every(med => !med.times?.some(t => Number.parseInt(t.split(':')[0]) < 12))) &&
+                     (!todaysActivities || !todaysActivities.some(a => Number.parseInt(a.scheduled_time.split(':')[0]) < 12)) && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">{language === "id" ? "Tidak ada tugas pagi" : "No morning tasks"}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* PM (Afternoon/Evening) Column */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-4 pb-2 border-b">
+                      <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold">
+                        {language === "id" ? "Malam" : "PM"}
+                      </div>
+                      <span className="text-sm text-muted-foreground">(12:00 - 23:59)</span>
+                    </div>
+
+                    {/* PM Medications */}
+                    {todaysMeds && todaysMeds.length > 0 ? (
+                      todaysMeds.map((med) => 
+                        med.times?.filter((time) => {
+                          const [hours] = time.split(":").map(Number)
+                          return hours >= 12
+                        }).map((time, index) => {
+                          const log = med.logs?.find((l) => l.scheduledTime === time)
+                          const isTaken = log?.taken || false
+                          const currentTime = new Date()
+                          const scheduleTime = new Date()
+                          const [hours, minutes] = time.split(":")
+                          scheduleTime.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0)
+                          const isPastDue = currentTime > scheduleTime
+
+                          return (
+                            <div
+                              key={`${med.id}-${time}`}
+                              className={`p-3 rounded-lg border-2 transition-all ${
+                                isTaken
+                                  ? "bg-green-50 border-green-200"
+                                  : isPastDue
+                                    ? "bg-red-50 border-red-200"
+                                    : "bg-gray-50 border-gray-200"
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <button
+                                  onClick={() => handleMedicationCheck(med.id, time, !isTaken)}
+                                  className="flex items-center justify-center mt-0.5"
+                                >
+                                  {isTaken ? (
+                                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                                  ) : (
+                                    <Circle className="w-5 h-5 text-gray-400 hover:text-green-600 transition-colors" />
+                                  )}
+                                </button>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Pill className="w-4 h-4 text-blue-600" />
+                                    <span className="font-medium text-sm">{med.name}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{time}</span>
+                                    <span>•</span>
+                                    <span>{med.dosage}</span>
+                                  </div>
+                                  {isTaken && (
+                                    <Badge className="mt-2 bg-green-100 text-green-800 text-xs">
+                                      {t("monitoring.taken")}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })
+                      )
+                    ) : null}
+
+                    {/* PM Activities */}
+                    {todaysActivities
+                      ?.filter((activity) => {
+                        const [hours] = activity.scheduled_time.split(":").map(Number)
+                        return hours >= 12
+                      })
+                      .map((activity) => {
+                        const isCompleted = activity.completed_at !== null
+
+                        return (
+                          <div
+                            key={activity.id}
+                            className={`p-3 rounded-lg border-2 transition-all ${
+                              isCompleted ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <button
+                                onClick={() => handleActivityToggle(activity.id, !isCompleted)}
+                                className="flex items-center justify-center mt-0.5"
+                              >
+                                {isCompleted ? (
+                                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                                ) : (
+                                  <Circle className="w-5 h-5 text-gray-400 hover:text-green-600 transition-colors" />
+                                )}
+                              </button>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Activity className="w-4 h-4 text-purple-600" />
+                                  <span className="font-medium text-sm">{activity.title}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <Clock className="w-3 h-3" />
+                                  <span>{activity.scheduled_time}</span>
+                                  <span>•</span>
+                                  <span>{activity.duration_minutes} {language === "id" ? "menit" : "min"}</span>
+                                </div>
+                                {isCompleted && (
+                                  <Badge className="mt-2 bg-green-100 text-green-800 text-xs">
+                                    {t("monitoring.completed")}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+
+                    {/* Empty state for PM */}
+                    {(!todaysMeds || todaysMeds.every(med => !med.times?.some(t => Number.parseInt(t.split(':')[0]) >= 12))) &&
+                     (!todaysActivities || !todaysActivities.some(a => Number.parseInt(a.scheduled_time.split(':')[0]) >= 12)) && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">{language === "id" ? "Tidak ada tugas malam" : "No evening tasks"}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Original Detailed Medication Checklist (kept for reference) */}
+            <Card className="hidden">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5" />
