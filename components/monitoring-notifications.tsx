@@ -194,97 +194,57 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
           </Button>
         )}
 
-        {/* Today's To-Do List Summary */}
+        {/* Daftar Tugas Checklist */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-blue-500" />
-            {language === "id" ? "Tugas Hari Ini" : "Today's Tasks"}
+            {language === "id" ? "Daftar Tugas" : "Task Checklist"}
           </h4>
 
-          {/* Upcoming Medications */}
-          {upcomingReminders.length > 0 && (
-            <div className="space-y-2">
-              {upcomingReminders.slice(0, 3).map((reminder: any) => {
-                const now = new Date()
-                const isPast = reminder.reminderTime < now
-                const timeStr = reminder.reminderTime.toLocaleTimeString(language === "id" ? "id-ID" : "en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-                return (
-                  <div 
-                    key={reminder.id} 
-                    className={`flex items-center gap-3 p-2.5 rounded-lg border ${
-                      isPast 
-                        ? "bg-red-50 border-red-200" 
-                        : "bg-blue-50 border-blue-200"
-                    }`}
-                  >
-                    <div className="flex-shrink-0">
-                      <div className={`w-2 h-2 rounded-full ${isPast ? "bg-red-500" : "bg-blue-500"}`} />
+          {/* Combined Medications and Activities Checklist */}
+          <div className="space-y-2">
+            {upcomingReminders.length === 0 && (!schedules || schedules.length === 0) ? (
+              <div className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
+                <CheckCircle className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                <p>{language === "id" ? "Semua tugas selesai!" : "All tasks completed!"}</p>
+              </div>
+            ) : (
+              <>
+                {/* Medication Tasks */}
+                {upcomingReminders.slice(0, 3).map((reminder: any) => {
+                  const now = new Date()
+                  const isPast = reminder.reminderTime < now
+                  return (
+                    <div 
+                      key={reminder.id} 
+                      className={`flex items-center gap-3 p-2.5 rounded-lg border ${
+                        isPast 
+                          ? "bg-red-50 border-red-200" 
+                          : "bg-blue-50 border-blue-200"
+                      }`}
+                    >
+                      <div className="flex-shrink-0">
+                        <div className={`w-2 h-2 rounded-full ${isPast ? "bg-red-500" : "bg-blue-500"}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">{reminder.medication}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {reminder.time} • {reminder.dosage}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">{reminder.medication}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {reminder.time} • {reminder.dosage}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-              {upcomingReminders.length > 3 && (
-                <p className="text-xs text-muted-foreground text-center pt-1">
-                  +{upcomingReminders.length - 3} {language === "id" ? "lagi" : "more"}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Today's Activities */}
-          {schedules && schedules.length > 0 && (
-            <div className="space-y-2 pt-2">
-              {schedules.slice(0, 3).map((schedule: any, idx: number) => {
-                const isCompleted = schedule.status === "completed"
-                return (
-                  <div
-                    key={idx}
-                    className={`flex items-center gap-3 p-2.5 rounded-lg border ${
-                      isCompleted 
-                        ? "bg-green-50 border-green-200" 
-                        : "bg-gray-50 border-gray-200"
-                    }`}
-                  >
-                    <div className="flex-shrink-0">
-                      {isCompleted ? (
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <div className="w-2 h-2 rounded-full bg-gray-400" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">{schedule.activity_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {schedule.scheduled_time}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-              {schedules.length > 3 && (
-                <p className="text-xs text-muted-foreground text-center pt-1">
-                  +{schedules.length - 3} {language === "id" ? "lagi" : "more"}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Empty State */}
-          {upcomingReminders.length === 0 && (!schedules || schedules.length === 0) && (
-            <div className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
-              <CheckCircle className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-              <p>{language === "id" ? "Semua tugas selesai!" : "All tasks completed!"}</p>
-            </div>
-          )}
+                  )
+                })}
+                
+                {/* Show total count if there are more tasks */}
+                {(upcomingReminders.length + (schedules?.length || 0)) > 3 && (
+                  <p className="text-xs text-muted-foreground text-center pt-1">
+                    +{(upcomingReminders.length + (schedules?.length || 0)) - 3} {language === "id" ? "tugas lagi" : "more tasks"}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {/* Info Text */}
