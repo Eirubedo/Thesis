@@ -14,7 +14,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export function SessionPreferences() {
   const { language } = useLanguage()
-  const { user, keepLoggedIn, setKeepLoggedIn, logout } = useAuth()
+  const { user, isLoading, keepLoggedIn, setKeepLoggedIn, logout } = useAuth()
   const [isUpdating, setIsUpdating] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
 
@@ -24,6 +24,25 @@ export function SessionPreferences() {
     fetcher,
     { revalidateOnFocus: false }
   )
+
+  // Skip rendering if auth is still loading or user doesn't exist
+  if (isLoading || !user) {
+    return (
+      <Card className="border-sky-100">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            {language === "id" ? "Sesi & Keamanan" : "Session & Security"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-4">
+            <div className="w-5 h-5 border-2 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const handleToggleKeepLoggedIn = async (enabled: boolean) => {
     setIsUpdating(true)

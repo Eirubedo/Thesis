@@ -67,7 +67,7 @@ Service for Web Push operations:
 
 ### `useNotifications` (`/hooks/use-notifications.ts`)
 React hook for managing notifications:
-```typescript
+\`\`\`typescript
 const {
   isSupported,           // Browser supports push
   isSubscribed,          // Currently subscribed
@@ -81,7 +81,7 @@ const {
   mutatePreferences,     // Revalidate preferences from server
   mutateDeviceTokens,    // Revalidate device tokens from server
 } = useNotifications({ userId, enabled: true })
-```
+\`\`\`
 
 ### Updated `useAuth` Hook (`/hooks/use-auth.ts`)
 Enhanced with persistent session support:
@@ -140,7 +140,7 @@ Updated `/app/settings/page.tsx` to include:
 
 ## Usage Example
 
-```typescript
+\`\`\`typescript
 // In a component
 import { useNotifications } from '@/hooks/use-notifications'
 
@@ -161,7 +161,7 @@ function MyComponent() {
     </button>
   )
 }
-```
+\`\`\`
 
 ## Important Notes
 
