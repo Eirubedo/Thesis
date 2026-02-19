@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
 import { useLanguage } from "@/contexts/language-context"
 import { useRouter } from "next/navigation"
 import { Globe, Bell, Shield, Info, Palette, FileText } from "lucide-react"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { NotificationPreferences } from "@/components/notification-preferences"
+import { SessionPreferences } from "@/components/session-preferences"
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -19,9 +21,7 @@ export default function SettingsPage() {
   const router = useRouter()
   const { toast } = useToast()
 
-  const [notifications, setNotifications] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
-  const [soundEnabled, setSoundEnabled] = useState(true)
 
   if (!user) {
     router.push("/login")
@@ -47,6 +47,12 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-6">
+          {/* Session Preferences */}
+          <SessionPreferences />
+
+          {/* Notification Preferences */}
+          <NotificationPreferences userId={user?.id} />
+
           {/* Language Settings */}
           <Card className="border-sky-100">
             <CardHeader>
@@ -66,34 +72,6 @@ export default function SettingsPage() {
                   <SelectItem value="id">{t("settings.indonesian")}</SelectItem>
                 </SelectContent>
               </Select>
-            </CardContent>
-          </Card>
-
-          {/* Notification Settings */}
-          <Card className="border-sky-100">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Bell className="w-5 h-5 mr-2 text-yellow-500" />
-                {t("settings.notifications")}
-              </CardTitle>
-              <CardDescription>{t("settings.notificationsDesc")}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="push-notifications">{t("settings.pushNotifications")}</Label>
-                  <p className="text-sm text-gray-500">{t("settings.pushNotificationsDesc")}</p>
-                </div>
-                <Switch id="push-notifications" checked={notifications} onCheckedChange={setNotifications} />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="sound-notifications">{t("settings.soundNotifications")}</Label>
-                  <p className="text-sm text-gray-500">{t("settings.soundNotificationsDesc")}</p>
-                </div>
-                <Switch id="sound-notifications" checked={soundEnabled} onCheckedChange={setSoundEnabled} />
-              </div>
             </CardContent>
           </Card>
 

@@ -76,6 +76,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useBPTracking } from "@/hooks/use-bp-tracking"
 import { useMedicationTracking } from "@/hooks/use-medication-tracking"
 import { useActivityScheduling } from "@/hooks/use-activity-scheduling"
+import { MonitoringNotifications } from "@/components/monitoring-notifications"
 import { useLanguage } from "@/contexts/language-context"
 import type { ActivityType } from "@/types/database"
 
@@ -279,6 +280,11 @@ export default function MonitoringPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("monitoring.title")}</h1>
           <p className="text-gray-600">{t("monitoring.subtitle")}</p>
+        </div>
+
+        {/* Monitoring Notifications Widget */}
+        <div className="mb-6">
+          <MonitoringNotifications userId={user?.id} />
         </div>
 
         <Tabs defaultValue="bp" className="space-y-6">
