@@ -22,7 +22,6 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
     deviceTokens,
     subscribe,
     unsubscribe,
-    updatePreferences,
   } = useNotifications({ userId, enabled: true })
 
   const [isSubscribing, setIsSubscribing] = useState(false)
@@ -32,15 +31,11 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
     setIsUpdating(true)
     try {
       if (enabled && permission !== "granted") {
-        const success = await subscribe("VAPID_PUBLIC_KEY_HERE")
-        if (success) {
-          await updatePreferences({ notifications_enabled: true })
-        }
+        await subscribe("VAPID_PUBLIC_KEY_HERE")
       } else if (!enabled && deviceTokens?.length) {
         for (const token of deviceTokens) {
           await unsubscribe(token.id)
         }
-        await updatePreferences({ notifications_enabled: false })
       }
     } finally {
       setIsUpdating(false)

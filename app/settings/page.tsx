@@ -3,7 +3,6 @@
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/use-auth"
@@ -75,15 +74,22 @@ export default function SettingsPage() {
               <CardDescription>{t("settings.selectLanguage")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <Select value={language} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-full max-w-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">{t("settings.english")}</SelectItem>
-                  <SelectItem value="id">{t("settings.indonesian")}</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => handleLanguageChange("en")}
+                  variant={language === "en" ? "default" : "outline"}
+                  className="flex-1"
+                >
+                  🇺🇸 English
+                </Button>
+                <Button
+                  onClick={() => handleLanguageChange("id")}
+                  variant={language === "id" ? "default" : "outline"}
+                  className="flex-1"
+                >
+                  🇮🇩 Bahasa Indonesia
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
