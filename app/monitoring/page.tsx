@@ -130,6 +130,15 @@ export default function MonitoringPage() {
   const [scheduleDesc, setScheduleDesc] = useState("")
   const [scheduleTime, setScheduleTime] = useState("")
   const [scheduleDuration, setScheduleDuration] = useState("10")
+  const [scheduleDays, setScheduleDays] = useState<string[]>([
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ])
   const [reminderEnabled, setReminderEnabled] = useState(true)
   const [reminderBefore, setReminderBefore] = useState("15")
   const [isAddingSchedule, setIsAddingSchedule] = useState(false)
@@ -185,12 +194,13 @@ export default function MonitoringPage() {
 
   // Schedule Handlers
   const handleAddSchedule = async () => {
-    if (scheduleTitle && scheduleTime) {
+    if (scheduleTitle && scheduleTime && scheduleDays.length > 0) {
       await addSchedule({
         activity_type: scheduleType,
         title: scheduleTitle,
         description: scheduleDesc,
         scheduled_time: scheduleTime,
+        scheduled_days: scheduleDays as any,
         duration_minutes: Number.parseInt(scheduleDuration),
         reminder_enabled: reminderEnabled,
         reminder_minutes_before: Number.parseInt(reminderBefore),
@@ -199,10 +209,23 @@ export default function MonitoringPage() {
       setScheduleDesc("")
       setScheduleTime("")
       setScheduleDuration("10")
+      setScheduleDays(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"])
       setReminderEnabled(true)
       setReminderBefore("15")
       setIsAddingSchedule(false)
     }
+  }
+
+  const toggleDay = (day: string) => {
+    setScheduleDays((prev) => {
+      if (prev.includes(day)) {
+        // Don't allow removing the last day
+        if (prev.length === 1) return prev
+        return prev.filter((d) => d !== day)
+      } else {
+        return [...prev, day]
+      }
+    })
   }
 
   const handleCompleteActivity = async (scheduleId: string) => {
@@ -958,6 +981,35 @@ export default function MonitoringPage() {
                       placeholder={t("monitoring.descriptionPlaceholder") || "Deskripsi aktivitas (opsional)"}
                       rows={2}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>{language === "id" ? "Hari" : "Days"}</Label>
+                    <div className="grid grid-cols-7 gap-2">
+                      {[
+                        { key: "monday", label: language === "id" ? "Sen" : "Mon" },
+                        { key: "tuesday", label: language === "id" ? "Sel" : "Tue" },
+                        { key: "wednesday", label: language === "id" ? "Rab" : "Wed" },
+                        { key: "thursday", label: language === "id" ? "Kam" : "Thu" },
+                        { key: "friday", label: language === "id" ? "Jum" : "Fri" },
+                        { key: "saturday", label: language === "id" ? "Sab" : "Sat" },
+                        { key: "sunday", label: language === "id" ? "Min" : "Sun" },
+                      ].map((day) => (
+                        <Button
+                          key={day.key}
+                          type="button"
+                          variant={scheduleDays.includes(day.key) ? "default" : "outline"}
+                          size="sm"
+                          className="h-10 text-xs"
+                          onClick={() => toggleDay(day.key)}
+                        >
+                          {day.label}
+                        </Button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {language === "id" ? "Pilih minimal 1 hari" : "Select at least 1 day"}
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
