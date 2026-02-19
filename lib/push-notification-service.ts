@@ -13,7 +13,8 @@ export const pushNotificationService = {
     if (!this.isSupported()) return null
 
     try {
-      const registration = await navigator.serviceWorker.register("/service-worker.js", {
+      // Use API route instead of public file to ensure correct MIME type
+      const registration = await navigator.serviceWorker.register("/api/service-worker", {
         scope: "/",
       })
       console.log("[v0] Service Worker registered:", registration)
