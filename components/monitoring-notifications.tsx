@@ -17,22 +17,72 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export function MonitoringNotifications({ userId }: MonitoringNotificationsProps) {
   const { language } = useLanguage()
-  const { isSupported, permission, preferences, subscribe } = useNotifications({ userId, enabled: true })
+  const { isSupported, isSubscribed, permission, subscribe, medications, schedules } = useNotifications({ userId, enabled: true })
   const [isSetupComplete, setIsSetupComplete] = useState(false)
-
-  // Fetch user's active reminders/schedules
-  const { data: schedules } = useSWR(
-    userId ? `/api/schedules?user_id=${userId}` : null,
-    fetcher,
-    { refreshInterval: 30000 }
-  )
+  const [upcomingReminders, setUpcomingReminders] = useState<any[]>([])
 
   useEffect(() => {
     // Check if notifications are already enabled
-    if (preferences?.notifications_enabled) {
+    if (isSubscribed) {
       setIsSetupComplete(true)
     }
-  }, [preferences])
+  }, [isSubscribed])
+
+  // Calculate upcoming medication reminders
+  useEffect(() => {
+    if (!medications || !Array.isArray(medications)) return
+
+    try {
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const reminders: any[] = []
+
+      medications.forEach((med: any) => {
+        if (med.time_slots && Array.isArray(med.time_slots)) {
+          med.time_slots.forEach((timeStr: string) => {
+            try {
+              const [hours, minutes] = timeStr.split(":").map(Number)
+              const reminderTime = new Date(today)
+              reminderTime.setHours(hours, minutes, 0)
+
+              // Include today's reminders that haven't passed and tomorrow's
+              if (reminderTime >= now) {
+                reminders.push({
+                  id: `${med.id}-${timeStr}`,
+                  medication: med.name,
+                  dosage: med.dosage,
+                  time: timeStr,
+                  reminderTime,
+                  isPast: false,
+                })
+              } else if (today.getTime() === new Date(reminderTime).getTime()) {
+                // For tomorrow
+                reminderTime.setDate(reminderTime.getDate() + 1)
+                reminders.push({
+                  id: `${med.id}-${timeStr}-tomorrow`,
+                  medication: med.name,
+                  dosage: med.dosage,
+                  time: timeStr,
+                  reminderTime,
+                  isPast: false,
+                })
+              }
+            } catch (error) {
+              console.error("[v0] Error parsing medication time:", timeStr, error)
+            }
+          })
+        }
+      })
+
+      // Sort by time
+      reminders.sort((a, b) => a.reminderTime.getTime() - b.reminderTime.getTime())
+      
+      // Keep only next 5 reminders
+      setUpcomingReminders(reminders.slice(0, 5))
+    } catch (error) {
+      console.error("[v0] Error calculating reminders:", error)
+    }
+  }, [medications])
 
   const handleSetupNotifications = async () => {
     if (isSupported && permission !== "granted") {
@@ -115,21 +165,58 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {!isSetupComplete && !preferences?.notifications_enabled && (
+        {!isSetupComplete && (
           <Button onClick={handleSetupNotifications} className="w-full">
             <Bell className="w-4 h-4 mr-2" />
             {t.enableNotifications}
           </Button>
         )}
 
-        {/* Upcoming Schedules */}
+        {/* Upcoming Medication Reminders */}
         <div className="space-y-2">
           <h4 className="text-sm font-semibold flex items-center gap-2">
             <Clock className="w-4 h-4 text-blue-500" />
-            {t.todaySchedules}
+            {t.upcomingMeds}
           </h4>
 
-          {schedules && schedules.length > 0 ? (
+          {upcomingReminders.length > 0 ? (
+            <div className="space-y-2">
+              {upcomingReminders.map((reminder: any) => {
+                const timeStr = reminder.reminderTime.toLocaleTimeString(language === "id" ? "id-ID" : "en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+                return (
+                  <div key={reminder.id} className="flex items-start justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground text-sm">{reminder.medication}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {reminder.dosage ? `${reminder.dosage} • ` : ""}
+                        {timeStr}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700 border-blue-200">
+                      {reminder.time}
+                    </Badge>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground py-3 text-center bg-gray-50 rounded">
+              {language === "id" ? "Belum ada obat yang dijadwalkan" : "No medications scheduled"}
+            </div>
+          )}
+        </div>
+
+        {/* Today's Activities */}
+        {schedules && schedules.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
+              {t.todaySchedules}
+            </h4>
+
             <div className="space-y-2">
               {schedules.slice(0, 3).map((schedule: any, idx: number) => (
                 <div
@@ -153,17 +240,15 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
                 </p>
               )}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-3 text-center">{t.noSchedules}</p>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Info Text */}
-        {isSetupComplete || preferences?.notifications_enabled ? (
-          <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
+        {isSetupComplete ? (
+          <div className="bg-green-50 border border-green-200 rounded p-3 text-xs text-green-800">
             {language === "id"
-              ? "Anda akan menerima pemberitahuan untuk pengingat jadwal minum obat dan aktivitas monitoring lainnya."
-              : "You will receive notifications for medication reminders and other monitoring activities."}
+              ? "✓ Pemberitahuan aktif. Anda akan menerima pengingat untuk obat yang dijadwalkan."
+              : "✓ Notifications active. You will receive reminders for scheduled medications."}
           </div>
         ) : null}
       </CardContent>

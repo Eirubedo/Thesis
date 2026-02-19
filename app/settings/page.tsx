@@ -16,12 +16,24 @@ import { NotificationPreferences } from "@/components/notification-preferences"
 import { SessionPreferences } from "@/components/session-preferences"
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const { language, setLanguage, t } = useLanguage()
   const router = useRouter()
   const { toast } = useToast()
 
   const [darkMode, setDarkMode] = useState(false)
+
+  // Wait for auth to load before checking
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-sky-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">{t("common.loading")}</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!user) {
     router.push("/login")

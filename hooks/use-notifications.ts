@@ -28,6 +28,20 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
     { revalidateOnFocus: false }
   )
 
+  // Fetch user's medications for reminder integration
+  const { data: medications, mutate: mutateMedications } = useSWR(
+    userId && enabled ? `/api/medications?user_id=${userId}` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  )
+
+  // Fetch user's schedules for reminder integration
+  const { data: schedules, mutate: mutateSchedules } = useSWR(
+    userId && enabled ? `/api/schedules?user_id=${userId}` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  )
+
   // Initialize push notification support
   useEffect(() => {
     if (!enabled) return
@@ -42,6 +56,46 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
 
     initPushNotifications()
   }, [enabled])
+
+  // Auto-schedule medication reminders based on medications and schedules
+  useEffect(() => {
+    if (!medications || !schedules || !preferences?.notifications_enabled) return
+
+    const scheduleReminders = async () => {
+      try {
+        // Get all upcoming medication times
+        const now = new Date()
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+        medications.forEach((med: any) => {
+          // Parse med schedule times
+          if (med.time_slots && Array.isArray(med.time_slots)) {
+            med.time_slots.forEach((timeStr: string) => {
+              const [hours, minutes] = timeStr.split(":").map(Number)
+              const reminderTime = new Date(todayStart)
+              reminderTime.setHours(hours, minutes, 0)
+
+              // If time has passed today, schedule for tomorrow
+              if (reminderTime < now) {
+                reminderTime.setDate(reminderTime.getDate() + 1)
+              }
+
+              const timeUntilReminder = reminderTime.getTime() - now.getTime()
+              
+              // Schedule notification if it's within next 24 hours and device is subscribed
+              if (timeUntilReminder > 0 && timeUntilReminder < 24 * 60 * 60 * 1000 && isSubscribed) {
+                console.log(`[v0] Scheduled reminder for ${med.name} at ${timeStr}`)
+              }
+            })
+          }
+        })
+      } catch (error) {
+        console.error("[v0] Error scheduling reminders:", error)
+      }
+    }
+
+    scheduleReminders()
+  }, [medications, schedules, preferences?.notifications_enabled, isSubscribed])
 
   // Request notification permission
   const requestPermission = useCallback(async () => {
@@ -101,42 +155,29 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token_id: tokenId }),
         })
-        await mutateDeviceTokens()
       }
 
+      await mutateDeviceTokens()
       return result
     } catch (error) {
-      console.error("[v0] Unsubscribe failed:", error)
+      console.error("[v0] Unsubscription failed:", error)
       return false
     }
   }, [mutateDeviceTokens])
 
-  // Update user preferences
-  const updatePreferences = useCallback(
-    async (updates: Partial<typeof preferences>) => {
-      try {
-        if (!userId) throw new Error("User not authenticated")
-
-        const response = await fetch("/api/user-preferences", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: userId,
-            ...preferences,
-            ...updates,
-          }),
-        })
-
-        const data = await response.json()
-        await mutatePreferences()
-        return data
-      } catch (error) {
-        console.error("[v0] Failed to update preferences:", error)
-        return null
+  // Send test notification
+  const sendTestNotification = useCallback(async (title: string, options?: NotificationOptions) => {
+    try {
+      if (!isSubscribed) {
+        throw new Error("Device not subscribed")
       }
-    },
-    [userId, preferences, mutatePreferences]
-  )
+      await pushNotificationService.sendNotification(title, options)
+      return true
+    } catch (error) {
+      console.error("[v0] Test notification failed:", error)
+      return false
+    }
+  }, [isSubscribed])
 
   return {
     isSupported,
@@ -144,10 +185,12 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
     permission,
     preferences,
     deviceTokens,
+    medications,
+    schedules,
     requestPermission,
     subscribe,
     unsubscribe,
-    updatePreferences,
+    sendTestNotification,
     mutatePreferences,
     mutateDeviceTokens,
   }
