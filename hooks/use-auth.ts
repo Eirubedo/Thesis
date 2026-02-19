@@ -18,6 +18,7 @@ interface AuthUser {
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [keepLoggedIn, setKeepLoggedIn] = useState(false)
 
   useEffect(() => {
     checkUser()
@@ -25,9 +26,14 @@ export function useAuth() {
 
   const checkUser = async () => {
     try {
+      // Check if keep_logged_in preference exists
       const storedUser = localStorage.getItem("auth_user")
+      const storedKeepLoggedIn = localStorage.getItem("keep_logged_in")
+      
       if (storedUser) {
-        setUser(JSON.parse(storedUser))
+        const userData = JSON.parse(storedUser)
+        setUser(userData)
+        setKeepLoggedIn(storedKeepLoggedIn === "true")
       }
     } catch (error) {
       console.error("Error checking user:", error)
@@ -36,7 +42,11 @@ export function useAuth() {
     }
   }
 
-  const login = async (phone_number: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (
+    phone_number: string,
+    password: string,
+    keepLogged?: boolean
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true)
 
@@ -70,7 +80,22 @@ export function useAuth() {
       }
 
       setUser(authUser)
+      setKeepLoggedIn(keepLogged ?? false)
+      
       localStorage.setItem("auth_user", JSON.stringify(authUser))
+      localStorage.setItem("keep_logged_in", String(keepLogged ?? false))
+
+      // Update user preferences if keep_logged_in changed
+      if (keepLogged) {
+        await fetch("/api/user-preferences", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userData.id,
+            keep_logged_in: true,
+          }),
+        }).catch((error) => console.error("[v0] Failed to update preferences:", error))
+      }
 
       return { success: true }
     } catch (error) {
@@ -136,6 +161,13 @@ export function useAuth() {
         stress_level: 5,
       })
 
+      // Create user preferences with keep_logged_in = false by default
+      await supabase.from("user_preferences").insert({
+        user_id: newUser.id,
+        keep_logged_in: false,
+        notifications_enabled: false,
+      })
+
       // Set user data
       const authUser: AuthUser = {
         id: newUser.id,
@@ -149,7 +181,10 @@ export function useAuth() {
       }
 
       setUser(authUser)
+      setKeepLoggedIn(false)
+      
       localStorage.setItem("auth_user", JSON.stringify(authUser))
+      localStorage.setItem("keep_logged_in", "false")
 
       return { success: true }
     } catch (error) {
@@ -160,9 +195,16 @@ export function useAuth() {
     }
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem("auth_user")
+  const logout = (force: boolean = false) => {
+    // Only allow logout if keep_logged_in is false or force is true
+    if (!keepLoggedIn || force) {
+      setUser(null)
+      setKeepLoggedIn(false)
+      localStorage.removeItem("auth_user")
+      localStorage.removeItem("keep_logged_in")
+    } else {
+      console.log("[v0] Logout prevented: keep_logged_in is enabled. Update settings to disable.")
+    }
   }
 
   const updateProfile = async (profileData: Partial<AuthUser>): Promise<{ success: boolean; error?: string }> => {
@@ -189,6 +231,8 @@ export function useAuth() {
   return {
     user,
     isLoading,
+    keepLoggedIn,
+    setKeepLoggedIn,
     login,
     register,
     logout,
