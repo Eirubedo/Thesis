@@ -20,6 +20,12 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
   const { isSupported, isSubscribed, permission, subscribe, medications, schedules } = useNotifications({ userId, enabled: true })
   const [isSetupComplete, setIsSetupComplete] = useState(false)
   const [upcomingReminders, setUpcomingReminders] = useState<any[]>([])
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Ensure component only renders after hydration
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     // Check if notifications are already enabled
@@ -123,6 +129,22 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
   }
 
   const t = translations[language] || translations.en
+
+  if (!isMounted) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Bell className="w-4 h-4" />
+            {t.title}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-20 bg-gray-100 rounded animate-pulse" />
+        </CardContent>
+      </Card>
+    )
+  }
 
   if (!isSupported) {
     return (
