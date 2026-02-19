@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Bell, CheckCircle, Clock, AlertCircle } from "lucide-react"
+import { Bell, CheckCircle, Clock, AlertCircle, CheckCircle2, Circle, Pill, Activity } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,11 +11,21 @@ import useSWR from "swr"
 
 interface MonitoringNotificationsProps {
   userId: string | undefined
+  todaysMeds?: any[]
+  todaysActivities?: any[]
+  handleMedicationCheck?: (medicationId: string, time: string, taken: boolean) => void
+  handleActivityToggle?: (activityId: string, isCompleted: boolean) => void
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-export function MonitoringNotifications({ userId }: MonitoringNotificationsProps) {
+export function MonitoringNotifications({ 
+  userId, 
+  todaysMeds, 
+  todaysActivities,
+  handleMedicationCheck,
+  handleActivityToggle 
+}: MonitoringNotificationsProps) {
   const { language } = useLanguage()
   const { isSupported, isSubscribed, permission, subscribe, medications, schedules, preferences } = useNotifications({ userId, enabled: true })
   const [isSetupComplete, setIsSetupComplete] = useState(false)
@@ -194,56 +204,254 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
           </Button>
         )}
 
-        {/* Daftar Tugas Checklist */}
+        {/* Daftar Tugas Hari Ini */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-blue-500" />
-            {language === "id" ? "Daftar Tugas" : "Task Checklist"}
+            {language === "id" ? "Daftar Tugas Hari Ini" : "Today's To-Do List"}
           </h4>
+          <p className="text-xs text-muted-foreground">
+            {language === "id" ? "Obat dan aktivitas yang harus dilakukan hari ini" : "Medications and activities to complete today"}
+          </p>
 
-          {/* Combined Medications and Activities Checklist */}
-          <div className="space-y-2">
-            {upcomingReminders.length === 0 && (!schedules || schedules.length === 0) ? (
-              <div className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
-                <CheckCircle className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                <p>{language === "id" ? "Semua tugas selesai!" : "All tasks completed!"}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* AM (Morning) Column */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b">
+                <div className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-semibold">
+                  {language === "id" ? "Pagi" : "AM"}
+                </div>
+                <span className="text-xs text-muted-foreground">(00:00 - 11:59)</span>
               </div>
-            ) : (
-              <>
-                {/* Medication Tasks */}
-                {upcomingReminders.slice(0, 3).map((reminder: any) => {
-                  const now = new Date()
-                  const isPast = reminder.reminderTime < now
+
+              {/* AM Medications */}
+              {todaysMeds && todaysMeds.length > 0 ? (
+                todaysMeds.map((med) => 
+                  med.times?.filter((time: string) => {
+                    const [hours] = time.split(":").map(Number)
+                    return hours < 12
+                  }).map((time: string) => {
+                    const log = med.logs?.find((l: any) => l.scheduledTime === time)
+                    const isTaken = log?.taken || false
+                    const currentTime = new Date()
+                    const scheduleTime = new Date()
+                    const [hours, minutes] = time.split(":")
+                    scheduleTime.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0)
+                    const isPastDue = currentTime > scheduleTime
+
+                    return (
+                      <div
+                        key={`${med.id}-${time}`}
+                        className={`p-2 rounded-lg border transition-all ${
+                          isTaken
+                            ? "bg-green-50 border-green-200"
+                            : isPastDue
+                              ? "bg-red-50 border-red-200"
+                              : "bg-gray-50 border-gray-200"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <button
+                            onClick={() => handleMedicationCheck?.(med.id, time, !isTaken)}
+                            className="flex items-center justify-center mt-0.5"
+                          >
+                            {isTaken ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Circle className="w-4 h-4 text-gray-400 hover:text-green-600 transition-colors" />
+                            )}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <Pill className="w-3 h-3 text-blue-600 flex-shrink-0" />
+                              <span className="font-medium text-xs truncate">{med.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                              <Clock className="w-2.5 h-2.5" />
+                              <span>{time}</span>
+                              <span>•</span>
+                              <span className="truncate">{med.dosage}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })
+                )
+              ) : null}
+
+              {/* AM Activities */}
+              {todaysActivities
+                ?.filter((activity) => {
+                  const [hours] = activity.scheduled_time.split(":").map(Number)
+                  return hours < 12
+                })
+                .map((activity) => {
+                  const isCompleted = activity.completed_at !== null
+
                   return (
-                    <div 
-                      key={reminder.id} 
-                      className={`flex items-center gap-3 p-2.5 rounded-lg border ${
-                        isPast 
-                          ? "bg-red-50 border-red-200" 
-                          : "bg-blue-50 border-blue-200"
+                    <div
+                      key={activity.id}
+                      className={`p-2 rounded-lg border transition-all ${
+                        isCompleted ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"
                       }`}
                     >
-                      <div className="flex-shrink-0">
-                        <div className={`w-2 h-2 rounded-full ${isPast ? "bg-red-500" : "bg-blue-500"}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-foreground truncate">{reminder.medication}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {reminder.time} • {reminder.dosage}
-                        </p>
+                      <div className="flex items-start gap-2">
+                        <button
+                          onClick={() => handleActivityToggle?.(activity.id, !isCompleted)}
+                          className="flex items-center justify-center mt-0.5"
+                        >
+                          {isCompleted ? (
+                            <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <Circle className="w-4 h-4 text-gray-400 hover:text-green-600 transition-colors" />
+                          )}
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <Activity className="w-3 h-3 text-purple-600 flex-shrink-0" />
+                            <span className="font-medium text-xs truncate">{activity.title}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                            <Clock className="w-2.5 h-2.5" />
+                            <span>{activity.scheduled_time}</span>
+                            <span>•</span>
+                            <span>{activity.duration_minutes} {language === "id" ? "mnt" : "min"}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )
                 })}
-                
-                {/* Show total count if there are more tasks */}
-                {(upcomingReminders.length + (schedules?.length || 0)) > 3 && (
-                  <p className="text-xs text-muted-foreground text-center pt-1">
-                    +{(upcomingReminders.length + (schedules?.length || 0)) - 3} {language === "id" ? "tugas lagi" : "more tasks"}
-                  </p>
-                )}
-              </>
-            )}
+
+              {/* Empty state for AM */}
+              {(!todaysMeds || todaysMeds.every(med => !med.times?.some((t: string) => Number.parseInt(t.split(':')[0]) < 12))) &&
+               (!todaysActivities || !todaysActivities.some(a => Number.parseInt(a.scheduled_time.split(':')[0]) < 12)) && (
+                <div className="text-center py-4 text-muted-foreground">
+                  <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
+                  <p className="text-xs">{language === "id" ? "Tidak ada tugas pagi" : "No morning tasks"}</p>
+                </div>
+              )}
+            </div>
+
+            {/* PM (Afternoon/Evening) Column */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b">
+                <div className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full text-xs font-semibold">
+                  {language === "id" ? "Malam" : "PM"}
+                </div>
+                <span className="text-xs text-muted-foreground">(12:00 - 23:59)</span>
+              </div>
+
+              {/* PM Medications */}
+              {todaysMeds && todaysMeds.length > 0 ? (
+                todaysMeds.map((med) => 
+                  med.times?.filter((time: string) => {
+                    const [hours] = time.split(":").map(Number)
+                    return hours >= 12
+                  }).map((time: string) => {
+                    const log = med.logs?.find((l: any) => l.scheduledTime === time)
+                    const isTaken = log?.taken || false
+                    const currentTime = new Date()
+                    const scheduleTime = new Date()
+                    const [hours, minutes] = time.split(":")
+                    scheduleTime.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0)
+                    const isPastDue = currentTime > scheduleTime
+
+                    return (
+                      <div
+                        key={`${med.id}-${time}`}
+                        className={`p-2 rounded-lg border transition-all ${
+                          isTaken
+                            ? "bg-green-50 border-green-200"
+                            : isPastDue
+                              ? "bg-red-50 border-red-200"
+                              : "bg-gray-50 border-gray-200"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          <button
+                            onClick={() => handleMedicationCheck?.(med.id, time, !isTaken)}
+                            className="flex items-center justify-center mt-0.5"
+                          >
+                            {isTaken ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Circle className="w-4 h-4 text-gray-400 hover:text-green-600 transition-colors" />
+                            )}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <Pill className="w-3 h-3 text-blue-600 flex-shrink-0" />
+                              <span className="font-medium text-xs truncate">{med.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                              <Clock className="w-2.5 h-2.5" />
+                              <span>{time}</span>
+                              <span>•</span>
+                              <span className="truncate">{med.dosage}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })
+                )
+              ) : null}
+
+              {/* PM Activities */}
+              {todaysActivities
+                ?.filter((activity) => {
+                  const [hours] = activity.scheduled_time.split(":").map(Number)
+                  return hours >= 12
+                })
+                .map((activity) => {
+                  const isCompleted = activity.completed_at !== null
+
+                  return (
+                    <div
+                      key={activity.id}
+                      className={`p-2 rounded-lg border transition-all ${
+                        isCompleted ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <button
+                          onClick={() => handleActivityToggle?.(activity.id, !isCompleted)}
+                          className="flex items-center justify-center mt-0.5"
+                        >
+                          {isCompleted ? (
+                            <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <Circle className="w-4 h-4 text-gray-400 hover:text-green-600 transition-colors" />
+                          )}
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <Activity className="w-3 h-3 text-purple-600 flex-shrink-0" />
+                            <span className="font-medium text-xs truncate">{activity.title}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                            <Clock className="w-2.5 h-2.5" />
+                            <span>{activity.scheduled_time}</span>
+                            <span>•</span>
+                            <span>{activity.duration_minutes} {language === "id" ? "mnt" : "min"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+
+              {/* Empty state for PM */}
+              {(!todaysMeds || todaysMeds.every(med => !med.times?.some((t: string) => Number.parseInt(t.split(':')[0]) >= 12))) &&
+               (!todaysActivities || !todaysActivities.some(a => Number.parseInt(a.scheduled_time.split(':')[0]) >= 12)) && (
+                <div className="text-center py-4 text-muted-foreground">
+                  <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
+                  <p className="text-xs">{language === "id" ? "Tidak ada tugas malam" : "No evening tasks"}</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
