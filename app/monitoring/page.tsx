@@ -104,6 +104,7 @@ export default function MonitoringPage() {
     logActivity,
     deleteActivityLog,
     getTodaysSchedule,
+    getUpcomingSchedule,
     getActivityStatistics,
   } = useActivityScheduling()
 
