@@ -17,7 +17,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export function MonitoringNotifications({ userId }: MonitoringNotificationsProps) {
   const { language } = useLanguage()
-  const { isSupported, isSubscribed, permission, subscribe, medications, schedules } = useNotifications({ userId, enabled: true })
+  const { isSupported, isSubscribed, permission, subscribe, medications, schedules, preferences } = useNotifications({ userId, enabled: true })
   const [isSetupComplete, setIsSetupComplete] = useState(false)
   const [upcomingReminders, setUpcomingReminders] = useState<any[]>([])
   const [isMounted, setIsMounted] = useState(false)
@@ -170,7 +170,7 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
             <Bell className="w-4 h-4" />
             {t.title}
           </span>
-          {isSetupComplete || preferences?.notifications_enabled ? (
+          {isSetupComplete || preferences?.notification_medications ? (
             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
               <CheckCircle className="w-3 h-3 mr-1" />
               {language === "id" ? "Aktif" : "Active"}
@@ -183,7 +183,7 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
           )}
         </CardTitle>
         <CardDescription className="mt-2">
-          {isSetupComplete || preferences?.notifications_enabled ? t.enabled : t.setupDesc}
+          {isSetupComplete || preferences?.notification_medications ? t.enabled : t.setupDesc}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
