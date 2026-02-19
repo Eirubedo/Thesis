@@ -287,7 +287,7 @@ export function MonitoringNotifications({
                   return hours < 12
                 })
                 .map((activity) => {
-                  const isCompleted = activity.completed_at !== null
+                  const isCompleted = activity.todayCompleted || false
 
                   return (
                     <div
@@ -406,7 +406,7 @@ export function MonitoringNotifications({
                   return hours >= 12
                 })
                 .map((activity) => {
-                  const isCompleted = activity.completed_at !== null
+                  const isCompleted = activity.todayCompleted || false
 
                   return (
                     <div
