@@ -142,41 +142,13 @@ export default function ReportsPage() {
   )
 
   const { data: chatActivity, mutate: mutateChat } = useSWR(
-    user?.id
-      ? async () => {
-          const thirtyDaysAgo = new Date()
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
-          const { data, error } = await supabase
-            .from("conversations")
-            .select("started_at, message_count")
-            .eq("user_id", user.id)
-            .gte("started_at", thirtyDaysAgo.toISOString())
-            .order("started_at", { ascending: true })
-
-          if (error) throw error
-
-          const groupedByDay: { [key: string]: { count: number; messages: number } } = {}
-          data?.forEach((conv: any) => {
-            const date = new Date(conv.started_at).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })
-            if (!groupedByDay[date]) {
-              groupedByDay[date] = { count: 0, messages: 0 }
-            }
-            groupedByDay[date].count += 1
-            groupedByDay[date].messages += conv.message_count || 0
-          })
-
-          return Object.entries(groupedByDay).map(([date, data]) => ({
-            date,
-            sessions: data.count,
-            messages: data.messages,
-          }))
-        }
-      : null,
-    { refreshInterval: 5000 }
+    user?.id ? [`/api/chat-activity?user_id=${user.id}`, user.id] : null,
+    async ([url]) => {
+      const res = await fetch(url)
+      if (!res.ok) throw new Error("Failed to fetch")
+      return res.json()
+    },
+    { refreshInterval: 3000, dedupingInterval: 1000 }
   )
 
   const [insights, setInsights] = useState<InsightsData | null>(null)
