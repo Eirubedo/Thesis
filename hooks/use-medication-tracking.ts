@@ -245,8 +245,46 @@ export function useMedicationTracking() {
     const now = new Date()
     const daysAgo = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
 
-    const recentLogs = medicationLogs.filter((log) => new Date(log.taken_at) >= daysAgo)
-    return recentLogs.filter((log) => !log.was_taken).length
+    let missedCount = 0
+
+    // Get all active medications
+    const activeMedications = medications.filter((med) => med.is_active)
+
+    // For each day in the range
+    for (let d = 0; d < days; d++) {
+      const checkDate = new Date(now.getTime() - d * 24 * 60 * 60 * 1000)
+      const dateString = checkDate.toISOString().split("T")[0]
+
+      // For each active medication
+      for (const med of activeMedications) {
+        const scheduledTimes = med.times || []
+
+        // For each scheduled time
+        for (const time of scheduledTimes) {
+          // Check if there's a log for this medication, date, and time
+          const log = medicationLogs.find(
+            (l) =>
+              l.medication_id === med.id &&
+              l.taken_at.startsWith(dateString) &&
+              l.notes === time
+          )
+
+          // Count as missed if: no log exists OR log exists but was_taken = false
+          if (!log || !log.was_taken) {
+            // Only count if the scheduled time has passed
+            const [hours, minutes] = time.split(":").map(Number)
+            const scheduledDateTime = new Date(checkDate)
+            scheduledDateTime.setHours(hours, minutes, 0, 0)
+
+            if (scheduledDateTime <= now) {
+              missedCount++
+            }
+          }
+        }
+      }
+    }
+
+    return missedCount
   }
 
   const updateMedication = async (id: string, updates: Partial<Medication>) => {
