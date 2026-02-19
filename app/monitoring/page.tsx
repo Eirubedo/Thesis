@@ -99,10 +99,11 @@ export default function MonitoringPage() {
   const {
     schedules,
     addSchedule,
-    logActivity,
+    updateSchedule,
     deleteSchedule,
+    logActivity,
+    deleteActivityLog,
     getTodaysSchedule,
-    getUpcomingSchedule,
     getActivityStatistics,
   } = useActivityScheduling()
 
@@ -235,8 +236,9 @@ export default function MonitoringPage() {
   const handleActivityToggle = async (scheduleId: string, isCompleted: boolean) => {
     if (isCompleted) {
       await logActivity(scheduleId)
+    } else {
+      await deleteActivityLog(scheduleId)
     }
-    // If uncompleting, we would need to delete the log, but for now we just mark as complete
   }
 
   const stats = getStats(30)
