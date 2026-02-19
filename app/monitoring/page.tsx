@@ -1130,7 +1130,7 @@ export default function MonitoringPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {schedules.map((schedule) => (
+                    {schedules.filter(s => s.is_active !== false).map((schedule) => (
                       <TableRow key={schedule.id}>
                         <TableCell>
                           <div>
