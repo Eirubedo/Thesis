@@ -314,7 +314,7 @@ export function MonitoringNotifications({
                           </div>
                           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                             <Clock className="w-2.5 h-2.5" />
-                            <span>{activity.scheduled_time}</span>
+                            <span>{typeof activity.scheduled_time === 'string' ? activity.scheduled_time.slice(0, 5) : activity.scheduled_time}</span>
                             <span>•</span>
                             <span>{activity.duration_minutes} {language === "id" ? "mnt" : "min"}</span>
                           </div>
@@ -433,7 +433,7 @@ export function MonitoringNotifications({
                           </div>
                           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                             <Clock className="w-2.5 h-2.5" />
-                            <span>{activity.scheduled_time}</span>
+                            <span>{typeof activity.scheduled_time === 'string' ? activity.scheduled_time.slice(0, 5) : activity.scheduled_time}</span>
                             <span>•</span>
                             <span>{activity.duration_minutes} {language === "id" ? "mnt" : "min"}</span>
                           </div>

@@ -235,10 +235,14 @@ export default function MonitoringPage() {
   }
 
   const handleActivityToggle = async (scheduleId: string, isCompleted: boolean) => {
+    console.log("[v0] handleActivityToggle called", { scheduleId, isCompleted })
     if (isCompleted) {
+      console.log("[v0] Logging activity completion")
       await logActivity(scheduleId)
     } else {
-      await deleteActivityLog(scheduleId)
+      console.log("[v0] Deleting activity log to uncheck")
+      const result = await deleteActivityLog(scheduleId)
+      console.log("[v0] Delete result:", result)
     }
   }
 

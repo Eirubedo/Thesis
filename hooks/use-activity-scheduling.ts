@@ -248,18 +248,34 @@ export function useActivityScheduling() {
 
   const deleteActivityLog = async (scheduleId: string) => {
     const userId = getUserId()
+    console.log("[v0] deleteActivityLog called", { userId, scheduleId })
     if (!userId) return { success: false, error: "Not authenticated" }
 
     try {
       const today = new Date().toISOString().split("T")[0]
+      console.log("[v0] Today date:", today)
 
-      const { error } = await supabase
+      // First check what logs exist
+      const { data: existingLogs, error: checkError } = await supabase
+        .from("activity_logs")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("schedule_id", scheduleId)
+        .gte("completed_at", `${today}T00:00:00`)
+        .lte("completed_at", `${today}T23:59:59`)
+
+      console.log("[v0] Existing logs for today:", existingLogs)
+
+      const { data, error } = await supabase
         .from("activity_logs")
         .delete()
         .eq("user_id", userId)
         .eq("schedule_id", scheduleId)
         .gte("completed_at", `${today}T00:00:00`)
-        .lt("completed_at", `${today}T23:59:59`)
+        .lte("completed_at", `${today}T23:59:59`)
+        .select()
+
+      console.log("[v0] Delete result:", { data, error })
 
       if (error) throw error
 
@@ -268,7 +284,7 @@ export function useActivityScheduling() {
 
       return { success: true }
     } catch (error) {
-      console.error("Error deleting activity log:", error)
+      console.error("[v0] Error deleting activity log:", error)
       return { success: false, error: "Failed to delete activity log" }
     }
   }
