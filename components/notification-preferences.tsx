@@ -121,7 +121,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
               <Label className="text-base font-medium">{t.enableNotifications}</Label>
               <p className="text-sm text-muted-foreground mt-1">
                 {permission === "granted"
-                  ? "Pemberitahuan diaktifkan"
+                  ? language === "id" ? "Pemberitahuan diaktifkan" : "Notifications enabled"
                   : permission === "denied"
                     ? t.permissionDenied
                     : t.permissionDefault}
@@ -129,9 +129,9 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
             </div>
           </div>
           <Switch
-            checked={preferences?.notification_medications ?? false}
+            checked={permission === "granted" && (preferences?.notification_medications ?? false)}
             onCheckedChange={handleToggleNotifications}
-            disabled={isUpdating || (permission === "denied")}
+            disabled={isUpdating || permission === "denied"}
           />
         </div>
 
