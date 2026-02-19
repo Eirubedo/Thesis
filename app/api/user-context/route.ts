@@ -77,9 +77,9 @@ export async function GET(request: NextRequest) {
       .from("full_assessments")
       .select("*")
       .eq("user_id", userId)
-      .single()
+      .maybeSingle()
 
-    if (assessError && assessError.code !== "PGRST116") {
+    if (assessError) {
       console.error("Error fetching full assessment:", assessError)
     }
 
