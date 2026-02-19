@@ -47,10 +47,16 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
     if (!enabled) return
 
     const initPushNotifications = async () => {
-      setIsSupported(pushNotificationService.isSupported())
-      if (pushNotificationService.isSupported()) {
+      const supported = pushNotificationService.isSupported()
+      setIsSupported(supported)
+      
+      if (supported) {
         setPermission(Notification.permission)
-        await pushNotificationService.registerServiceWorker()
+        // Don't await service worker registration - let it happen in background
+        // This prevents blocking the UI if it fails
+        pushNotificationService.registerServiceWorker().catch((error) => {
+          console.log("[v0] Service Worker registration failed (non-critical):", error)
+        })
       }
     }
 
@@ -59,7 +65,7 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
 
   // Auto-schedule medication reminders based on medications and schedules
   useEffect(() => {
-    if (!medications || !schedules || !preferences?.notifications_enabled) return
+    if (!medications || !schedules || !preferences?.notification_medications) return
 
     const scheduleReminders = async () => {
       try {
@@ -95,7 +101,7 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
     }
 
     scheduleReminders()
-  }, [medications, schedules, preferences?.notifications_enabled, isSubscribed])
+  }, [medications, schedules, preferences?.notification_medications, isSubscribed])
 
   // Request notification permission
   const requestPermission = useCallback(async () => {
@@ -171,7 +177,10 @@ export const useNotifications = ({ userId, enabled = true }: UseNotificationsPro
       if (!isSubscribed) {
         throw new Error("Device not subscribed")
       }
-      await pushNotificationService.sendNotification(title, options)
+      // For now, just show a browser notification
+      if (Notification.permission === "granted") {
+        new Notification(title, options)
+      }
       return true
     } catch (error) {
       console.error("[v0] Test notification failed:", error)

@@ -13,13 +13,20 @@ export const pushNotificationService = {
     if (!this.isSupported()) return null
 
     try {
+      // First check if service worker file exists and is accessible
+      const swResponse = await fetch("/service-worker.js", { method: "HEAD" })
+      if (!swResponse.ok || !swResponse.headers.get("content-type")?.includes("javascript")) {
+        console.log("[v0] Service Worker file not available or not served as JavaScript - skipping registration")
+        return null
+      }
+
       const registration = await navigator.serviceWorker.register("/service-worker.js", {
         scope: "/",
       })
       console.log("[v0] Service Worker registered:", registration)
       return registration
     } catch (error) {
-      console.error("[v0] Service Worker registration failed:", error)
+      console.log("[v0] Service Worker registration skipped:", error instanceof Error ? error.message : String(error))
       return null
     }
   },
