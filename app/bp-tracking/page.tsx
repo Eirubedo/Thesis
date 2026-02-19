@@ -268,9 +268,9 @@ export default function BPTrackingPage() {
                         <div className="text-sm text-gray-500">{t("bp.mmHg")}</div>
                       </div>
 
-                      {reading.heartRate && (
+                      {reading.heart_rate && (
                         <div className="text-center">
-                          <div className="text-lg font-semibold">{reading.heartRate}</div>
+                          <div className="text-lg font-semibold">{reading.heart_rate}</div>
                           <div className="text-sm text-gray-500">{t("bp.bpm")}</div>
                         </div>
                       )}
@@ -289,8 +289,8 @@ export default function BPTrackingPage() {
                     </div>
 
                     <div className="text-right">
-                      <div className="text-sm font-medium">{reading.date.toLocaleDateString()}</div>
-                      <div className="text-sm text-gray-500">{reading.time}</div>
+                      <div className="text-sm font-medium">{new Date(reading.measurement_date).toLocaleDateString()}</div>
+                      <div className="text-sm text-gray-500">{new Date(reading.measurement_date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
                       {reading.notes && (
                         <div className="text-xs text-gray-400 mt-1 max-w-xs truncate">{reading.notes}</div>
                       )}
