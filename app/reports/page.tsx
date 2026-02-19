@@ -135,6 +135,12 @@ export default function ReportsPage() {
     { refreshInterval: 5000 }
   )
 
+  const { data: adherenceData, mutate: mutateAdherence } = useSWR(
+    user?.id ? `/api/medications/adherence?user_id=${user.id}&days=7` : null,
+    fetcher,
+    { refreshInterval: 5000 }
+  )
+
   const { data: activityData, mutate: mutateActivity } = useSWR(
     user?.id ? `/api/schedules?user_id=${user.id}` : null,
     fetcher,
@@ -466,43 +472,18 @@ export default function ReportsPage() {
                 <Pill className="w-4 h-4 text-blue-500" />
                 {language === "id" ? "Kepatuhan Obat" : "Med Adherence"}
               </CardTitle>
+              {adherenceData && (
+                <CardDescription>
+                  {language === "id" ? "Tingkat kepatuhan" : "Adherence rate"}: {adherenceData.percentage}%
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent>
-              {medicationData && medicationData.length > 0 ? (
+              {adherenceData && adherenceData.daily && adherenceData.daily.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
-                  <LineChart
-                    data={(() => {
-                      const last7Days = []
-                      for (let i = 6; i >= 0; i--) {
-                        const date = new Date()
-                        date.setDate(date.getDate() - i)
-                        const dateStr = date.toISOString().split("T")[0]
-                        const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-
-                        // Get all logs for this day
-                        const allDayLogs = medicationData.flatMap((med: any) => (med.logs || []).map((log: any) => ({ ...log, med_id: med.id, med_name: med.name })))
-                        const dayLogsByDate = allDayLogs.filter((log: any) => log.taken_at && log.taken_at.startsWith(dateStr))
-                        
-                        const taken = dayLogsByDate.filter((log: any) => log.was_taken === true).length
-                        const missed = dayLogsByDate.filter((log: any) => log.was_taken === false).length
-                        
-                        // If there are active medications but no logs for today, count them as "no data"
-                        // The visualization will show 0 for both if no logs exist
-                        const total = taken + missed
-
-                        last7Days.push({
-                          date: dayLabel,
-                          [language === "id" ? "Diminum" : "Taken"]: taken,
-                          [language === "id" ? "Terlewat" : "Missed"]: missed,
-                          total: total, // For reference in tooltips
-                        })
-                      }
-                      return last7Days
-                    })()}
-                    margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
-                  >
+                  <LineChart data={adherenceData.daily} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" hide />
+                    <XAxis dataKey="date" className="text-xs" />
                     <YAxis className="text-xs" />
                     <RechartsTooltip
                       contentStyle={{
@@ -511,22 +492,28 @@ export default function ReportsPage() {
                         borderRadius: "6px",
                       }}
                       formatter={(value: any, name: string) => {
-                        if (name === "total") return null
-                        return [value, name]
+                        const labels: Record<string, string> = {
+                          taken: language === "id" ? "Diminum" : "Taken",
+                          missed: language === "id" ? "Terlewat" : "Missed",
+                          scheduled: language === "id" ? "Dijadwalkan" : "Scheduled",
+                        }
+                        return [value, labels[name] || name]
                       }}
                     />
                     <Line
                       type="monotone"
-                      dataKey={language === "id" ? "Diminum" : "Taken"}
+                      dataKey="taken"
                       stroke="#22c55e"
                       strokeWidth={2}
+                      name={language === "id" ? "Diminum" : "Taken"}
                       dot={false}
                     />
                     <Line
                       type="monotone"
-                      dataKey={language === "id" ? "Terlewat" : "Missed"}
+                      dataKey="missed"
                       stroke="#ef4444"
                       strokeWidth={2}
+                      name={language === "id" ? "Terlewat" : "Missed"}
                       dot={false}
                     />
                   </LineChart>
