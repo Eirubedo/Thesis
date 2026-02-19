@@ -479,15 +479,22 @@ export default function ReportsPage() {
                         const dateStr = date.toISOString().split("T")[0]
                         const dayLabel = date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 
-                        const dayMeds = medicationData.flatMap((med: any) => med.logs || [])
-                        const dayLogs = dayMeds.filter((log: any) => log.taken_at && log.taken_at.startsWith(dateStr))
-                        const taken = dayLogs.filter((log: any) => log.was_taken).length
-                        const missed = dayLogs.filter((log: any) => !log.was_taken).length
+                        // Get all logs for this day
+                        const allDayLogs = medicationData.flatMap((med: any) => (med.logs || []).map((log: any) => ({ ...log, med_id: med.id, med_name: med.name })))
+                        const dayLogsByDate = allDayLogs.filter((log: any) => log.taken_at && log.taken_at.startsWith(dateStr))
+                        
+                        const taken = dayLogsByDate.filter((log: any) => log.was_taken === true).length
+                        const missed = dayLogsByDate.filter((log: any) => log.was_taken === false).length
+                        
+                        // If there are active medications but no logs for today, count them as "no data"
+                        // The visualization will show 0 for both if no logs exist
+                        const total = taken + missed
 
                         last7Days.push({
                           date: dayLabel,
                           [language === "id" ? "Diminum" : "Taken"]: taken,
                           [language === "id" ? "Terlewat" : "Missed"]: missed,
+                          total: total, // For reference in tooltips
                         })
                       }
                       return last7Days
@@ -502,6 +509,10 @@ export default function ReportsPage() {
                         backgroundColor: "hsl(var(--background))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "6px",
+                      }}
+                      formatter={(value: any, name: string) => {
+                        if (name === "total") return null
+                        return [value, name]
                       }}
                     />
                     <Line

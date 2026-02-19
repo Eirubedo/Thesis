@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
       .from("medications")
       .select(`
         *,
-        logs:medication_logs(*)
+        logs:medication_logs(
+          id,
+          taken_at,
+          was_taken,
+          created_at,
+          scheduled_at,
+          notes
+        )
       `)
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
