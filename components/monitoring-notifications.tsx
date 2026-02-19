@@ -194,76 +194,98 @@ export function MonitoringNotifications({ userId }: MonitoringNotificationsProps
           </Button>
         )}
 
-        {/* Upcoming Medication Reminders */}
-        <div className="space-y-2">
+        {/* Today's To-Do List Summary */}
+        <div className="space-y-3">
           <h4 className="text-sm font-semibold flex items-center gap-2">
-            <Clock className="w-4 h-4 text-blue-500" />
-            {t.upcomingMeds}
+            <CheckCircle className="w-4 h-4 text-blue-500" />
+            {language === "id" ? "Tugas Hari Ini" : "Today's Tasks"}
           </h4>
 
-          {upcomingReminders.length > 0 ? (
+          {/* Upcoming Medications */}
+          {upcomingReminders.length > 0 && (
             <div className="space-y-2">
-              {upcomingReminders.map((reminder: any) => {
+              {upcomingReminders.slice(0, 3).map((reminder: any) => {
+                const now = new Date()
+                const isPast = reminder.reminderTime < now
                 const timeStr = reminder.reminderTime.toLocaleTimeString(language === "id" ? "id-ID" : "en-US", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })
                 return (
-                  <div key={reminder.id} className="flex items-start justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground text-sm">{reminder.medication}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {reminder.dosage ? `${reminder.dosage} • ` : ""}
-                        {timeStr}
+                  <div 
+                    key={reminder.id} 
+                    className={`flex items-center gap-3 p-2.5 rounded-lg border ${
+                      isPast 
+                        ? "bg-red-50 border-red-200" 
+                        : "bg-blue-50 border-blue-200"
+                    }`}
+                  >
+                    <div className="flex-shrink-0">
+                      <div className={`w-2 h-2 rounded-full ${isPast ? "bg-red-500" : "bg-blue-500"}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm text-foreground truncate">{reminder.medication}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {reminder.time} • {reminder.dosage}
                       </p>
                     </div>
-                    <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700 border-blue-200">
-                      {reminder.time}
-                    </Badge>
                   </div>
                 )
               })}
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground py-3 text-center bg-gray-50 rounded">
-              {language === "id" ? "Belum ada obat yang dijadwalkan" : "No medications scheduled"}
-            </div>
-          )}
-        </div>
-
-        {/* Today's Activities */}
-        {schedules && schedules.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
-              {t.todaySchedules}
-            </h4>
-
-            <div className="space-y-2">
-              {schedules.slice(0, 3).map((schedule: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="flex items-start justify-between p-2 bg-muted rounded text-sm"
-                >
-                  <div>
-                    <p className="font-medium text-foreground">{schedule.activity_name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {language === "id" ? "Waktu" : "Time"}: {schedule.scheduled_time}
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className="ml-2">
-                    {schedule.status === "completed" ? "✓" : "•"}
-                  </Badge>
-                </div>
-              ))}
-              {schedules.length > 3 && (
-                <p className="text-xs text-muted-foreground pt-2">
-                  +{schedules.length - 3} {language === "id" ? "lainnya" : "more"}
+              {upcomingReminders.length > 3 && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  +{upcomingReminders.length - 3} {language === "id" ? "lagi" : "more"}
                 </p>
               )}
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Today's Activities */}
+          {schedules && schedules.length > 0 && (
+            <div className="space-y-2 pt-2">
+              {schedules.slice(0, 3).map((schedule: any, idx: number) => {
+                const isCompleted = schedule.status === "completed"
+                return (
+                  <div
+                    key={idx}
+                    className={`flex items-center gap-3 p-2.5 rounded-lg border ${
+                      isCompleted 
+                        ? "bg-green-50 border-green-200" 
+                        : "bg-gray-50 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex-shrink-0">
+                      {isCompleted ? (
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <div className="w-2 h-2 rounded-full bg-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm text-foreground truncate">{schedule.activity_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {schedule.scheduled_time}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+              {schedules.length > 3 && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  +{schedules.length - 3} {language === "id" ? "lagi" : "more"}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {upcomingReminders.length === 0 && (!schedules || schedules.length === 0) && (
+            <div className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
+              <CheckCircle className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              <p>{language === "id" ? "Semua tugas selesai!" : "All tasks completed!"}</p>
+            </div>
+          )}
+        </div>
 
         {/* Info Text */}
         {isSetupComplete ? (
