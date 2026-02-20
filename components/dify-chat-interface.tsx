@@ -13,6 +13,8 @@ import { useLanguage } from "@/contexts/language-context"
 import { useTTS } from "@/hooks/use-tts"
 import { Send, Mic, MicOff, Volume2, VolumeX, Loader2, MessageCircle, Bot, User, Play, CheckCircle, Circle, Clock } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import type { SpeechRecognition } from "types/speech-recognition"
 
@@ -85,7 +87,7 @@ export function DifyChatInterface({
   const { user } = useAuth()
   const { t, language } = useLanguage()
   const { toast } = useToast()
-  const { speak, manualSpeak, stopSpeech, isPlaying, isLoading: ttsLoading, currentProvider } = useTTS()
+  const { speak, manualSpeak, stopSpeech, isPlaying, isLoading: ttsLoading, currentProvider, settings, saveSettings } = useTTS()
 
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
@@ -794,8 +796,18 @@ export function DifyChatInterface({
                 {getProgressBadge()}
               </div>
               {showHeader && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-500">Voice: {currentProvider}</span>
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="autoplay-toggle"
+                      checked={settings.autoPlay}
+                      onCheckedChange={(checked) => saveSettings({ autoPlay: checked })}
+                      className="data-[state=checked]:bg-sky-500"
+                    />
+                    <Label htmlFor="autoplay-toggle" className="text-xs text-gray-600 cursor-pointer">
+                      {language === "id" ? "Putar Otomatis" : "Autoplay"}
+                    </Label>
+                  </div>
                   {isPlaying && <Volume2 className="w-4 h-4 text-yellow-500 animate-pulse" />}
                 </div>
               )}
@@ -807,25 +819,25 @@ export function DifyChatInterface({
 
       {/* Session Choice Dialog */}
       <Dialog open={showSessionDialog} onOpenChange={setShowSessionDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[90vw] max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-center">{t("chat.continueOrNew")}</DialogTitle>
-            <DialogDescription className="text-center">{t("chat.continueOrNewDesc")}</DialogDescription>
+            <DialogTitle className="text-center text-base sm:text-lg">{t("chat.continueOrNew")}</DialogTitle>
+            <DialogDescription className="text-center text-xs sm:text-sm px-2">{t("chat.continueOrNewDesc")}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3 mt-4">
             {lastConversation && (
               <Button
                 onClick={handleContinueSession}
-                className="w-full h-auto py-4 flex flex-col items-start gap-1 bg-sky-500 hover:bg-sky-600 text-white"
+                className="w-full h-auto py-3 sm:py-4 flex flex-col items-start gap-1 bg-sky-500 hover:bg-sky-600 text-white"
               >
-                <div className="flex items-center gap-2 font-semibold">
-                  <MessageCircle className="w-5 h-5" />
+                <div className="flex items-center gap-2 font-semibold text-sm sm:text-base">
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   {t("chat.continueLastSession")}
                 </div>
-                <span className="text-xs text-sky-100">{t("chat.continueLastSessionDesc")}</span>
+                <span className="text-[10px] sm:text-xs text-sky-100">{t("chat.continueLastSessionDesc")}</span>
                 {lastConversation.started_at && (
-                  <span className="text-xs text-sky-200">
+                  <span className="text-[10px] sm:text-xs text-sky-200">
                     {t("chat.lastConversationFrom")} {new Date(lastConversation.started_at).toLocaleDateString()}
                   </span>
                 )}
@@ -835,13 +847,13 @@ export function DifyChatInterface({
             <Button
               onClick={handleNewSession}
               variant="outline"
-              className="w-full h-auto py-4 flex flex-col items-start gap-1 border-sky-200 hover:bg-sky-50 bg-transparent"
+              className="w-full h-auto py-3 sm:py-4 flex flex-col items-start gap-1 border-sky-200 hover:bg-sky-50 bg-transparent"
             >
-              <div className="flex items-center gap-2 font-semibold text-sky-700">
-                <Bot className="w-5 h-5" />
+              <div className="flex items-center gap-2 font-semibold text-sky-700 text-sm sm:text-base">
+                <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
                 {t("chat.startNewSession")}
               </div>
-              <span className="text-xs text-gray-500">{t("chat.startNewSessionDesc")}</span>
+              <span className="text-[10px] sm:text-xs text-gray-500">{t("chat.startNewSessionDesc")}</span>
             </Button>
           </div>
         </DialogContent>
