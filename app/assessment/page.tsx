@@ -262,8 +262,8 @@ export default function AssessmentPage() {
                   <div className={`w-12 h-12 rounded-lg ${assessment.color} flex items-center justify-center mb-4`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <CardTitle className="text-xl w-auto h-5">{assessment.title}</CardTitle>
-                  <CardDescription className="text-sm h-14">{assessment.description}</CardDescription>
+                  <CardTitle className="text-xl mb-2">{assessment.title}</CardTitle>
+                  <CardDescription className="text-sm min-h-[3.5rem]">{assessment.description}</CardDescription>
                   <div className="flex items-center gap-2 mt-2">
                     <Clock className="w-4 h-4 text-gray-500" />
                     <span className="text-sm text-gray-600">{assessment.duration}</span>
