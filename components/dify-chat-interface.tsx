@@ -301,6 +301,12 @@ export function DifyChatInterface({
           timestamp: new Date(msg.created_at),
         }))
         setMessages(loadedMessages)
+
+        // Auto-play the last assistant message if autoplay is enabled
+        const lastAssistantMessage = loadedMessages.filter(msg => msg.role === "assistant").pop()
+        if (lastAssistantMessage && settings.autoPlay) {
+          await speak(lastAssistantMessage.content, language === "id" ? "id-ID" : "en-US")
+        }
       }
     } catch (error) {
       console.error("Failed to load conversation:", error)
@@ -512,7 +518,10 @@ export function DifyChatInterface({
         }
       }
 
-      // TTS is now on-demand only - user must click play button to hear audio
+      // Auto-play TTS if enabled
+      if (fullContent) {
+        await speak(fullContent, language === "id" ? "id-ID" : "en-US")
+      }
     } catch (error) {
       console.error("Chat error:", error)
       toast({
