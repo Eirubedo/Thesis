@@ -53,7 +53,7 @@ export default function SelfHelpPage() {
     {
       id: 1,
       title: "Deep Breathing for Blood Pressure",
-      titleId: "Pernapasan Dalam untuk Tekanan Darah",
+      titleId: "Tarik Napas Dalam untuk Tekanan Darah",
       description: "Learn breathing techniques that can help lower blood pressure naturally",
       descriptionId: "Pelajari teknik pernapasan yang dapat membantu menurunkan tekanan darah secara alami",
       category: "bloodPressure",
