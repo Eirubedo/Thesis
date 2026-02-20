@@ -64,7 +64,7 @@ export default function SelfHelpPage() {
       type: "exercise",
       timerDuration: 600,
       video: {
-        videoId: "YRPh_GaiL8s",
+        videoId: "XKy_XDGhL9o",
         title: "Guided Breathing for Hypertension",
         titleId: "Panduan Pernapasan untuk Hipertensi",
         description: "Follow along with this breathing exercise designed for blood pressure management",
