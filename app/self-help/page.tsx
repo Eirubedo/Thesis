@@ -278,7 +278,7 @@ DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang diranca
       type: "exercise",
       timerDuration: 1200,
       video: {
-        videoId: "akbY1QMJR4M",
+        videoId: "EsVLl_bEcXw",
         title: "Low-Impact Exercise for High Blood Pressure",
         titleId: "Olahraga Dampak Rendah untuk Tekanan Darah Tinggi",
         description: "Safe exercise routine designed for hypertension management",
