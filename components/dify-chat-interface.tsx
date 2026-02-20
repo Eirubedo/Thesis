@@ -736,9 +736,9 @@ export function DifyChatInterface({
     const greeting = userName ? (language === "id" ? `Halo ${userName}!` : `Hello ${userName}!`) : (language === "id" ? "Halo!" : "Hello!")
     
     if (language === "id") {
-      return `${greeting} Saya ANSWA (AI Nursing Support for Wellness Assistance), asisten kesehatan AI Anda yang siap membantu 24/7. Saya di sini untuk mendengarkan, mendukung, dan memberikan bimbingan terkait kesehatan hipertensi dan kesejahteraan mental Anda. Anda juga bisa berbicara dengan menekan ikon mikrofon untuk mengobrol dengan suara. Bagaimana perasaan Anda hari ini?`
+      return `${greeting} Saya Aski, asisten kesehatan AI Anda yang siap menemani 24 jam. Anda bisa berbicara dengan menekan ikon mikrofon untuk mengobrol dengan suara.`
     }
-    return `${greeting} I'm ANSWA (AI Nursing Support for Wellness Assistance), your AI health assistant available 24/7. I'm here to listen, support, and provide guidance for your hypertension health and mental wellbeing. You can also speak by pressing the microphone icon to chat with voice. How are you feeling today?`
+    return `${greeting} I'm Aski, your AI health assistant ready to accompany you 24 hours. You can speak by pressing the microphone icon to chat with voice.`
   }
 
   useEffect(() => {
