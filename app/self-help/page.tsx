@@ -53,7 +53,7 @@ export default function SelfHelpPage() {
     {
       id: 1,
       title: "Deep Breathing for Blood Pressure",
-      titleId: "Pernapasan Dalam untuk Tekanan Darah",
+      titleId: "Tarik Napas Dalam untuk Tekanan Darah",
       description: "Learn breathing techniques that can help lower blood pressure naturally",
       descriptionId: "Pelajari teknik pernapasan yang dapat membantu menurunkan tekanan darah secara alami",
       category: "bloodPressure",
@@ -64,7 +64,7 @@ export default function SelfHelpPage() {
       type: "exercise",
       timerDuration: 600,
       video: {
-        videoId: "YRPh_GaiL8s",
+        videoId: "XKy_XDGhL9o",
         title: "Guided Breathing for Hypertension",
         titleId: "Panduan Pernapasan untuk Hipertensi",
         description: "Follow along with this breathing exercise designed for blood pressure management",
@@ -278,7 +278,7 @@ DASH (Dietary Approaches to Stop Hypertension) adalah rencana makan yang diranca
       type: "exercise",
       timerDuration: 1200,
       video: {
-        videoId: "akbY1QMJR4M",
+        videoId: "EsVLl_bEcXw",
         title: "Low-Impact Exercise for High Blood Pressure",
         titleId: "Olahraga Dampak Rendah untuk Tekanan Darah Tinggi",
         description: "Safe exercise routine designed for hypertension management",
