@@ -150,11 +150,6 @@ export function useTTS() {
       try {
         await speakWithOpenAI(text, language)
         logTTSEvent("MANUAL_TTS_SUCCESS", { provider: "openai", text: text.substring(0, 50) })
-        toast({
-          title: "Using OpenAI Voice",
-          description: "Audio is played using OpenAI's natural Indonesian voice.",
-          duration: 2500,
-        })
       } catch (error) {
         logTTSEvent("MANUAL_TTS_FAILURE", {
           openaiError: error instanceof Error ? error.message : "Unknown error",
