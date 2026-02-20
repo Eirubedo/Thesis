@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
 
 interface TTSSettings {
@@ -17,7 +17,7 @@ export function useTTS() {
   const { toast } = useToast()
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [currentProvider] = useState<"browser">("browser")
+  const [currentProvider] = useState<"openai">("openai")
   const [settings, setSettings] = useState<TTSSettings>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tts-settings")
@@ -25,21 +25,10 @@ export function useTTS() {
     }
     return DEFAULT_SETTINGS
   })
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
 
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      const loadVoices = () => {
-        const availableVoices = speechSynthesis.getVoices()
-        setVoices(availableVoices)
-      }
 
-      loadVoices()
-      speechSynthesis.onvoiceschanged = loadVoices
-    }
-  }, [])
 
   const saveSettings = useCallback(
     (newSettings: Partial<TTSSettings>) => {
@@ -58,8 +47,9 @@ export function useTTS() {
 
   const stopSpeech = useCallback(() => {
     try {
-      if (utteranceRef.current) {
-        speechSynthesis.cancel()
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.currentTime = 0
       }
     } catch {
       // ignore
@@ -67,135 +57,75 @@ export function useTTS() {
     setIsPlaying(false)
   }, [])
 
-  const findBestVoice = useCallback(
-    (language: string): SpeechSynthesisVoice | null => {
-      if (voices.length === 0) return null
+  const speakWithOpenAI = useCallback(
+    async (text: string, language = "id-ID") => {
+      return new Promise<void>(async (resolve, reject) => {
+        try {
+          // stop any current speech
+          stopSpeech()
 
-      // For Indonesian, prioritize native Indonesian voices
-      if (language === "id-ID") {
-        // First try to find Indonesian voices with exact match
-        const indonesianVoices = voices.filter((voice) => 
-          voice.lang === "id-ID" || 
-          voice.lang === "id_ID" || 
-          voice.lang.toLowerCase().startsWith("id")
-        )
-
-        if (indonesianVoices.length > 0) {
-          // Priority order for Indonesian voices:
-          // 1. Google Indonesian (best quality)
-          const googleIndo = indonesianVoices.find((voice) => 
-            voice.name.toLowerCase().includes("google") && 
-            (voice.name.toLowerCase().includes("indonesia") || voice.lang.startsWith("id"))
-          )
-          if (googleIndo) {
-            logTTSEvent("VOICE_PRIORITY", { selected: "Google Indonesian", name: googleIndo.name })
-            return googleIndo
-          }
-
-          // 2. Microsoft Indonesian
-          const msIndo = indonesianVoices.find((voice) => 
-            voice.name.toLowerCase().includes("microsoft") ||
-            voice.name.toLowerCase().includes("andika") ||
-            voice.name.toLowerCase().includes("gadis")
-          )
-          if (msIndo) {
-            logTTSEvent("VOICE_PRIORITY", { selected: "Microsoft Indonesian", name: msIndo.name })
-            return msIndo
-          }
-
-          // 3. Any other Indonesian voice (avoid English voices speaking Indonesian)
-          const nativeIndo = indonesianVoices.find((voice) => 
-            !voice.name.toLowerCase().includes("english") &&
-            !voice.lang.startsWith("en")
-          )
-          if (nativeIndo) {
-            logTTSEvent("VOICE_PRIORITY", { selected: "Native Indonesian", name: nativeIndo.name })
-            return nativeIndo
-          }
-
-          // 4. First available Indonesian voice
-          logTTSEvent("VOICE_PRIORITY", { selected: "First Indonesian", name: indonesianVoices[0].name })
-          return indonesianVoices[0]
-        }
-
-        // Fallback: If no Indonesian voice, log warning
-        logTTSEvent("VOICE_WARNING", { message: "No Indonesian voice found, using fallback" })
-      }
-
-      // For English or if no Indonesian voice found, find matching language
-      const matchingVoices = voices.filter((voice) => voice.lang.startsWith(language.substring(0, 2)))
-
-      if (matchingVoices.length > 0) {
-        // Prefer Google voices
-        const googleVoice = matchingVoices.find((voice) => voice.name.toLowerCase().includes("google"))
-        if (googleVoice) return googleVoice
-
-        // Otherwise return first matching voice
-        return matchingVoices[0]
-      }
-
-      // Fallback to default voice
-      return voices[0] || null
-    },
-    [voices, logTTSEvent],
-  )
-
-  const speakWithBrowser = useCallback(
-    (text: string, language = "id-ID") => {
-      return new Promise<void>((resolve, reject) => {
-        if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-          const error = "Browser TTS not supported"
-          logTTSEvent("BROWSER_TTS_ERROR", { error, text: text.substring(0, 50) })
-          reject(new Error(error))
-          return
-        }
-
-        // stop any current speech
-        stopSpeech()
-
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.lang = language
-        utterance.volume = settings.volume
-        utterance.rate = 1.0
-        utterance.pitch = 1.0
-
-        const selectedVoice = findBestVoice(language)
-        if (selectedVoice) {
-          utterance.voice = selectedVoice
-          logTTSEvent("VOICE_SELECTED", {
-            voiceName: selectedVoice.name,
-            voiceLang: selectedVoice.lang,
-            requestedLang: language,
-          })
-        }
-
-        utterance.onstart = () => {
-          setIsPlaying(true)
-          logTTSEvent("BROWSER_TTS_START", {
+          logTTSEvent("OPENAI_TTS_REQUEST", {
             text: text.substring(0, 50),
             language,
-            voice: selectedVoice?.name || "default",
           })
-        }
 
-        utterance.onend = () => {
+          const lang = language.startsWith("id") ? "id" : "en"
+          const response = await fetch("/api/tts/openai", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              text,
+              language: lang,
+            }),
+          })
+
+          if (!response.ok) {
+            throw new Error("Failed to generate speech")
+          }
+
+          const data = await response.json()
+
+          // Create audio element and play
+          const audio = new Audio(data.audio)
+          audio.volume = settings.volume
+          audioRef.current = audio
+
+          audio.onplay = () => {
+            setIsPlaying(true)
+            logTTSEvent("OPENAI_TTS_START", {
+              text: text.substring(0, 50),
+              language,
+              voice: data.voice,
+            })
+          }
+
+          audio.onended = () => {
+            setIsPlaying(false)
+            logTTSEvent("OPENAI_TTS_END", { text: text.substring(0, 50) })
+            resolve()
+          }
+
+          audio.onerror = (event) => {
+            setIsPlaying(false)
+            const error = "OpenAI TTS playback error"
+            logTTSEvent("OPENAI_TTS_ERROR", { error, text: text.substring(0, 50) })
+            reject(new Error(error))
+          }
+
+          await audio.play()
+        } catch (error) {
           setIsPlaying(false)
-          logTTSEvent("BROWSER_TTS_END", { text: text.substring(0, 50) })
-          resolve()
+          logTTSEvent("OPENAI_TTS_ERROR", {
+            error: error instanceof Error ? error.message : "Unknown error",
+            text: text.substring(0, 50),
+          })
+          reject(error)
         }
-
-        utterance.onerror = (event) => {
-          setIsPlaying(false)
-          const error = `Browser TTS error: ${event.error}`
-          logTTSEvent("BROWSER_TTS_ERROR", { error, text: text.substring(0, 50) })
-          reject(new Error(error))
-        }
-
-        utteranceRef.current = utterance
-        speechSynthesis.speak(utterance)
       })
     },
-    [settings.volume, stopSpeech, logTTSEvent, findBestVoice],
+    [settings.volume, stopSpeech, logTTSEvent],
   )
 
   const speak = useCallback(
@@ -203,31 +133,31 @@ export function useTTS() {
       if (!settings.autoPlay) return
       setIsLoading(true)
       try {
-        await speakWithBrowser(text, language)
-        logTTSEvent("TTS_SUCCESS", { provider: "browser", text: text.substring(0, 50) })
+        await speakWithOpenAI(text, language)
+        logTTSEvent("TTS_SUCCESS", { provider: "openai", text: text.substring(0, 50) })
       } catch (error) {
-        console.error("Browser TTS failed:", error)
+        console.error("OpenAI TTS failed:", error)
       } finally {
         setIsLoading(false)
       }
     },
-    [settings.autoPlay, speakWithBrowser, logTTSEvent],
+    [settings.autoPlay, speakWithOpenAI, logTTSEvent],
   )
 
   const manualSpeak = useCallback(
     async (text: string, language = "id-ID") => {
       setIsLoading(true)
       try {
-        await speakWithBrowser(text, language)
-        logTTSEvent("MANUAL_TTS_SUCCESS", { provider: "browser", text: text.substring(0, 50) })
+        await speakWithOpenAI(text, language)
+        logTTSEvent("MANUAL_TTS_SUCCESS", { provider: "openai", text: text.substring(0, 50) })
         toast({
-          title: "Using Browser Voice",
-          description: "Audio is played using your device's built-in voice.",
+          title: "Using OpenAI Voice",
+          description: "Audio is played using OpenAI's natural Indonesian voice.",
           duration: 2500,
         })
       } catch (error) {
         logTTSEvent("MANUAL_TTS_FAILURE", {
-          browserError: error instanceof Error ? error.message : "Unknown error",
+          openaiError: error instanceof Error ? error.message : "Unknown error",
           text: text.substring(0, 50),
         })
         toast({
@@ -239,7 +169,7 @@ export function useTTS() {
         setIsLoading(false)
       }
     },
-    [speakWithBrowser, logTTSEvent, toast],
+    [speakWithOpenAI, logTTSEvent, toast],
   )
 
   return {
@@ -248,7 +178,7 @@ export function useTTS() {
     stopSpeech,
     isPlaying,
     isLoading,
-    currentProvider, // always "browser"
+    currentProvider, // always "openai"
     settings: { autoPlay: settings.autoPlay },
     saveSettings: (newSettings: { autoPlay: boolean }) => saveSettings(newSettings),
   }
