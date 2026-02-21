@@ -536,7 +536,26 @@ export function DifyChatInterface({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       
       audioChunksRef.current = []
-      const mediaRecorder = new MediaRecorder(stream)
+      
+      // Try to use the most compatible audio format
+      const mimeTypes = [
+        'audio/mp4',
+        'audio/mpeg',
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/ogg;codecs=opus'
+      ]
+      
+      let selectedMimeType = 'audio/webm'
+      for (const mimeType of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mimeType)) {
+          selectedMimeType = mimeType
+          console.log("[v0] Using MIME type:", mimeType)
+          break
+        }
+      }
+      
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: selectedMimeType })
       mediaRecorderRef.current = mediaRecorder
 
       mediaRecorder.ondataavailable = (event) => {
@@ -547,15 +566,31 @@ export function DifyChatInterface({
 
       mediaRecorder.onstop = async () => {
         console.log("[v0] Recording stopped, processing audio...")
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" })
+        const audioBlob = new Blob(audioChunksRef.current, { type: selectedMimeType })
         
         // Stop all audio tracks
         stream.getTracks().forEach(track => track.stop())
 
+        // Determine file extension based on MIME type
+        let fileExtension = 'webm'
+        let fileName = 'recording.webm'
+        if (selectedMimeType.includes('mp4')) {
+          fileExtension = 'mp4'
+          fileName = 'recording.mp4'
+        } else if (selectedMimeType.includes('mpeg')) {
+          fileExtension = 'mp3'
+          fileName = 'recording.mp3'
+        } else if (selectedMimeType.includes('ogg')) {
+          fileExtension = 'ogg'
+          fileName = 'recording.ogg'
+        }
+
+        console.log("[v0] Audio blob created:", audioBlob.type, audioBlob.size, "bytes, filename:", fileName)
+
         // Send to Dify for transcription
         try {
           const formData = new FormData()
-          formData.append("file", audioBlob, "recording.webm")
+          formData.append("file", audioBlob, fileName)
           formData.append("user_id", user?.id || "anonymous")
 
           const response = await fetch("/api/stt/dify", {
