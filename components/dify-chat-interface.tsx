@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import type { SpeechRecognition } from "types/speech-recognition"
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -16,13 +17,14 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import type { SpeechRecognition } from "types/speech-recognition"
+
 
 interface Message {
   id: string
   content: string
   role: "user" | "assistant"
   timestamp: Date
+  message_id?: string // Dify message ID for TTS
 }
 
 interface UserContext {
@@ -251,8 +253,8 @@ export function DifyChatInterface({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
+  // Initialize Web Speech API for speech recognition
   useEffect(() => {
-    // Initialize speech recognition
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const recognition = new (window as any).webkitSpeechRecognition()
       recognition.continuous = false
@@ -268,8 +270,10 @@ export function DifyChatInterface({
       recognition.onerror = () => {
         setIsListening(false)
         toast({
-          title: "Speech Recognition Error",
-          description: "Could not recognize speech. Please try again.",
+          title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
+          description: language === "id"
+            ? "Tidak dapat mengenali suara. Silakan coba lagi."
+            : "Could not recognize speech. Please try again.",
           variant: "destructive",
         })
       }
@@ -280,7 +284,13 @@ export function DifyChatInterface({
 
       recognitionRef.current = recognition
     }
-  }, [toast, language])
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+      }
+    }
+  }, [language, toast])
 
   const loadConversation = async (conversationId: string) => {
     try {
@@ -417,6 +427,7 @@ export function DifyChatInterface({
           content: fullContent,
           role: "assistant",
           timestamp: new Date(),
+          message_id: data.message_id, // Store Dify message_id for TTS
         }
         setMessages((prev) => [...prev, assistantMessage])
       } else {
@@ -462,7 +473,7 @@ export function DifyChatInterface({
                   setMessages((prev) =>
                     prev.map((msg) =>
                       msg.id === assistantMessage.id
-                        ? { ...msg, id: assistantMessageId, content: fullContent }
+                        ? { ...msg, id: assistantMessageId, content: fullContent, message_id: assistantMessageId }
                         : msg
                     )
                   )
@@ -489,6 +500,7 @@ export function DifyChatInterface({
           : "Sorry, I couldn't provide a response. Please try again."),
         role: "assistant",
         timestamp: new Date(),
+        message_id: assistantMessageId, // Store Dify message_id for TTS
       }
       await saveConversation(finalMessage, "assistant")
 
@@ -520,7 +532,7 @@ export function DifyChatInterface({
 
       // Auto-play TTS if enabled
       if (fullContent) {
-        await speak(fullContent, language === "id" ? "id-ID" : "en-US")
+        await speak(fullContent, assistantMessageId)
       }
     } catch (error) {
       console.error("Chat error:", error)
@@ -560,8 +572,8 @@ export function DifyChatInterface({
     }
   }
 
-  const handleManualSpeak = async (text: string) => {
-    await manualSpeak(text, language === "id" ? "id-ID" : "en-US")
+  const handleManualSpeak = async (text: string, message_id?: string) => {
+    await manualSpeak(text, message_id)
   }
 
   const chatContent = (
@@ -608,12 +620,12 @@ export function DifyChatInterface({
                 >
                   <div className="flex items-start justify-between">
                     <p className="text-sm whitespace-pre-wrap flex-1">{message.content}</p>
-                    {message.role === "assistant" && (
-                      <Button
-                        onClick={() => handleManualSpeak(message.content)}
-                        variant="ghost"
-                        size="sm"
-                        className="ml-2 h-6 w-6 p-0 hover:bg-gray-200"
+                  {message.role === "assistant" && (
+                    <Button
+                      onClick={() => handleManualSpeak(message.content, message.message_id)}
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 h-6 w-6 p-0 hover:bg-gray-200"
                         disabled={ttsLoading}
                         aria-label="Play assistant message"
                       >
