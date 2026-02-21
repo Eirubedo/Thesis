@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import type { SpeechRecognition } from "types/speech-recognition"
+
 
 interface Message {
   id: string
@@ -105,7 +105,8 @@ export function DifyChatInterface({
   const [loadingLastConversation, setLoadingLastConversation] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
 
   useEffect(() => {
     const fetchUserContext = async () => {
@@ -252,36 +253,14 @@ export function DifyChatInterface({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
+  // Cleanup media recorder on unmount
   useEffect(() => {
-    // Initialize speech recognition
-    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
-      const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = false
-      recognition.interimResults = false
-      recognition.lang = language === "id" ? "id-ID" : "en-US"
-
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript
-        setInput(transcript)
-        setIsListening(false)
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop()
       }
-
-      recognition.onerror = () => {
-        setIsListening(false)
-        toast({
-          title: "Speech Recognition Error",
-          description: "Could not recognize speech. Please try again.",
-          variant: "destructive",
-        })
-      }
-
-      recognition.onend = () => {
-        setIsListening(false)
-      }
-
-      recognitionRef.current = recognition
     }
-  }, [toast, language])
+  }, [])
 
   const loadConversation = async (conversationId: string) => {
     try {
@@ -549,17 +528,82 @@ export function DifyChatInterface({
     }
   }
 
-  const startListening = () => {
-    if (recognitionRef.current && !isListening) {
+  const startListening = async () => {
+    if (isListening) return
+
+    try {
+      console.log("[v0] Starting Dify STT...")
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      
+      audioChunksRef.current = []
+      const mediaRecorder = new MediaRecorder(stream)
+      mediaRecorderRef.current = mediaRecorder
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data)
+        }
+      }
+
+      mediaRecorder.onstop = async () => {
+        console.log("[v0] Recording stopped, processing audio...")
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" })
+        
+        // Stop all audio tracks
+        stream.getTracks().forEach(track => track.stop())
+
+        // Send to Dify for transcription
+        try {
+          const formData = new FormData()
+          formData.append("file", audioBlob, "recording.webm")
+          formData.append("user_id", user?.id || "anonymous")
+
+          const response = await fetch("/api/stt/dify", {
+            method: "POST",
+            body: formData,
+          })
+
+          if (!response.ok) {
+            throw new Error("Failed to transcribe audio")
+          }
+
+          const data = await response.json()
+          console.log("[v0] Transcription received:", data.text)
+          setInput(data.text)
+        } catch (error) {
+          console.error("[v0] STT error:", error)
+          toast({
+            title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
+            description: language === "id" 
+              ? "Tidak dapat mengenali suara. Silakan coba lagi."
+              : "Could not recognize speech. Please try again.",
+            variant: "destructive",
+          })
+        } finally {
+          setIsListening(false)
+        }
+      }
+
+      mediaRecorder.start()
       setIsListening(true)
-      recognitionRef.current.start()
+      console.log("[v0] Recording started")
+    } catch (error) {
+      console.error("[v0] Microphone access error:", error)
+      toast({
+        title: language === "id" ? "Akses Mikrofon Ditolak" : "Microphone Access Denied",
+        description: language === "id"
+          ? "Silakan izinkan akses mikrofon untuk menggunakan input suara."
+          : "Please allow microphone access to use voice input.",
+        variant: "destructive",
+      })
+      setIsListening(false)
     }
   }
 
   const stopListening = () => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop()
-      setIsListening(false)
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      console.log("[v0] Stopping recording...")
+      mediaRecorderRef.current.stop()
     }
   }
 
