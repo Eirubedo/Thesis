@@ -537,13 +537,14 @@ export function DifyChatInterface({
       
       audioChunksRef.current = []
       
-      // Try to use the most compatible audio format
+      // Try to use the most compatible audio format for Dify
+      // Dify accepts: mp3, mp4, mpeg, mpga, m4a, wav, webm
+      // webm with opus codec is most reliable across browsers and Dify
       const mimeTypes = [
-        'audio/mp4',
-        'audio/mpeg',
         'audio/webm;codecs=opus',
         'audio/webm',
-        'audio/ogg;codecs=opus'
+        'audio/ogg;codecs=opus',
+        'audio/mpeg',
       ]
       
       let selectedMimeType = 'audio/webm'
