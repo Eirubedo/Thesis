@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import type { SpeechRecognition } from "types/speech-recognition"
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -105,8 +106,7 @@ export function DifyChatInterface({
   const [loadingLastConversation, setLoadingLastConversation] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
-  const audioChunksRef = useRef<Blob[]>([])
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   useEffect(() => {
     const fetchUserContext = async () => {
@@ -253,14 +253,44 @@ export function DifyChatInterface({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  // Cleanup media recorder on unmount
+  // Initialize Web Speech API for speech recognition
   useEffect(() => {
+    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
+      const recognition = new (window as any).webkitSpeechRecognition()
+      recognition.continuous = false
+      recognition.interimResults = false
+      recognition.lang = language === "id" ? "id-ID" : "en-US"
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript
+        setInput(transcript)
+        setIsListening(false)
+      }
+
+      recognition.onerror = () => {
+        setIsListening(false)
+        toast({
+          title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
+          description: language === "id"
+            ? "Tidak dapat mengenali suara. Silakan coba lagi."
+            : "Could not recognize speech. Please try again.",
+          variant: "destructive",
+        })
+      }
+
+      recognition.onend = () => {
+        setIsListening(false)
+      }
+
+      recognitionRef.current = recognition
+    }
+
     return () => {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-        mediaRecorderRef.current.stop()
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
       }
     }
-  }, [])
+  }, [language, toast])
 
   const loadConversation = async (conversationId: string) => {
     try {
@@ -528,118 +558,17 @@ export function DifyChatInterface({
     }
   }
 
-  const startListening = async () => {
-    if (isListening) return
-
-    try {
-      console.log("[v0] Starting Dify STT...")
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      
-      audioChunksRef.current = []
-      
-      // Try to use the most compatible audio format for Dify
-      // Dify accepts: mp3, mp4, mpeg, mpga, m4a, wav, webm
-      // webm with opus codec is most reliable across browsers and Dify
-      const mimeTypes = [
-        'audio/webm;codecs=opus',
-        'audio/webm',
-        'audio/ogg;codecs=opus',
-        'audio/mpeg',
-      ]
-      
-      let selectedMimeType = 'audio/webm'
-      for (const mimeType of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(mimeType)) {
-          selectedMimeType = mimeType
-          console.log("[v0] Using MIME type:", mimeType)
-          break
-        }
-      }
-      
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: selectedMimeType })
-      mediaRecorderRef.current = mediaRecorder
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data)
-        }
-      }
-
-      mediaRecorder.onstop = async () => {
-        console.log("[v0] Recording stopped, processing audio...")
-        const audioBlob = new Blob(audioChunksRef.current, { type: selectedMimeType })
-        
-        // Stop all audio tracks
-        stream.getTracks().forEach(track => track.stop())
-
-        // Determine file extension based on MIME type
-        let fileExtension = 'webm'
-        let fileName = 'recording.webm'
-        if (selectedMimeType.includes('mp4')) {
-          fileExtension = 'mp4'
-          fileName = 'recording.mp4'
-        } else if (selectedMimeType.includes('mpeg')) {
-          fileExtension = 'mp3'
-          fileName = 'recording.mp3'
-        } else if (selectedMimeType.includes('ogg')) {
-          fileExtension = 'ogg'
-          fileName = 'recording.ogg'
-        }
-
-        console.log("[v0] Audio blob created:", audioBlob.type, audioBlob.size, "bytes, filename:", fileName)
-
-        // Send to Dify for transcription
-        try {
-          const formData = new FormData()
-          formData.append("file", audioBlob, fileName)
-          formData.append("user_id", user?.id || "anonymous")
-
-          const response = await fetch("/api/stt/dify", {
-            method: "POST",
-            body: formData,
-          })
-
-          if (!response.ok) {
-            throw new Error("Failed to transcribe audio")
-          }
-
-          const data = await response.json()
-          console.log("[v0] Transcription received:", data.text)
-          setInput(data.text)
-        } catch (error) {
-          console.error("[v0] STT error:", error)
-          toast({
-            title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
-            description: language === "id" 
-              ? "Tidak dapat mengenali suara. Silakan coba lagi."
-              : "Could not recognize speech. Please try again.",
-            variant: "destructive",
-          })
-        } finally {
-          setIsListening(false)
-        }
-      }
-
-      mediaRecorder.start()
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
       setIsListening(true)
-      console.log("[v0] Recording started")
-    } catch (error) {
-      console.error("[v0] Microphone access error:", error)
-      toast({
-        title: language === "id" ? "Akses Mikrofon Ditolak" : "Microphone Access Denied",
-        description: language === "id"
-          ? "Silakan izinkan akses mikrofon untuk menggunakan input suara."
-          : "Please allow microphone access to use voice input.",
-        variant: "destructive",
-      })
-      setIsListening(false)
+      recognitionRef.current.start()
     }
   }
 
   const stopListening = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      console.log("[v0] Stopping recording...")
-      mediaRecorderRef.current.stop()
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop()
+      setIsListening(false)
     }
   }
 
