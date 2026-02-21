@@ -17,7 +17,7 @@ export function useTTS() {
   const { toast } = useToast()
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [currentProvider] = useState<"openai">("openai")
+  const [currentProvider] = useState<"dify">("dify")
   const [settings, setSettings] = useState<TTSSettings>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("tts-settings")
@@ -57,27 +57,27 @@ export function useTTS() {
     setIsPlaying(false)
   }, [])
 
-  const speakWithOpenAI = useCallback(
-    async (text: string, language = "id-ID") => {
+  const speakWithDify = useCallback(
+    async (text: string, message_id?: string) => {
       return new Promise<void>(async (resolve, reject) => {
         try {
           // stop any current speech
           stopSpeech()
 
-          logTTSEvent("OPENAI_TTS_REQUEST", {
+          logTTSEvent("DIFY_TTS_REQUEST", {
             text: text.substring(0, 50),
-            language,
+            message_id,
           })
 
-          const lang = language.startsWith("id") ? "id" : "en"
-          const response = await fetch("/api/tts/openai", {
+          const response = await fetch("/api/tts/dify", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
               text,
-              language: lang,
+              message_id,
+              user_id: "user",
             }),
           })
 
@@ -94,30 +94,28 @@ export function useTTS() {
 
           audio.onplay = () => {
             setIsPlaying(true)
-            logTTSEvent("OPENAI_TTS_START", {
+            logTTSEvent("DIFY_TTS_START", {
               text: text.substring(0, 50),
-              language,
-              voice: data.voice,
             })
           }
 
           audio.onended = () => {
             setIsPlaying(false)
-            logTTSEvent("OPENAI_TTS_END", { text: text.substring(0, 50) })
+            logTTSEvent("DIFY_TTS_END", { text: text.substring(0, 50) })
             resolve()
           }
 
           audio.onerror = (event) => {
             setIsPlaying(false)
-            const error = "OpenAI TTS playback error"
-            logTTSEvent("OPENAI_TTS_ERROR", { error, text: text.substring(0, 50) })
+            const error = "Dify TTS playback error"
+            logTTSEvent("DIFY_TTS_ERROR", { error, text: text.substring(0, 50) })
             reject(new Error(error))
           }
 
           await audio.play()
         } catch (error) {
           setIsPlaying(false)
-          logTTSEvent("OPENAI_TTS_ERROR", {
+          logTTSEvent("DIFY_TTS_ERROR", {
             error: error instanceof Error ? error.message : "Unknown error",
             text: text.substring(0, 50),
           })
@@ -129,30 +127,30 @@ export function useTTS() {
   )
 
   const speak = useCallback(
-    async (text: string, language = "id-ID") => {
+    async (text: string, message_id?: string) => {
       if (!settings.autoPlay) return
       setIsLoading(true)
       try {
-        await speakWithOpenAI(text, language)
-        logTTSEvent("TTS_SUCCESS", { provider: "openai", text: text.substring(0, 50) })
+        await speakWithDify(text, message_id)
+        logTTSEvent("TTS_SUCCESS", { provider: "dify", text: text.substring(0, 50) })
       } catch (error) {
-        console.error("OpenAI TTS failed:", error)
+        console.error("Dify TTS failed:", error)
       } finally {
         setIsLoading(false)
       }
     },
-    [settings.autoPlay, speakWithOpenAI, logTTSEvent],
+    [settings.autoPlay, speakWithDify, logTTSEvent],
   )
 
   const manualSpeak = useCallback(
-    async (text: string, language = "id-ID") => {
+    async (text: string, message_id?: string) => {
       setIsLoading(true)
       try {
-        await speakWithOpenAI(text, language)
-        logTTSEvent("MANUAL_TTS_SUCCESS", { provider: "openai", text: text.substring(0, 50) })
+        await speakWithDify(text, message_id)
+        logTTSEvent("MANUAL_TTS_SUCCESS", { provider: "dify", text: text.substring(0, 50) })
       } catch (error) {
         logTTSEvent("MANUAL_TTS_FAILURE", {
-          openaiError: error instanceof Error ? error.message : "Unknown error",
+          difyError: error instanceof Error ? error.message : "Unknown error",
           text: text.substring(0, 50),
         })
         toast({
@@ -164,7 +162,7 @@ export function useTTS() {
         setIsLoading(false)
       }
     },
-    [speakWithOpenAI, logTTSEvent, toast],
+    [speakWithDify, logTTSEvent, toast],
   )
 
   return {
@@ -173,7 +171,7 @@ export function useTTS() {
     stopSpeech,
     isPlaying,
     isLoading,
-    currentProvider, // always "openai"
+    currentProvider, // always "dify"
     settings: { autoPlay: settings.autoPlay },
     saveSettings: (newSettings: { autoPlay: boolean }) => saveSettings(newSettings),
   }
