@@ -257,96 +257,29 @@ export function DifyChatInterface({
   useEffect(() => {
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = true // Enable continuous listening
-      recognition.interimResults = true // Show interim results
+      recognition.continuous = false
+      recognition.interimResults = false
       recognition.lang = language === "id" ? "id-ID" : "en-US"
-      recognition.maxAlternatives = 1
-
-      let finalTranscript = ""
-      let silenceTimer: NodeJS.Timeout | null = null
 
       recognition.onresult = (event: any) => {
-        let interimTranscript = ""
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + " "
-          } else {
-            interimTranscript += transcript
-          }
-        }
-
-        // Update input with current transcript
-        const currentTranscript = (finalTranscript + interimTranscript).trim()
-        if (currentTranscript) {
-          setInput(currentTranscript)
-        }
-
-        // Reset silence timer on any speech detected
-        if (silenceTimer) {
-          clearTimeout(silenceTimer)
-        }
-
-        // Set timer to stop after 3 seconds of silence if we have final transcript
-        if (finalTranscript.trim()) {
-          silenceTimer = setTimeout(() => {
-            if (recognitionRef.current && isListening) {
-              recognitionRef.current.stop()
-            }
-          }, 3000) // 3 seconds of silence after speech
-        }
+        const transcript = event.results[0][0].transcript
+        setInput(transcript)
+        setIsListening(false)
       }
 
-      recognition.onerror = (event: any) => {
-        console.log("[v0] Speech recognition error:", event.error)
-        // Don't show error for "no-speech" - just restart if autoPlay is on
-        if (event.error === "no-speech" && settings.autoPlay) {
-          // Automatically restart if autoPlay is on
-          setTimeout(() => {
-            if (recognitionRef.current && !isListening && settings.autoPlay) {
-              try {
-                setIsListening(true)
-                recognitionRef.current.start()
-              } catch (err) {
-                console.log("[v0] Could not restart recognition:", err)
-              }
-            }
-          }, 500)
-        } else if (event.error !== "no-speech" && event.error !== "aborted") {
-          setIsListening(false)
-          toast({
-            title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
-            description: language === "id"
-              ? "Tidak dapat mengenali suara. Silakan coba lagi."
-              : "Could not recognize speech. Please try again.",
-            variant: "destructive",
-          })
-        }
+      recognition.onerror = () => {
+        setIsListening(false)
+        toast({
+          title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
+          description: language === "id"
+            ? "Tidak dapat mengenali suara. Silakan coba lagi."
+            : "Could not recognize speech. Please try again.",
+          variant: "destructive",
+        })
       }
 
       recognition.onend = () => {
-        console.log("[v0] Speech recognition ended")
-        finalTranscript = ""
-        if (silenceTimer) {
-          clearTimeout(silenceTimer)
-        }
-        
-        // Auto-restart if autoPlay is on and not manually stopped
-        if (settings.autoPlay && isListening) {
-          setTimeout(() => {
-            if (recognitionRef.current && settings.autoPlay && !isLoading) {
-              try {
-                recognitionRef.current.start()
-              } catch (err) {
-                console.log("[v0] Could not restart recognition:", err)
-                setIsListening(false)
-              }
-            }
-          }, 500)
-        } else {
-          setIsListening(false)
-        }
+        setIsListening(false)
       }
 
       recognitionRef.current = recognition
@@ -354,14 +287,10 @@ export function DifyChatInterface({
 
     return () => {
       if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop()
-        } catch (err) {
-          // Ignore errors on cleanup
-        }
+        recognitionRef.current.stop()
       }
     }
-  }, [language, toast, settings.autoPlay, isListening, isLoading])
+  }, [language, toast])
 
   const loadConversation = async (conversationId: string) => {
     try {
@@ -631,26 +560,15 @@ export function DifyChatInterface({
 
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
-      try {
-        setIsListening(true)
-        recognitionRef.current.start()
-        console.log("[v0] Started listening")
-      } catch (err) {
-        console.error("[v0] Error starting recognition:", err)
-        setIsListening(false)
-      }
+      setIsListening(true)
+      recognitionRef.current.start()
     }
   }
 
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
-      try {
-        recognitionRef.current.stop()
-        setIsListening(false)
-        console.log("[v0] Stopped listening")
-      } catch (err) {
-        console.error("[v0] Error stopping recognition:", err)
-      }
+      recognitionRef.current.stop()
+      setIsListening(false)
     }
   }
 
@@ -660,7 +578,7 @@ export function DifyChatInterface({
       // Start listening after TTS finishes
       const timer = setTimeout(() => {
         startListening()
-      }, 500)
+      }, 1000)
       return () => clearTimeout(timer)
     }
   }, [isPlaying, settings.autoPlay, isLoading, messages.length])
