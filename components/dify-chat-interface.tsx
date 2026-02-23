@@ -601,8 +601,8 @@ export function DifyChatInterface({
         }
       }
 
-      // Auto-play TTS if enabled
-      if (fullContent) {
+      // Auto-play TTS if enabled (speak function already checks autoPlay setting)
+      if (fullContent && settings.autoPlay) {
         await speak(fullContent, assistantMessageId)
       }
     } catch (error) {
@@ -654,18 +654,7 @@ export function DifyChatInterface({
     }
   }
 
-  // Auto-start listening when autoPlay is enabled
-  useEffect(() => {
-    if (settings.autoPlay && !isListening && !isLoading && recognitionRef.current) {
-      // Start listening automatically after a short delay
-      const timer = setTimeout(() => {
-        startListening()
-      }, 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [settings.autoPlay, isLoading])
-
-  // Auto-start listening after assistant finishes speaking
+  // Auto-start listening after assistant finishes speaking (only when autoPlay is enabled)
   useEffect(() => {
     if (settings.autoPlay && !isPlaying && !isListening && !isLoading && recognitionRef.current && messages.length > 0) {
       // Start listening after TTS finishes
