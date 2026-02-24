@@ -257,61 +257,64 @@ export function DifyChatInterface({
   useEffect(() => {
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = true
-      recognition.interimResults = true
+      recognition.continuous = false
+      recognition.interimResults = false
       recognition.lang = language === "id" ? "id-ID" : "en-US"
 
-      let silenceTimer: ReturnType<typeof setTimeout> | null = null
-      let latestTranscript = ""
-
-      const resetSilenceTimer = () => {
-        if (silenceTimer) clearTimeout(silenceTimer)
-        // Stop after 4 seconds of silence
-        silenceTimer = setTimeout(() => {
-          if (recognitionRef.current) {
-            recognitionRef.current.stop()
-          }
-        }, 4000)
-      }
+      // Track whether we should keep trying (for 7-second extended window)
+      let shouldKeepListening = false
+      let listenStartTime = 0
+      const MAX_LISTEN_MS = 7000
 
       recognition.onresult = (event: any) => {
-        let interim = ""
-        let final = ""
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript
-          } else {
-            interim += event.results[i][0].transcript
-          }
-        }
-        if (final) {
-          latestTranscript += final
-        }
-        setInput((latestTranscript + interim).trim())
-        resetSilenceTimer()
+        shouldKeepListening = false
+        const transcript = event.results[0][0].transcript
+        setInput(transcript)
+        setIsListening(false)
       }
 
       recognition.onerror = (event: any) => {
-        if (silenceTimer) clearTimeout(silenceTimer)
-        if (event.error === "no-speech") {
-          // No speech detected, just stop quietly
-          setIsListening(false)
-          return
+        if (event.error === "no-speech" && shouldKeepListening) {
+          // Still within 7-second window — silently restart
+          const elapsed = Date.now() - listenStartTime
+          if (elapsed < MAX_LISTEN_MS) {
+            try {
+              recognition.start()
+            } catch {
+              shouldKeepListening = false
+              setIsListening(false)
+            }
+            return
+          }
+        }
+        shouldKeepListening = false
+        if (event.error !== "no-speech" && event.error !== "aborted") {
+          toast({
+            title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
+            description: language === "id"
+              ? "Tidak dapat mengenali suara. Silakan coba lagi."
+              : "Could not recognize speech. Please try again.",
+            variant: "destructive",
+          })
         }
         setIsListening(false)
-        toast({
-          title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
-          description: language === "id"
-            ? "Tidak dapat mengenali suara. Silakan coba lagi."
-            : "Could not recognize speech. Please try again.",
-          variant: "destructive",
-        })
       }
 
       recognition.onend = () => {
-        if (silenceTimer) clearTimeout(silenceTimer)
-        latestTranscript = ""
-        setIsListening(false)
+        if (!shouldKeepListening) {
+          setIsListening(false)
+        }
+      }
+
+      // Expose helpers so startListening can set the flag
+      ;(recognition as any)._startExtended = () => {
+        shouldKeepListening = true
+        listenStartTime = Date.now()
+        recognition.start()
+      }
+      ;(recognition as any)._stop = () => {
+        shouldKeepListening = false
+        recognition.stop()
       }
 
       recognitionRef.current = recognition
@@ -593,13 +596,23 @@ export function DifyChatInterface({
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       setIsListening(true)
-      recognitionRef.current.start()
+      const rec = recognitionRef.current as any
+      if (rec._startExtended) {
+        rec._startExtended()
+      } else {
+        rec.start()
+      }
     }
   }
 
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop()
+      const rec = recognitionRef.current as any
+      if (rec._stop) {
+        rec._stop()
+      } else {
+        rec.stop()
+      }
       setIsListening(false)
     }
   }
