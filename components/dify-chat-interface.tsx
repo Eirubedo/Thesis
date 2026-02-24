@@ -257,17 +257,47 @@ export function DifyChatInterface({
   useEffect(() => {
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = false
-      recognition.interimResults = false
+      recognition.continuous = true
+      recognition.interimResults = true
       recognition.lang = language === "id" ? "id-ID" : "en-US"
 
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript
-        setInput(transcript)
-        setIsListening(false)
+      let silenceTimer: ReturnType<typeof setTimeout> | null = null
+      let latestTranscript = ""
+
+      const resetSilenceTimer = () => {
+        if (silenceTimer) clearTimeout(silenceTimer)
+        // Stop after 4 seconds of silence
+        silenceTimer = setTimeout(() => {
+          if (recognitionRef.current) {
+            recognitionRef.current.stop()
+          }
+        }, 4000)
       }
 
-      recognition.onerror = () => {
+      recognition.onresult = (event: any) => {
+        let interim = ""
+        let final = ""
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript
+          } else {
+            interim += event.results[i][0].transcript
+          }
+        }
+        if (final) {
+          latestTranscript += final
+        }
+        setInput((latestTranscript + interim).trim())
+        resetSilenceTimer()
+      }
+
+      recognition.onerror = (event: any) => {
+        if (silenceTimer) clearTimeout(silenceTimer)
+        if (event.error === "no-speech") {
+          // No speech detected, just stop quietly
+          setIsListening(false)
+          return
+        }
         setIsListening(false)
         toast({
           title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
@@ -279,6 +309,8 @@ export function DifyChatInterface({
       }
 
       recognition.onend = () => {
+        if (silenceTimer) clearTimeout(silenceTimer)
+        latestTranscript = ""
         setIsListening(false)
       }
 
