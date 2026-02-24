@@ -257,37 +257,40 @@ export function DifyChatInterface({
   useEffect(() => {
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = false
-      recognition.interimResults = false
+      recognition.continuous = true
+      recognition.interimResults = true
       recognition.lang = language === "id" ? "id-ID" : "en-US"
 
-      // Track whether we should keep trying (for 7-second extended window)
-      let shouldKeepListening = false
-      let listenStartTime = 0
-      const MAX_LISTEN_MS = 7000
+      // Accumulate only finalized segments to avoid duplication
+      let finalTranscript = ""
+      let silenceTimer: ReturnType<typeof setTimeout> | null = null
+      const SILENCE_MS = 7000
+
+      const resetSilenceTimer = () => {
+        if (silenceTimer) clearTimeout(silenceTimer)
+        silenceTimer = setTimeout(() => {
+          recognition.stop()
+        }, SILENCE_MS)
+      }
 
       recognition.onresult = (event: any) => {
-        shouldKeepListening = false
-        const transcript = event.results[0][0].transcript
-        setInput(transcript)
-        setIsListening(false)
+        let interimTranscript = ""
+        // Only iterate new results from resultIndex onward
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i]
+          if (result.isFinal) {
+            finalTranscript += result[0].transcript
+          } else {
+            interimTranscript += result[0].transcript
+          }
+        }
+        // Show finalized text + current interim — no duplication
+        setInput((finalTranscript + interimTranscript).trim())
+        resetSilenceTimer()
       }
 
       recognition.onerror = (event: any) => {
-        if (event.error === "no-speech" && shouldKeepListening) {
-          // Still within 7-second window — silently restart
-          const elapsed = Date.now() - listenStartTime
-          if (elapsed < MAX_LISTEN_MS) {
-            try {
-              recognition.start()
-            } catch {
-              shouldKeepListening = false
-              setIsListening(false)
-            }
-            return
-          }
-        }
-        shouldKeepListening = false
+        if (silenceTimer) clearTimeout(silenceTimer)
         if (event.error !== "no-speech" && event.error !== "aborted") {
           toast({
             title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
@@ -297,23 +300,19 @@ export function DifyChatInterface({
             variant: "destructive",
           })
         }
+        finalTranscript = ""
         setIsListening(false)
       }
 
       recognition.onend = () => {
-        if (!shouldKeepListening) {
-          setIsListening(false)
-        }
+        if (silenceTimer) clearTimeout(silenceTimer)
+        finalTranscript = ""
+        setIsListening(false)
       }
 
-      // Expose helpers so startListening can set the flag
-      ;(recognition as any)._startExtended = () => {
-        shouldKeepListening = true
-        listenStartTime = Date.now()
-        recognition.start()
-      }
       ;(recognition as any)._stop = () => {
-        shouldKeepListening = false
+        if (silenceTimer) clearTimeout(silenceTimer)
+        finalTranscript = ""
         recognition.stop()
       }
 
@@ -596,12 +595,7 @@ export function DifyChatInterface({
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       setIsListening(true)
-      const rec = recognitionRef.current as any
-      if (rec._startExtended) {
-        rec._startExtended()
-      } else {
-        rec.start()
-      }
+      recognitionRef.current.start()
     }
   }
 
