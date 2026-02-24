@@ -107,6 +107,8 @@ export function DifyChatInterface({
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const autoSubmitRef = useRef(false)
+  const pendingSubmitRef = useRef<((text: string) => void) | null>(null)
 
   useEffect(() => {
     const fetchUserContext = async () => {
@@ -257,40 +259,41 @@ export function DifyChatInterface({
   useEffect(() => {
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = true
-      recognition.interimResults = true
+      recognition.continuous = false
+      recognition.interimResults = false
       recognition.lang = language === "id" ? "id-ID" : "en-US"
 
-      // Accumulate only finalized segments to avoid duplication
-      let finalTranscript = ""
-      let silenceTimer: ReturnType<typeof setTimeout> | null = null
-      const SILENCE_MS = 7000
-
-      const resetSilenceTimer = () => {
-        if (silenceTimer) clearTimeout(silenceTimer)
-        silenceTimer = setTimeout(() => {
-          recognition.stop()
-        }, SILENCE_MS)
-      }
+      // Track whether we should keep trying (for 7-second extended window)
+      let shouldKeepListening = false
+      let listenStartTime = 0
+      const MAX_LISTEN_MS = 7000
 
       recognition.onresult = (event: any) => {
-        let interimTranscript = ""
-        // Only iterate new results from resultIndex onward
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i]
-          if (result.isFinal) {
-            finalTranscript += result[0].transcript
-          } else {
-            interimTranscript += result[0].transcript
-          }
+        shouldKeepListening = false
+        const transcript = event.results[0][0].transcript
+        setInput(transcript)
+        setIsListening(false)
+        // Auto-submit when voice ends, if enabled
+        if (autoSubmitRef.current && pendingSubmitRef.current) {
+          pendingSubmitRef.current(transcript)
         }
-        // Show finalized text + current interim — no duplication
-        setInput((finalTranscript + interimTranscript).trim())
-        resetSilenceTimer()
       }
 
       recognition.onerror = (event: any) => {
-        if (silenceTimer) clearTimeout(silenceTimer)
+        if (event.error === "no-speech" && shouldKeepListening) {
+          // Still within 7-second window — silently restart
+          const elapsed = Date.now() - listenStartTime
+          if (elapsed < MAX_LISTEN_MS) {
+            try {
+              recognition.start()
+            } catch {
+              shouldKeepListening = false
+              setIsListening(false)
+            }
+            return
+          }
+        }
+        shouldKeepListening = false
         if (event.error !== "no-speech" && event.error !== "aborted") {
           toast({
             title: language === "id" ? "Kesalahan Pengenalan Suara" : "Speech Recognition Error",
@@ -300,27 +303,23 @@ export function DifyChatInterface({
             variant: "destructive",
           })
         }
-        finalTranscript = ""
         setIsListening(false)
       }
 
       recognition.onend = () => {
-        if (silenceTimer) clearTimeout(silenceTimer)
-        finalTranscript = ""
-        setIsListening(false)
+        if (!shouldKeepListening) {
+          setIsListening(false)
+        }
       }
 
-      ;(recognition as any)._start = () => {
-        // Always reset before a new session so previous finals don't bleed in
-        finalTranscript = ""
-        if (silenceTimer) clearTimeout(silenceTimer)
+      // Expose helpers so startListening can set the flag
+      ;(recognition as any)._startExtended = () => {
+        shouldKeepListening = true
+        listenStartTime = Date.now()
         recognition.start()
-        resetSilenceTimer()
       }
-
       ;(recognition as any)._stop = () => {
-        if (silenceTimer) clearTimeout(silenceTimer)
-        finalTranscript = ""
+        shouldKeepListening = false
         recognition.stop()
       }
 
@@ -413,13 +412,17 @@ export function DifyChatInterface({
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Keep autoSubmitRef in sync with the autoPlay setting
+  autoSubmitRef.current = settings.autoPlay
+
+  const handleSubmit = async (e: React.FormEvent, overrideText?: string) => {
     e.preventDefault()
-    if (!input.trim() || isLoading) return
+    const text = overrideText ?? input
+    if (!text.trim() || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: input.trim(),
+      content: text.trim(),
       role: "user",
       timestamp: new Date(),
     }
@@ -600,12 +603,18 @@ export function DifyChatInterface({
     }
   }
 
+  // Wire pendingSubmitRef so the STT closure can trigger auto-submit
+  pendingSubmitRef.current = (text: string) => {
+    if (!text.trim() || isLoading) return
+    handleSubmit({ preventDefault: () => {} } as React.FormEvent, text)
+  }
+
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       setIsListening(true)
       const rec = recognitionRef.current as any
-      if (rec._start) {
-        rec._start()
+      if (rec._startExtended) {
+        rec._startExtended()
       } else {
         rec.start()
       }
