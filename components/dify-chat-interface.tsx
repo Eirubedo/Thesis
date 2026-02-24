@@ -310,6 +310,14 @@ export function DifyChatInterface({
         setIsListening(false)
       }
 
+      ;(recognition as any)._start = () => {
+        // Always reset before a new session so previous finals don't bleed in
+        finalTranscript = ""
+        if (silenceTimer) clearTimeout(silenceTimer)
+        recognition.start()
+        resetSilenceTimer()
+      }
+
       ;(recognition as any)._stop = () => {
         if (silenceTimer) clearTimeout(silenceTimer)
         finalTranscript = ""
@@ -595,7 +603,12 @@ export function DifyChatInterface({
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       setIsListening(true)
-      recognitionRef.current.start()
+      const rec = recognitionRef.current as any
+      if (rec._start) {
+        rec._start()
+      } else {
+        rec.start()
+      }
     }
   }
 
