@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/hooks/use-toast"
-import { Eye, EyeOff, Phone, Lock } from "lucide-react"
+import { Eye, EyeOff, User, Lock } from "lucide-react"
 import { LanguageSelector } from "@/components/language-selector"
 import { useLanguage } from "@/contexts/language-context"
 
@@ -22,7 +22,7 @@ export default function LoginPage() {
   const { t } = useLanguage()
 
   const [formData, setFormData] = useState({
-    phone_number: "",
+    identifier: "",
     password: "",
   })
   const [showPassword, setShowPassword] = useState(false)
@@ -33,7 +33,7 @@ export default function LoginPage() {
     setIsSubmitting(true)
 
     try {
-      const result = await login(formData.phone_number, formData.password)
+      const result = await login(formData.identifier, formData.password)
 
       if (result.success) {
         toast({
@@ -95,15 +95,15 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone_number">{t("login.phoneNumber")}</Label>
+                <Label htmlFor="identifier">{t("login.identifier") || "Phone Number or Name"}</Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    id="phone_number"
-                    type="tel"
-                    placeholder={t("login.phoneNumberPlaceholder")}
-                    value={formData.phone_number}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, phone_number: e.target.value }))}
+                    id="identifier"
+                    type="text"
+                    placeholder={t("login.identifierPlaceholder") || "Enter phone number or name"}
+                    value={formData.identifier}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, identifier: e.target.value }))}
                     className="pl-10"
                     required
                   />

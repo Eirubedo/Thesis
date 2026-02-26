@@ -43,28 +43,63 @@ export function useAuth() {
   }
 
   const login = async (
-    phone_number: string,
+    identifier: string,
     password: string,
     keepLogged?: boolean
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true)
 
-      // Get user by phone number
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("phone_number", phone_number)
-        .single()
+      // Determine if the identifier looks like a phone number or a name
+      const isPhone = /^[+\d][\d\s\-()]*$/.test(identifier.trim())
 
-      if (userError || !userData) {
-        return { success: false, error: "Invalid phone number or password" }
+      let userData: any = null
+
+      if (isPhone) {
+        // Try phone number lookup
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("phone_number", identifier.trim())
+          .single()
+        if (!error && data) userData = data
+      } else {
+        // Try name lookup (case-insensitive)
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .ilike("full_name", identifier.trim())
+          .single()
+        if (!error && data) userData = data
+      }
+
+      // If not found with the initial strategy, try the other one as fallback
+      if (!userData) {
+        if (isPhone) {
+          const { data } = await supabase
+            .from("users")
+            .select("*")
+            .ilike("full_name", identifier.trim())
+            .single()
+          if (data) userData = data
+        } else {
+          const { data } = await supabase
+            .from("users")
+            .select("*")
+            .eq("phone_number", identifier.trim())
+            .single()
+          if (data) userData = data
+        }
+      }
+
+      if (!userData) {
+        return { success: false, error: "Invalid phone number/name or password" }
       }
 
       // Verify password
       const isValidPassword = await bcrypt.compare(password, userData.password_hash)
       if (!isValidPassword) {
-        return { success: false, error: "Invalid phone number or password" }
+        return { success: false, error: "Invalid phone number/name or password" }
       }
 
       // Set user data (excluding password hash)

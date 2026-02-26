@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth"
 
 interface AuthContextType {
   user: any
-  login: (phone_number: string, password: string) => Promise<{ success: boolean; error?: string }>
+  login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => void
   register: (userData: any) => Promise<{ success: boolean; error?: string }>
   isLoading: boolean
