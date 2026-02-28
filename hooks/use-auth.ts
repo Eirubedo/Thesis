@@ -193,7 +193,6 @@ export function useAuth() {
         smoking_status: "never",
         alcohol_consumption: "none",
         exercise_frequency: "none",
-        stress_level: 5,
       })
 
       // Create user preferences with keep_logged_in = false by default
