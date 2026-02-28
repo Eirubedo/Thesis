@@ -62,6 +62,19 @@ export async function GET(request: NextRequest) {
           .limit(30),
       ])
 
+    // Fetch actual recent conversation messages for deeper psychological analysis
+    const conversationIds = (conversationsResult.data || []).map((c: any) => c.id)
+    let recentMessages: any[] = []
+    if (conversationIds.length > 0) {
+      const { data: msgData } = await supabase
+        .from("conversation_messages")
+        .select("content, role, created_at, conversation_id")
+        .in("conversation_id", conversationIds)
+        .order("created_at", { ascending: false })
+        .limit(200)
+      recentMessages = msgData || []
+    }
+
     const user = userResult.data
     const hypertensionProfile = hpResult.data
     const bpReadings = bpResult.data || []
@@ -145,6 +158,18 @@ export async function GET(request: NextRequest) {
       return acc
     }, {} as Record<string, string[]>)
 
+    // Build conversation transcript for deep analysis (user messages only, most relevant)
+    const conversationMap = new Map((conversations || []).map((c: any) => [c.id, c]))
+    const chatTranscript = recentMessages
+      .filter((m: any) => m.role === "user")
+      .map((m: any) => {
+        const conv = conversationMap.get(m.conversation_id)
+        const type = conv?.conversation_type || "chat"
+        return `[${type}] ${m.content}`
+      })
+      .slice(0, 100)
+      .join("\n")
+
     // Build context for AI
     const contextData = {
       user: {
@@ -160,7 +185,7 @@ export async function GET(request: NextRequest) {
             smokingStatus: hypertensionProfile.smoking_status,
             alcoholConsumption: hypertensionProfile.alcohol_consumption,
             exerciseFrequency: hypertensionProfile.exercise_frequency,
-            stressLevel: hypertensionProfile.stress_level,
+            stressLevel: hypertensionProfile.stress_level || null,
           }
         : null,
       bloodPressure: bpStats,
@@ -171,12 +196,13 @@ export async function GET(request: NextRequest) {
       activities: schedules.map((s) => ({ title: s.title, type: s.activity_type })),
       conversations: conversationSummary,
       dailySummaries: summariesForContext,
+      recentUserMessages: chatTranscript,
     }
 
-    // Generate insights using OpenAI
+    // Generate insights using OpenAI GPT-4.1
     const systemPrompt =
       lang === "id"
-        ? `Anda adalah asisten kesehatan jiwa yang memberikan wawasan dan rekomendasi berdasarkan data kesehatan pengguna. Berikan respons dalam Bahasa Indonesia yang mudah dipahami.
+        ? `Anda adalah asisten kesehatan jiwa profesional yang memberikan wawasan dan rekomendasi berdasarkan data kesehatan pengguna. Berikan respons dalam Bahasa Indonesia yang mudah dipahami.
 
 Tugas Anda:
 1. Analisis RINGKASAN HARIAN (dailySummaries) untuk memahami perjalanan kesehatan pengguna dari waktu ke waktu
@@ -185,14 +211,22 @@ Tugas Anda:
    - Pemahaman pengguna tentang hipertensi (dari tes pengetahuan)
    - Kondisi mental dan emosional (dari asesmen dan monitoring)
    - Topik-topik kesehatan yang sering dibahas
-4. Berikan gambaran trajektori kondisi kesehatan: apakah membaik, stabil, atau perlu perhatian
-5. Rekomendasikan fitur ANSWA yang relevan berdasarkan kebutuhan spesifik
-6. Berikan saran konkret dan actionable
+4. **ANALISIS PSIKOLOGIS PENTING** - Berdasarkan pesan-pesan pengguna (recentUserMessages), analisis dan jelaskan secara eksplisit:
+   - **Kecemasan (Anxiety)**: Apakah pengguna menunjukkan tanda-tanda kecemasan? (kekhawatiran berlebihan, ketakutan, gelisah, kesulitan rileks, gangguan tidur terkait cemas)
+   - **Gangguan Citra Tubuh (Impaired Body Image)**: Apakah pengguna menunjukkan ketidakpuasan terhadap kondisi fisiknya? (merasa tidak berdaya karena penyakit, merasa tubuh tidak normal, malu dengan kondisi kesehatan, merasa berbeda dari orang lain)
+   - **Risiko Bunuh Diri (Suicide Risk)**: Apakah ada indikasi risiko bunuh diri? (perasaan putus asa, merasa menjadi beban, tidak ingin hidup, menyebutkan kematian, merasa tidak ada harapan)
+   Untuk setiap aspek, berikan penilaian: "Tidak terdeteksi", "Indikasi ringan", "Indikasi sedang", atau "Indikasi berat" beserta alasannya.
+5. Berikan gambaran trajektori kondisi kesehatan: apakah membaik, stabil, atau perlu perhatian
+6. Rekomendasikan fitur ANSWA yang relevan berdasarkan kebutuhan spesifik
+7. Berikan saran konkret dan actionable
 
-PENTING: Gunakan ringkasan harian untuk melihat perkembangan kondisi pengguna dari hari ke hari. Identifikasi perubahan positif dan area yang perlu ditingkatkan.
+PENTING: 
+- Jika data stressLevel bernilai null, JANGAN asumsikan level tertentu. Katakan bahwa tingkat stres belum diukur.
+- Gunakan ringkasan harian DAN pesan-pesan langsung pengguna untuk analisis psikologis yang mendalam.
+- Analisis psikologis harus berdasarkan BUKTI dari percakapan, bukan asumsi.
 
-Format respons dalam paragraf yang mengalir natural. Maksimal 4 paragraf.`
-        : `You are a mental health assistant providing insights and recommendations based on user health data. Respond in clear, easy-to-understand English.
+Format respons dalam paragraf yang mengalir natural. Maksimal 5 paragraf. Paragraf ke-4 HARUS berisi analisis psikologis (kecemasan, citra tubuh, risiko bunuh diri).`
+        : `You are a professional mental health assistant providing insights and recommendations based on user health data. Respond in clear, easy-to-understand English.
 
 Your tasks:
 1. Analyze DAILY SUMMARIES (dailySummaries) to understand user's health journey over time
@@ -201,13 +235,21 @@ Your tasks:
    - User's understanding of hypertension (from knowledge tests)
    - Mental and emotional condition (from assessments and monitoring)
    - Frequently discussed health topics
-4. Provide trajectory overview: improving, stable, or needs attention
-5. Recommend relevant ANSWA features based on specific needs
-6. Give concrete, actionable advice
+4. **CRITICAL PSYCHOLOGICAL ANALYSIS** - Based on user messages (recentUserMessages), explicitly analyze and report:
+   - **Anxiety**: Does the user show signs of anxiety? (excessive worry, fear, restlessness, difficulty relaxing, anxiety-related sleep issues)
+   - **Impaired Body Image**: Does the user show dissatisfaction with their physical condition? (feeling helpless due to illness, feeling body is abnormal, shame about health condition, feeling different from others)
+   - **Suicide Risk**: Are there any indications of suicide risk? (feelings of hopelessness, feeling like a burden, not wanting to live, mentioning death, feeling no hope)
+   For each aspect, provide assessment: "Not detected", "Mild indication", "Moderate indication", or "Severe indication" with reasoning.
+5. Provide trajectory overview: improving, stable, or needs attention
+6. Recommend relevant ANSWA features based on specific needs
+7. Give concrete, actionable advice
 
-IMPORTANT: Use daily summaries to see user's condition progress day by day. Identify positive changes and areas for improvement.
+IMPORTANT:
+- If stressLevel is null, DO NOT assume any level. State that stress level has not been measured.
+- Use daily summaries AND direct user messages for deep psychological analysis.
+- Psychological analysis must be based on EVIDENCE from conversations, not assumptions.
 
-Format response in naturally flowing paragraphs. Maximum 4 paragraphs.`
+Format response in naturally flowing paragraphs. Maximum 5 paragraphs. Paragraph 4 MUST contain the psychological analysis (anxiety, body image, suicide risk).`
 
     const userPrompt =
       lang === "id"
@@ -223,12 +265,12 @@ ${JSON.stringify(contextData, null, 2)}
 Provide personalized analysis and specific recommendations based on the user's condition. If data is incomplete, suggest the user to complete it through app features.`
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      max_tokens: 1000,
+      max_tokens: 1500,
       temperature: 0.7,
     })
 
