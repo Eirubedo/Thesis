@@ -152,10 +152,10 @@ export function DifyChatInterface({
     fetchProfilePicture()
   }, [user?.id])
 
-  // Check for last conversation and show dialog
+  // Check for last conversation and show dialog (applies to all conversation types)
   useEffect(() => {
     const checkLastConversation = async () => {
-      if (!user?.id || conversationType !== "chat") {
+      if (!user?.id) {
         setLoadingLastConversation(false)
         return
       }
