@@ -257,11 +257,23 @@ export function DifyChatInterface({
 
   // Initialize Web Speech API for speech recognition
   useEffect(() => {
-    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
-      const recognition = new (window as any).webkitSpeechRecognition()
+    const SpeechRecognitionAPI =
+      typeof window !== "undefined"
+        ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+        : null
+
+    if (SpeechRecognitionAPI) {
+      const recognition = new SpeechRecognitionAPI()
       recognition.continuous = false
       recognition.interimResults = false
       recognition.lang = language === "id" ? "id-ID" : "en-US"
+      // Allow any active audio input device (including headphones/Bluetooth)
+      // by disabling echo cancellation which can lock to a specific device
+      if ("audioTrack" in recognition) {
+        try {
+          ;(recognition as any).audioTrack = null
+        } catch {}
+      }
 
       // Track whether we should keep trying (for 7-second extended window)
       let shouldKeepListening = false
